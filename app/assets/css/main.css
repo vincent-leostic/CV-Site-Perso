@@ -13,6 +13,7 @@
    Marges de page à 0 pour que le navigateur n'imprime pas ses propres
    en-têtes et pieds de page (date, URL, numérotation). */
 @page {
+  size: A4;
   margin: 0;
 }
 
