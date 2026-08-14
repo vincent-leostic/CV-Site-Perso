@@ -93,7 +93,7 @@ export const cv: CvData = {
         {
           title: "Gestion d'adhérents de clubs de sport",
           description:
-            "Application qui centralise la vie d'un club de sport : fiches adhérents, inscriptions et suivi des cotisations. Livrée en production dans les délais et le budget alloués.",
+            "Application qui centralise la vie d'un club de sport : fiches adhérents et inscriptions. Livrée en production dans les délais et le budget alloués.",
           badges: [
             "Chef de projet",
             "Développeur",
@@ -112,7 +112,7 @@ export const cv: CvData = {
         {
           title: "Sécurité incendie",
           description:
-            "Fiches d'aide à l'intervention pour les pompiers, retrouvées en saisissant les informations d'un lieu et générées en PDF. Moteur de dessin sur photo prise par drone pour délimiter les zones sensibles et à risque.",
+            "Application de création des fiches d'aide à l'intervention pour les pompiers, retrouvées en saisissant les informations d'un lieu et générées en PDF. Moteur de dessin sur photo prise par drone pour délimiter les zones sensibles et à risque.",
           badges: ["Chef de projet", "Développeur", "Responsable fonctionnel"],
           favorite: true,
         },
@@ -126,7 +126,7 @@ export const cv: CvData = {
           title: "Refonte du site id3i.fr",
           description:
             "Refonte complète de la vitrine de l'entreprise, avec des technologies éprouvées et validées par la communauté.",
-          badges: ["Chef de projet", "Développeur", "Responsable fonctionnel", "IA"],
+          badges: ["Développeur", "Responsable fonctionnel", "IA"],
         },
       ],
     },
@@ -135,7 +135,8 @@ export const cv: CvData = {
       role: "Serveur, puis responsable de salle",
       company: "Restauration",
       period: "2008 – 2018",
-      description: "Dix ans en salle : encadrement d'équipe, gestion du rush, relation client.",
+      description:
+        "Dix ans en salle : encadrement d'équipe, gestion du rush, relation client. Multiples restaurants, autant de façons de travailler.",
     },
   ],
   skillGroups: [
