@@ -403,6 +403,7 @@ const telHref = `tel:${cv.phone.replaceAll(" ", "")}`;
 .mission-desc {
   font-size: 0.9rem;
   color: var(--text-muted);
+  white-space: pre-line;
 }
 
 .objectives {

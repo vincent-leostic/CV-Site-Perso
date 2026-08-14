@@ -70,7 +70,7 @@ export interface CvData {
  * exactes de la période restauration et de la gendarmerie.
  */
 export const cv: CvData = {
-  name: "Vincent Leostic",
+  name: "Vincent LEOSTIC",
   title: "Développeur logiciel front, UI/UX et outillage IA",
   bio: "Développeur logiciel chez iD3i, à Brest, après une reconversion. Spécialisé front et UI/UX, je développe assisté par IA au quotidien et je construis l'outillage qui va avec.",
   photo: "/avatar.jpg",
@@ -86,9 +86,9 @@ export const cv: CvData = {
     {
       role: "Développeur logiciel",
       company: "iD3i, ESN à Brest",
-      period: "nov. 2019 – aujourd'hui",
+      period: "2019 – aujourd'hui",
       description:
-        "Applications web métier en Vue, Nuxt et TypeScript, sur un back C# et PostgreSQL. Spécialisation front et UI/UX. Outillage IA : bibliothèque de skills Claude Code par projet et par techno, garde-fous appliqués par hooks, rédaction de spécifications détaillées, applications livrées en développement assisté par IA.",
+        "Des missions variées, d'un secteur à l'autre, et rarement la même casquette : développeur, chef de projet, responsable technique ou fonctionnel selon les besoins. Ma spécialité reste le front et l'UI/UX.\nAvec le développement assisté par IA au quotidien, j'ai pu franchir le cap de la simple « théorie » : bibliothèque de skills, hooks, spécifications détaillées, IA marketplaces.",
       missions: [
         {
           title: "Gestion d'adhérents de clubs de sport",

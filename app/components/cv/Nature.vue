@@ -430,6 +430,7 @@ const telHref = `tel:${cv.phone.replaceAll(" ", "")}`;
 .desc {
   font-size: 0.9rem;
   color: var(--text-muted);
+  white-space: pre-line;
 }
 
 .shoots {

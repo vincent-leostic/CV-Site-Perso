@@ -319,6 +319,7 @@ const initials = cv.name
   hyphens: auto;
   font-size: 1rem;
   line-height: 1.7;
+  white-space: pre-line;
 }
 
 .entry-missions {

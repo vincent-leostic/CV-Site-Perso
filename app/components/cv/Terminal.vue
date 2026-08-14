@@ -339,6 +339,10 @@ onUnmounted(() => {
   margin-top: 0.8rem;
 }
 
+.log-entry .dim {
+  white-space: pre-line;
+}
+
 /* L'espace entre [période] et l'intitulé (le template Vue le compacte) */
 .log-entry .strong {
   margin-left: 0.45rem;
