@@ -1,0 +1,28 @@
+{
+  "name": "site-cv",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "build": "nuxt build",
+    "dev": "nuxt dev",
+    "generate": "nuxt generate",
+    "preview": "nuxt preview",
+    "prepare": "vp config"
+  },
+  "dependencies": {
+    "nuxt": "^3.16.0",
+    "vue": "latest",
+    "vue-router": "latest"
+  },
+  "devDependencies": {
+    "@nuxt/typescript-build": "latest",
+    "typescript": "^5.7.0",
+    "vite-plus": "latest",
+    "vue-tsc": "^2.2.0"
+  },
+  "overrides": {
+    "vite": "npm:@voidzero-dev/vite-plus-core@latest",
+    "vitest": "npm:@voidzero-dev/vite-plus-test@latest"
+  },
+  "packageManager": "npm@11.12.0"
+}
