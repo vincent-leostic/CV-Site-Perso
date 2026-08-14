@@ -56,7 +56,7 @@ useSeoMeta({
 }
 
 .header-inner {
-  max-width: 1060px;
+  max-width: var(--container);
   margin: 0 auto;
   padding: 0.8rem 1.5rem;
   display: flex;

@@ -4,6 +4,8 @@ import TechIcon from "./TechIcon.vue";
 
 // Niveau affiché sur la carte joueur (années chez iD3i, arrondies)
 const PLAYER_LEVEL = 7;
+
+const telHref = `tel:${cv.phone.replaceAll(" ", "")}`;
 </script>
 
 <template>
@@ -16,9 +18,11 @@ const PLAYER_LEVEL = 7;
       </div>
       <h1 class="gamertag">{{ cv.name }}</h1>
       <p class="class-line">{{ cv.title }}<span class="cursor" aria-hidden="true" /></p>
+      <p class="age-line">Age {{ cv.age }} · {{ cv.location }}</p>
       <p class="bio">{{ cv.bio }}</p>
       <div class="menu">
         <a class="menu-btn" :href="`mailto:${cv.email}`">Contact</a>
+        <a class="menu-btn" :href="telHref">{{ cv.phone }}</a>
         <a
           v-for="link in cv.links"
           :key="link.label"
@@ -49,6 +53,20 @@ const PLAYER_LEVEL = 7;
           <h3 class="mission-role">{{ exp.role }}</h3>
           <p class="mission-zone">{{ exp.company }}</p>
           <p class="mission-desc">{{ exp.description }}</p>
+          <ul v-if="exp.missions" class="objectives">
+            <li v-for="m in exp.missions" :key="m.title">
+              <span class="obj-title"
+                >{{ m.title
+                }}<span v-if="m.favorite" class="fav" role="img" aria-label="Mission favorite">
+                  ★</span
+                >
+                <span v-for="badge in m.badges ?? []" :key="badge" class="obj-badge">{{
+                  badge
+                }}</span></span
+              >
+              <span class="obj-desc">{{ m.description }}</span>
+            </li>
+          </ul>
         </article>
       </section>
 
@@ -82,6 +100,17 @@ const PLAYER_LEVEL = 7;
             <p class="cert-school">{{ edu.school }}</p>
           </div>
         </section>
+
+        <!-- Langues & hobbies -->
+        <section class="panel">
+          <h2 class="panel-title">Extras</h2>
+          <p v-for="lang in cv.languages" :key="lang.name" class="extra-line">
+            <span class="extra-strong">{{ lang.name }}</span> : {{ lang.level }}
+          </p>
+          <p class="extra-line">
+            <span class="extra-strong">Hobbies</span> : {{ cv.hobbies.join(", ") }}
+          </p>
+        </section>
       </aside>
     </div>
   </div>
@@ -89,7 +118,7 @@ const PLAYER_LEVEL = 7;
 
 <style scoped>
 .gaming {
-  max-width: 1060px;
+  max-width: var(--container);
   margin: 0 auto;
   padding: 2.5rem 1.5rem 3rem;
   display: flex;
@@ -100,7 +129,7 @@ const PLAYER_LEVEL = 7;
 /* --- Carte joueur --- */
 .player-card {
   position: relative;
-  max-width: 720px;
+  max-width: 800px;
   width: 100%;
   margin: 0 auto;
   text-align: center;
@@ -216,6 +245,16 @@ const PLAYER_LEVEL = 7;
   50% {
     opacity: 0;
   }
+}
+
+.age-line {
+  font-family: var(--font-heading);
+  font-size: 0.72rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  color: var(--accent-2);
+  margin: -0.6rem 0 0.8rem;
 }
 
 .bio {
@@ -366,6 +405,51 @@ const PLAYER_LEVEL = 7;
   color: var(--text-muted);
 }
 
+.objectives {
+  margin-top: 0.6rem;
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 0.55rem;
+  font-size: 0.9rem;
+  color: var(--text-muted);
+}
+
+.objectives li::before {
+  content: "▸ ";
+  color: var(--accent-2);
+}
+
+.obj-title {
+  font-weight: 600;
+  color: var(--text);
+}
+
+.obj-desc {
+  display: block;
+  padding-left: 1.05rem;
+}
+
+.fav {
+  color: #f0b429;
+  text-shadow: 0 0 8px rgba(240, 180, 41, 0.55);
+}
+
+.obj-badge {
+  display: inline-block;
+  font-family: var(--font-heading);
+  font-size: 0.52rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--accent-2);
+  border: 1px solid color-mix(in srgb, var(--accent-2) 45%, transparent);
+  border-radius: 3px;
+  padding: 0.06rem 0.4rem;
+  margin-left: 0.35rem;
+  vertical-align: middle;
+}
+
 /* --- Stats --- */
 .stat-group + .stat-group {
   margin-top: 1.1rem;
@@ -453,6 +537,20 @@ const PLAYER_LEVEL = 7;
 .cert-school {
   font-size: 0.83rem;
   color: var(--text-muted);
+}
+
+.extra-line {
+  font-size: 0.9rem;
+  color: var(--text-muted);
+}
+
+.extra-line + .extra-line {
+  margin-top: 0.45rem;
+}
+
+.extra-strong {
+  color: var(--text);
+  font-weight: 600;
 }
 
 @media (max-width: 820px) {

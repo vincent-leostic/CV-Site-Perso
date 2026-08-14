@@ -2,6 +2,8 @@
 import { cv } from "~/data/cv";
 import TechIcon from "./TechIcon.vue";
 
+const telHref = `tel:${cv.phone.replaceAll(" ", "")}`;
+
 // Initiales gravées dans le sceau de cire (ex. « V·L »)
 const initials = cv.name
   .split(" ")
@@ -28,7 +30,11 @@ const initials = cv.name
       <p class="bio">{{ cv.bio }}</p>
 
       <p class="contact">
+        <span>{{ cv.age }} ans, {{ cv.location }}</span>
+        <span class="fleuron" aria-hidden="true">❧</span>
         <a :href="`mailto:${cv.email}`">{{ cv.email }}</a>
+        <span class="fleuron" aria-hidden="true">❧</span>
+        <a :href="telHref">{{ cv.phone }}</a>
         <template v-for="link in cv.links" :key="link.label">
           <span class="fleuron" aria-hidden="true">❧</span>
           <a :href="link.url" target="_blank" rel="noopener">{{ link.label }}</a>
@@ -49,6 +55,18 @@ const initials = cv.name
           <h3 class="entry-role">{{ exp.role }}</h3>
           <p class="entry-place">{{ exp.company }}</p>
           <p class="entry-text">{{ exp.description }}</p>
+          <ul v-if="exp.missions" class="entry-missions">
+            <li v-for="m in exp.missions" :key="m.title">
+              <span class="m-title">{{ m.title }}</span
+              ><span v-if="m.favorite" class="fav" role="img" aria-label="Mission favorite"> ★</span
+              ><template v-if="m.badges">
+                <span class="m-casquettes"
+                  >({{ m.badges.join(", ").toLowerCase() }})</span
+                ></template
+              >
+              : {{ m.description }}
+            </li>
+          </ul>
         </article>
       </section>
 
@@ -64,6 +82,15 @@ const initials = cv.name
             <span class="savoir-item"><TechIcon :label="skill" />{{ skill }}</span
             >{{ i < group.skills.length - 1 ? ", " : "." }}
           </template>
+        </p>
+        <p class="savoir">
+          <span class="savoir-title">Langues</span> :
+          <template v-for="(lang, i) in cv.languages" :key="lang.name"
+            >{{ lang.name }} ({{ lang.level }}){{ i < cv.languages.length - 1 ? ", " : "." }}
+          </template>
+        </p>
+        <p class="savoir">
+          <span class="savoir-title">Passe-temps</span> : {{ cv.hobbies.join(", ") }}.
         </p>
       </section>
 
@@ -96,7 +123,7 @@ const initials = cv.name
 
 <style scoped>
 .manuscrit {
-  max-width: 780px;
+  max-width: 880px;
   margin: 0 auto;
   padding: 2.5rem 1.5rem 3.5rem;
 }
@@ -176,7 +203,7 @@ const initials = cv.name
   hyphens: auto;
   font-size: 1.08rem;
   line-height: 1.75;
-  max-width: 560px;
+  max-width: 640px;
   margin: 0 auto 1.4rem;
 }
 
@@ -251,7 +278,7 @@ const initials = cv.name
 
 /* --- Entrées de la chronique --- */
 .entry {
-  max-width: 560px;
+  max-width: 640px;
   margin: 0 auto;
   text-align: left;
 }
@@ -294,9 +321,40 @@ const initials = cv.name
   line-height: 1.7;
 }
 
+.entry-missions {
+  margin-top: 0.4rem;
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  font-size: 0.98rem;
+  line-height: 1.6;
+}
+
+.entry-missions li::before {
+  content: "· ";
+  color: var(--accent);
+}
+
+.entry-missions .m-title {
+  font-variant: small-caps;
+  letter-spacing: 0.04em;
+  color: var(--accent);
+}
+
+.entry-missions .fav {
+  color: #a97d10;
+}
+
+.entry-missions .m-casquettes {
+  font-style: italic;
+  color: var(--text-muted);
+  margin-left: 0.3rem;
+}
+
 /* --- Inventaire des sçavoirs --- */
 .savoir {
-  max-width: 560px;
+  max-width: 640px;
   margin: 0 auto 0.55rem;
   text-align: justify;
   hyphens: auto;

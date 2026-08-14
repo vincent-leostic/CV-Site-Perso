@@ -9,11 +9,18 @@ const COMMANDS = [
   "cat ./experiences.log",
   "./skills --graph",
   "cat ./formation.txt",
+  "cat ./extras.txt",
 ];
 
 // Fichiers listés par `ls ./contacts` : le mail puis les liens
 const contactFiles = [
   { name: "mail.txt", href: `mailto:${cv.email}`, value: cv.email, external: false },
+  {
+    name: "tel.txt",
+    href: `tel:${cv.phone.replaceAll(" ", "")}`,
+    value: cv.phone,
+    external: false,
+  },
   ...cv.links.map((link) => ({
     name: `${link.label.toLowerCase()}.url`,
     href: link.url,
@@ -95,6 +102,7 @@ onUnmounted(() => {
             <template v-if="i === 0">
               <p class="big">{{ cv.name }}</p>
               <p class="amber">{{ cv.title }}</p>
+              <p class="dim">{{ cv.age }} ans · {{ cv.location }}</p>
             </template>
 
             <!-- bio -->
@@ -130,6 +138,15 @@ onUnmounted(() => {
                 </p>
                 <p class="dim"># {{ exp.company }}</p>
                 <p class="dim">{{ exp.description }}</p>
+                <p v-for="m in exp.missions ?? []" :key="m.title" class="dim">
+                  - <span class="strong">{{ m.title }}</span
+                  ><span v-if="m.favorite" class="amber" role="img" aria-label="Mission favorite">
+                    ★</span
+                  ><template v-if="m.badges">
+                    <span class="amber">[{{ m.badges.join("|").toLowerCase() }}]</span></template
+                  >
+                  : {{ m.description }}
+                </p>
               </div>
             </template>
 
@@ -146,7 +163,7 @@ onUnmounted(() => {
             </template>
 
             <!-- formation -->
-            <template v-else>
+            <template v-else-if="i === 5">
               <div v-for="edu in cv.education" :key="edu.degree" class="log-entry">
                 <p>
                   <span class="amber">[{{ edu.period }}]</span>
@@ -154,6 +171,16 @@ onUnmounted(() => {
                 </p>
                 <p class="dim"># {{ edu.school }}</p>
               </div>
+            </template>
+
+            <!-- langues & hobbies -->
+            <template v-else>
+              <p class="amber"># Langues</p>
+              <p v-for="lang in cv.languages" :key="lang.name" class="dim">
+                - <span class="strong">{{ lang.name }}</span> : {{ lang.level }}
+              </p>
+              <p class="amber"># Hobbies</p>
+              <p class="dim">- {{ cv.hobbies.join(", ") }}</p>
             </template>
           </div>
         </template>
@@ -169,7 +196,7 @@ onUnmounted(() => {
 
 <style scoped>
 .terminal {
-  max-width: 880px;
+  max-width: 1020px;
   margin: 0 auto;
   padding: 2.5rem 1.5rem 3rem;
 }

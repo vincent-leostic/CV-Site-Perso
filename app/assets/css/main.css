@@ -4,6 +4,11 @@
    transition de thème. Le look par défaut = thème Sérieux.
    ============================================================ */
 
+:root {
+  /* Largeur du conteneur global (header + thèmes pleine largeur) */
+  --container: 1240px;
+}
+
 :root,
 [data-theme="serieux"] {
   --font-body: "Inter", "Segoe UI", system-ui, sans-serif;

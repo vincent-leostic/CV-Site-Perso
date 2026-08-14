@@ -1,6 +1,8 @@
 <script setup lang="ts">
 import { cv } from "~/data/cv";
 import TechIcon from "./TechIcon.vue";
+
+const telHref = `tel:${cv.phone.replaceAll(" ", "")}`;
 </script>
 
 <template>
@@ -30,7 +32,9 @@ import TechIcon from "./TechIcon.vue";
       <p class="role">{{ cv.title }}</p>
       <p class="bio">{{ cv.bio }}</p>
       <div class="links">
+        <span class="pill">{{ cv.age }} ans · {{ cv.location }}</span>
         <a class="pill" :href="`mailto:${cv.email}`">{{ cv.email }}</a>
+        <a class="pill" :href="telHref">{{ cv.phone }}</a>
         <a
           v-for="link in cv.links"
           :key="link.label"
@@ -61,6 +65,20 @@ import TechIcon from "./TechIcon.vue";
             <h3 class="step-role">{{ exp.role }}</h3>
             <p class="company">{{ exp.company }}</p>
             <p class="desc">{{ exp.description }}</p>
+            <ul v-if="exp.missions" class="shoots">
+              <li v-for="m in exp.missions" :key="m.title">
+                <span class="shoot-title"
+                  >{{ m.title
+                  }}<span v-if="m.favorite" class="fav" role="img" aria-label="Mission favorite">
+                    ★</span
+                  >
+                  <span v-for="badge in m.badges ?? []" :key="badge" class="shoot-badge">{{
+                    badge
+                  }}</span></span
+                >
+                <span class="shoot-desc">{{ m.description }}</span>
+              </li>
+            </ul>
           </div>
         </article>
       </div>
@@ -88,6 +106,13 @@ import TechIcon from "./TechIcon.vue";
           <h3 class="root-degree">{{ edu.degree }}</h3>
           <p class="company">{{ edu.school }}</p>
         </article>
+      </div>
+
+      <div class="extras">
+        <p v-for="lang in cv.languages" :key="lang.name">
+          <strong>{{ lang.name }}</strong> : {{ lang.level }}
+        </p>
+        <p><strong>Hobbies</strong> : {{ cv.hobbies.join(", ") }}</p>
       </div>
     </section>
   </div>
@@ -221,7 +246,7 @@ import TechIcon from "./TechIcon.vue";
 
 .bio {
   color: var(--text-muted);
-  max-width: 540px;
+  max-width: 620px;
   margin: 0 auto 1.5rem;
   animation: rise 0.7s cubic-bezier(0.22, 1, 0.36, 1) 0.26s backwards;
 }
@@ -282,7 +307,7 @@ import TechIcon from "./TechIcon.vue";
 
 /* --- Le sentier --- */
 .path-sec {
-  max-width: 820px;
+  max-width: 940px;
   margin: 0 auto;
   padding: 1.5rem 1.5rem 0;
 }
@@ -407,9 +432,65 @@ import TechIcon from "./TechIcon.vue";
   color: var(--text-muted);
 }
 
+.shoots {
+  margin-top: 0.6rem;
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 0.55rem;
+  font-size: 0.9rem;
+  color: var(--text-muted);
+  text-align: left;
+}
+
+.shoots li::before {
+  content: "• ";
+  color: var(--accent);
+}
+
+.shoot-title {
+  font-weight: 700;
+  color: var(--text);
+}
+
+.shoot-desc {
+  display: block;
+  padding-left: 0.85rem;
+}
+
+.fav {
+  color: #e0a416;
+}
+
+.shoot-badge {
+  display: inline-block;
+  font-size: 0.58rem;
+  font-weight: 700;
+  color: var(--accent);
+  background: color-mix(in srgb, var(--accent) 12%, transparent);
+  border-radius: 999px;
+  padding: 0.04rem 0.4rem;
+  margin-left: 0.3rem;
+  vertical-align: middle;
+}
+
+.extras {
+  margin-top: 2rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+  font-size: 0.95rem;
+  color: var(--text-muted);
+}
+
+.extras strong {
+  color: var(--text);
+  font-weight: 700;
+}
+
 /* --- Le jardin de compétences --- */
 .garden {
-  max-width: 720px;
+  max-width: 800px;
   margin: 0 auto;
   padding: 3.5rem 1.5rem 0;
   text-align: center;
@@ -471,7 +552,7 @@ import TechIcon from "./TechIcon.vue";
 
 /* --- Les racines --- */
 .roots {
-  max-width: 720px;
+  max-width: 800px;
   margin: 0 auto;
   padding: 3.5rem 1.5rem 0;
   text-align: center;
