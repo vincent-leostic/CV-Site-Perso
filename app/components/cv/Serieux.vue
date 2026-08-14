@@ -6,6 +6,21 @@ const telHref = `tel:${cv.phone.replaceAll(" ", "")}`;
 
 // Nuage de technos : tous les groupes à plat, les icônes en avant
 const allSkills = cv.skillGroups.flatMap((group) => group.skills);
+
+/** Le PDF, c'est simplement la version imprimée : les styles print s'occupent du reste */
+function printCv() {
+  window.print();
+}
+
+/** Chaque casquette a sa couleur, portée par la classe du badge */
+function badgeClass(badge: string) {
+  const slug = badge
+    .toLowerCase()
+    .normalize("NFD")
+    .replace(/[̀-ͯ]/g, "")
+    .replace(/[^a-z]+/g, "-");
+  return `m-badge badge-${slug}`;
+}
 </script>
 
 <template>
@@ -33,24 +48,38 @@ const allSkills = cv.skillGroups.flatMap((group) => group.skills);
           </a>
         </div>
 
-        <div class="side-sec">
-          <h2 class="side-title">Formation</h2>
-          <p v-for="edu in cv.education" :key="edu.degree" class="side-line">
-            <strong>{{ edu.period }}</strong> : {{ edu.degree }}, {{ edu.school }}
-          </p>
+        <!-- Version compacte du nuage, réservée à l'impression (bande de gauche) -->
+        <div class="side-sec side-technos">
+          <h2 class="side-title">Technos & outils</h2>
+          <ul class="cloud cloud-side">
+            <li v-for="skill in allSkills" :key="skill" class="chip">
+              <TechIcon :label="skill" branded />{{ skill }}
+            </li>
+          </ul>
         </div>
 
-        <div class="side-sec">
-          <h2 class="side-title">Langues</h2>
-          <p v-for="lang in cv.languages" :key="lang.name" class="side-line">
-            <strong>{{ lang.name }}</strong> : {{ lang.level }}
-          </p>
+        <div class="side-extras">
+          <div class="side-sec">
+            <h2 class="side-title">Formation</h2>
+            <p v-for="edu in cv.education" :key="edu.degree" class="side-line">
+              <strong>{{ edu.period }}</strong> : {{ edu.degree }}, {{ edu.school }}
+            </p>
+          </div>
+
+          <div class="side-sec">
+            <h2 class="side-title">Langues</h2>
+            <p v-for="lang in cv.languages" :key="lang.name" class="side-line">
+              <strong>{{ lang.name }}</strong> : {{ lang.level }}
+            </p>
+          </div>
+
+          <div class="side-sec">
+            <h2 class="side-title">Hobbies</h2>
+            <p class="side-line">{{ cv.hobbies.join(" · ") }}</p>
+          </div>
         </div>
 
-        <div class="side-sec">
-          <h2 class="side-title">Hobbies</h2>
-          <p class="side-line">{{ cv.hobbies.join(" · ") }}</p>
-        </div>
+        <button type="button" class="print-btn" @click="printCv">Imprimer / PDF</button>
       </aside>
 
       <!-- Colonne principale : parcours en timeline -->
@@ -59,9 +88,11 @@ const allSkills = cv.skillGroups.flatMap((group) => group.skills);
           <h2 class="sec-title">Expériences</h2>
           <ol class="timeline">
             <li v-for="exp in cv.experiences" :key="`${exp.role}-${exp.company}`" class="tl-item">
-              <p class="tl-period">{{ exp.period }}</p>
-              <h3 class="tl-role">{{ exp.role }}</h3>
-              <p class="tl-company">{{ exp.company }}</p>
+              <div class="tl-head">
+                <p class="tl-period">{{ exp.period }}</p>
+                <h3 class="tl-role">{{ exp.role }}</h3>
+                <p class="tl-company">{{ exp.company }}</p>
+              </div>
               <p class="tl-desc">{{ exp.description }}</p>
               <ul v-if="exp.missions" class="tl-missions">
                 <li v-for="m in exp.missions" :key="m.title">
@@ -72,7 +103,9 @@ const allSkills = cv.skillGroups.flatMap((group) => group.skills);
                     >
                   </p>
                   <p v-if="m.badges" class="m-badges">
-                    <span v-for="badge in m.badges" :key="badge" class="m-badge">{{ badge }}</span>
+                    <span v-for="badge in m.badges" :key="badge" :class="badgeClass(badge)">{{
+                      badge
+                    }}</span>
                   </p>
                   <p class="m-desc">{{ m.description }}</p>
                 </li>
@@ -81,11 +114,11 @@ const allSkills = cv.skillGroups.flatMap((group) => group.skills);
           </ol>
         </section>
 
-        <section>
+        <section class="cloud-sec">
           <h2 class="sec-title">Technos & outils</h2>
           <ul class="cloud">
             <li v-for="skill in allSkills" :key="skill" class="chip">
-              <TechIcon :label="skill" />{{ skill }}
+              <TechIcon :label="skill" branded />{{ skill }}
             </li>
           </ul>
         </section>
@@ -187,6 +220,17 @@ const allSkills = cv.skillGroups.flatMap((group) => group.skills);
   text-decoration: underline;
 }
 
+/* À l'écran, le wrapper est transparent : les sections restent des enfants
+   directs de la sidebar ; il ne sert qu'à la grille d'impression. */
+.side-extras {
+  display: contents;
+}
+
+/* Le nuage compact de la bande n'existe qu'à l'impression */
+.side-technos {
+  display: none;
+}
+
 .side-sec {
   margin-bottom: 1.1rem;
 }
@@ -209,6 +253,29 @@ const allSkills = cv.skillGroups.flatMap((group) => group.skills);
 .side-line strong {
   color: var(--text);
   font-weight: 600;
+}
+
+.print-btn {
+  align-self: start;
+  margin-top: 0.3rem;
+  padding: 0.45rem 1rem;
+  font: inherit;
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: var(--accent);
+  background: none;
+  border: 1px solid color-mix(in srgb, var(--accent) 45%, var(--border));
+  border-radius: var(--radius-pill);
+  cursor: pointer;
+  transition:
+    background-color 0.2s,
+    color 0.2s;
+}
+
+.print-btn:hover,
+.print-btn:focus-visible {
+  background: var(--accent);
+  color: var(--bg-card);
 }
 
 /* --- Nuage de technos --- */
@@ -280,6 +347,12 @@ const allSkills = cv.skillGroups.flatMap((group) => group.skills);
   display: flex;
   flex-direction: column;
   gap: 1.8rem;
+}
+
+/* À l'écran, l'en-tête de job est transparent : il ne sert qu'à la
+   languette de la version imprimée */
+.tl-head {
+  display: contents;
 }
 
 .tl-item {
@@ -388,14 +461,320 @@ const allSkills = cv.skillGroups.flatMap((group) => group.skills);
   font-weight: 600;
   text-transform: uppercase;
   letter-spacing: 0.04em;
-  color: var(--accent);
-  background: color-mix(in srgb, var(--accent) 10%, transparent);
-  border: 1px solid color-mix(in srgb, var(--accent) 25%, transparent);
+  color: var(--badge, var(--accent));
+  background: color-mix(in srgb, var(--badge, var(--accent)) 10%, transparent);
+  border: 1px solid color-mix(in srgb, var(--badge, var(--accent)) 28%, transparent);
   border-radius: var(--radius-pill);
   padding: 0.07rem 0.42rem;
 }
 
-@media (max-width: 760px) {
+/* Une couleur par casquette */
+.badge-chef-de-projet {
+  --badge: #3b5bdb;
+}
+
+.badge-developpeur {
+  --badge: #2f9e44;
+}
+
+.badge-responsable-technique {
+  --badge: #e8590c;
+}
+
+.badge-responsable-fonctionnel {
+  --badge: #0c8599;
+}
+
+.badge-ia {
+  --badge: #9c36b5;
+}
+
+.badge-en-autonomie {
+  --badge: #5d6470;
+}
+
+/* --- Impression : CV moderne à bande latérale encrée.
+   Colonne bleu profond avec l'identité en blanc, répétée sur chaque
+   page ; colonne claire pour le parcours, cartes et chips teintées. --- */
+@media print {
+  .serieux {
+    max-width: none;
+    padding: 0;
+  }
+
+  /* La bande encrée : en position fixe, elle se répète sur chaque page */
+  .sheet::before {
+    content: "";
+    position: fixed;
+    inset: 0 auto 0 0;
+    width: 62mm;
+    background: #232f7a;
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+  }
+
+  .sheet {
+    display: grid;
+    grid-template-columns: 62mm 1fr;
+    gap: 0;
+    padding: 0;
+    border: 0;
+    box-shadow: none;
+    animation: none;
+  }
+
+  /* --- Colonne encre : identité et infos clés en blanc --- */
+  .side {
+    position: relative;
+    top: 0;
+    padding: 7mm 5mm 10mm 7mm;
+    color: #fff;
+  }
+
+  .avatar {
+    width: 30mm;
+    height: 30mm;
+    border: 2px solid rgba(255, 255, 255, 0.85);
+    margin-bottom: 4mm;
+    filter: none;
+  }
+
+  .name {
+    font-size: 17pt;
+    color: #fff;
+  }
+
+  .role {
+    color: #bcc8ff;
+    font-size: 10.5pt;
+  }
+
+  .age {
+    color: #bcc8ff;
+    font-size: 9pt;
+    margin-bottom: 3mm;
+  }
+
+  .bio {
+    color: #dde3ff;
+    font-size: 9pt;
+    border: 0;
+    padding-bottom: 0;
+    margin-bottom: 4mm;
+  }
+
+  .contact {
+    border: 0;
+    gap: 1.2mm;
+    padding-bottom: 0;
+    margin-bottom: 4mm;
+    font-size: 9pt;
+  }
+
+  .contact a {
+    color: #fff;
+  }
+
+  .side-sec {
+    margin-bottom: 3.5mm;
+    break-inside: avoid;
+  }
+
+  /* Le nuage compact rejoint la bande, avant la formation */
+  .side-technos {
+    display: block;
+  }
+
+  /* Icônes seules : pastilles rondes façon photo, le logo remplit la
+     pastille et le blanc ne se lit plus que comme un fin liseré */
+  .cloud-side {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    gap: 1.8mm;
+  }
+
+  .cloud-side .chip {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0;
+    aspect-ratio: 1;
+    font-size: 0;
+    background: #fff;
+    border: 0;
+    padding: 0;
+    border-radius: 50%;
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+  }
+
+  .cloud-side .chip:not(:has(.tech-icon)) {
+    display: none;
+  }
+
+  .cloud-side .tech-icon {
+    width: 74%;
+    height: 74%;
+  }
+
+  .side-title {
+    color: #9daaf0;
+  }
+
+  .side-line {
+    color: #dde3ff;
+    font-size: 9pt;
+  }
+
+  .side-line strong {
+    color: #fff;
+  }
+
+  .print-btn {
+    display: none;
+  }
+
+  /* --- Colonne claire : le parcours --- */
+  .content {
+    display: block;
+    padding: 10mm 10mm 10mm 8mm;
+  }
+
+  .content section {
+    margin-bottom: 2.5mm;
+  }
+
+  /* Les languettes suffisent : pas de titre « Expériences » en print */
+  .content .sec-title {
+    display: none;
+  }
+
+  /* Plus de timeline : chaque job porte une languette bleu marine qui
+     part du bord gauche, dans la continuité de la bande */
+  .timeline {
+    gap: 0;
+    border-left: 0;
+  }
+
+  .tl-item {
+    animation: none;
+    padding-left: 0;
+    margin-bottom: 2.5mm;
+  }
+
+  /* De l'air entre deux expériences */
+  .tl-item + .tl-item {
+    margin-top: 5mm;
+  }
+
+  /* Les entrées courtes (sans cartes de missions) ne se coupent pas
+     entre deux pages */
+  .tl-item:not(:has(.tl-missions)) {
+    break-inside: avoid;
+  }
+
+  .tl-item::before {
+    display: none;
+  }
+
+  .tl-head {
+    display: block;
+    background: #232f7a;
+    margin: 0 0 2mm -8mm;
+    padding: 1.8mm 4mm 2mm 8mm;
+    border-radius: 0 3mm 3mm 0;
+    break-inside: avoid;
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+  }
+
+  .tl-head .tl-period {
+    color: #bcc8ff;
+    margin-bottom: 0.4mm;
+  }
+
+  .tl-head .tl-role {
+    color: #fff;
+  }
+
+  .tl-head .tl-company {
+    color: #dde3ff;
+    margin-bottom: 0;
+  }
+
+  /* Missions en liste simple : pastille devant chaque intitulé,
+     encadrée d'un titre et d'une ouverture */
+  .tl-missions {
+    margin-top: 2.5mm;
+    grid-template-columns: 1fr;
+    gap: 2mm;
+  }
+
+  .tl-missions::before {
+    content: "Mes missions";
+    font-weight: 700;
+    font-size: 1.05rem;
+    color: #232f7a;
+  }
+
+  .tl-missions::after {
+    content: "et bien plus encore";
+    font-style: italic;
+    color: var(--text-muted);
+  }
+
+  .tl-missions li {
+    break-inside: avoid;
+    position: relative;
+    padding: 0 0 0 4.5mm;
+    background: none;
+    border: 0;
+    border-radius: 0;
+  }
+
+  /* La pastille */
+  .tl-missions li::before {
+    content: "";
+    position: absolute;
+    left: 0;
+    top: 1.4mm;
+    width: 2mm;
+    height: 2mm;
+    border-radius: 50%;
+    background: #232f7a;
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+  }
+
+  /* En impression, les casquettes restent sobres : marine uniforme */
+  .m-badge {
+    --badge: #232f7a;
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+  }
+
+  /* La section technos de la colonne claire disparaît : elle vit dans la bande */
+  .cloud-sec {
+    display: none;
+  }
+
+  .cloud {
+    gap: 2mm;
+  }
+
+  .chip {
+    break-inside: avoid;
+    box-shadow: none;
+    padding: 1.2mm 3mm;
+    font-size: 9pt;
+    background: #f1f3fd;
+    border-color: transparent;
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+  }
+}
+
+@media screen and (max-width: 760px) {
   .sheet {
     grid-template-columns: 1fr;
     gap: 2rem;

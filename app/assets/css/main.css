@@ -9,6 +9,29 @@
   --container: 1240px;
 }
 
+/* Impression : seule la feuille du CV, sans chrome ni décors de fond.
+   Marges de page à 0 pour que le navigateur n'imprime pas ses propres
+   en-têtes et pieds de page (date, URL, numérotation). */
+@page {
+  margin: 0;
+}
+
+@media print {
+  .header,
+  .footer {
+    display: none !important;
+  }
+
+  body {
+    background: #fff !important;
+  }
+
+  body::before,
+  body::after {
+    display: none !important;
+  }
+}
+
 :root,
 [data-theme="serieux"] {
   --font-body: "Inter", "Segoe UI", system-ui, sans-serif;
@@ -110,6 +133,14 @@
 html {
   font-size: 16px;
   scroll-behavior: smooth;
+}
+
+/* Les tailles du site sont en rem : réduire la racine à l'impression
+   compacte tout proportionnellement pour tenir le CV sur une page */
+@media print {
+  html {
+    font-size: 13.5px;
+  }
 }
 
 body {
