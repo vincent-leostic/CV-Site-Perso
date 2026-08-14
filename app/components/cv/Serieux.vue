@@ -12,6 +12,11 @@ function printCv() {
   window.print();
 }
 
+/** Identifiant lisible d'un lien de profil, ex. github.com/foo -> "foo" */
+function linkHandle(url: string) {
+  return new URL(url).pathname.split("/").filter(Boolean).pop() ?? url;
+}
+
 /** Chaque casquette a sa couleur, portée par la classe du badge */
 function badgeClass(badge: string) {
   const slug = badge
@@ -35,16 +40,50 @@ function badgeClass(badge: string) {
         <p class="bio">{{ cv.bio }}</p>
 
         <div class="contact">
-          <a :href="`mailto:${cv.email}`">{{ cv.email }}</a>
-          <a :href="telHref">{{ cv.phone }}</a>
+          <a class="c-row" :href="`mailto:${cv.email}`">
+            <svg
+              class="c-ico"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              aria-hidden="true"
+            >
+              <rect width="20" height="16" x="2" y="4" rx="2" />
+              <path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7" />
+            </svg>
+            <span>{{ cv.email }}</span>
+          </a>
+          <a class="c-row" :href="telHref">
+            <svg
+              class="c-ico"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              aria-hidden="true"
+            >
+              <path
+                d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"
+              />
+            </svg>
+            <span>{{ cv.phone }}</span>
+          </a>
           <a
             v-for="link in cv.links"
             :key="link.label"
+            class="c-row"
             :href="link.url"
             target="_blank"
             rel="noopener"
           >
-            {{ link.label }}
+            <TechIcon class="c-ico" :label="link.label" />
+            <span class="label-screen">{{ link.label }}</span>
+            <span class="label-print">{{ linkHandle(link.url) }}</span>
           </a>
         </div>
 
@@ -218,6 +257,25 @@ function badgeClass(badge: string) {
 .contact a:hover,
 .contact a:focus-visible {
   text-decoration: underline;
+}
+
+.c-row {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  min-width: 0;
+}
+
+.c-ico {
+  width: 1em;
+  height: 1em;
+  flex: none;
+  color: var(--text-muted);
+}
+
+/* Les identifiants complets ne servent que sur papier */
+.label-print {
+  display: none;
 }
 
 /* À l'écran, le wrapper est transparent : les sections restent des enfants
@@ -413,6 +471,7 @@ function badgeClass(badge: string) {
 .tl-desc {
   font-size: 1rem;
   color: var(--text-muted);
+  white-space: pre-line;
 }
 
 /* Missions en cartes : l'expérience occupe le terrain */
@@ -573,6 +632,20 @@ function badgeClass(badge: string) {
 
   .contact a {
     color: #fff;
+  }
+
+  .contact .c-ico {
+    color: #fff;
+  }
+
+  /* Sur papier, l'identifiant remplace le libellé du lien */
+  .label-screen {
+    display: none;
+  }
+
+  .label-print {
+    display: inline;
+    overflow-wrap: anywhere;
   }
 
   .side-sec {
