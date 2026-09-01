@@ -37,16 +37,24 @@ jobs:
           npm ci
           npm run generate
 
-      # SFTP (port 22) : le FTP d'OVH mutualisé ne supporte pas le FTPS explicite
+      # SFTP (port 22) : le FTP d'OVH mutualisé ne supporte pas le FTPS explicite.
+      # lftp mirror crée le dossier distant au besoin et synchronise (ajouts,
+      # modifications, suppressions). Chemin relatif au home de l'utilisateur FTP.
       - name: Déployer .output/public sur OVH (SFTP)
         if: env.OVH_READY == 'true'
-        uses: wlixcc/SFTP-Deploy-Action@v1.2.5
-        with:
-          server: ${{ secrets.OVH_FTP_HOST }}
-          username: ${{ secrets.OVH_FTP_USER }}
-          password: ${{ secrets.OVH_FTP_PASSWORD }}
-          ssh_private_key: ""
-          port: 22
-          sftp_only: true
-          local_path: ./.output/public/*
-          remote_path: /home/codexog/vincent
+        env:
+          OVH_HOST: ${{ secrets.OVH_FTP_HOST }}
+          OVH_USER: ${{ secrets.OVH_FTP_USER }}
+          LFTP_PASSWORD: ${{ secrets.OVH_FTP_PASSWORD }}
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq lftp
+          # Espaces parasites parfois collés avec les secrets
+          OVH_HOST="$(printf '%s' "$OVH_HOST" | tr -d '[:space:]')"
+          OVH_USER="$(printf '%s' "$OVH_USER" | tr -d '[:space:]')"
+          lftp --env-password -u "$OVH_USER" "sftp://$OVH_HOST" <<'EOF'
+          set sftp:auto-confirm yes
+          set net:max-retries 2
+          mirror -R --delete --parallel=4 ./.output/public vincent
+          bye
+          EOF
