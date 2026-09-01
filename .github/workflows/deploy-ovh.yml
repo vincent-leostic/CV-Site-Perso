@@ -1,0 +1,49 @@
+# Déploiement automatique sur l'hébergement mutualisé OVH (vincent.leostic.bzh)
+# à chaque push sur main. Coexiste avec deploy.yml (GitHub Pages).
+# Nécessite 3 secrets (Settings → Secrets and variables → Actions) :
+#   OVH_FTP_HOST     ftp.cluster131.hosting.ovh.net
+#   OVH_FTP_USER     codexog
+#   OVH_FTP_PASSWORD mot de passe de l'utilisateur FTP
+# Tant que les secrets ne sont pas configurés, le workflow ne fait rien (pas d'échec).
+name: Déploiement OVH
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    env:
+      OVH_READY: ${{ secrets.OVH_FTP_HOST != '' && secrets.OVH_FTP_USER != '' && secrets.OVH_FTP_PASSWORD != '' }}
+    steps:
+      - name: Secrets absents — déploiement ignoré
+        if: env.OVH_READY != 'true'
+        run: echo "Secrets OVH_FTP_* non configurés dans GitHub, déploiement ignoré."
+
+      - uses: actions/checkout@v4
+        if: env.OVH_READY == 'true'
+
+      - uses: actions/setup-node@v4
+        if: env.OVH_READY == 'true'
+        with:
+          node-version: 22
+          cache: npm
+
+      - name: Générer le site statique
+        if: env.OVH_READY == 'true'
+        run: |
+          npm ci
+          npm run generate
+
+      - name: Déployer .output/public sur OVH (FTPS)
+        if: env.OVH_READY == 'true'
+        uses: SamKirkland/FTP-Deploy-Action@v4.3.5
+        with:
+          server: ${{ secrets.OVH_FTP_HOST }}
+          username: ${{ secrets.OVH_FTP_USER }}
+          password: ${{ secrets.OVH_FTP_PASSWORD }}
+          protocol: ftps
+          local-dir: ./.output/public/
+          server-dir: ./vincent/
