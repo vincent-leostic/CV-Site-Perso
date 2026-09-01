@@ -37,13 +37,16 @@ jobs:
           npm ci
           npm run generate
 
-      - name: Déployer .output/public sur OVH (FTPS)
+      # SFTP (port 22) : le FTP d'OVH mutualisé ne supporte pas le FTPS explicite
+      - name: Déployer .output/public sur OVH (SFTP)
         if: env.OVH_READY == 'true'
-        uses: SamKirkland/FTP-Deploy-Action@v4.3.5
+        uses: wlixcc/SFTP-Deploy-Action@v1.2.5
         with:
           server: ${{ secrets.OVH_FTP_HOST }}
           username: ${{ secrets.OVH_FTP_USER }}
           password: ${{ secrets.OVH_FTP_PASSWORD }}
-          protocol: ftps
-          local-dir: ./.output/public/
-          server-dir: ./vincent/
+          ssh_private_key: ""
+          port: 22
+          sftp_only: true
+          local_path: ./.output/public/*
+          remote_path: /home/codexog/vincent
