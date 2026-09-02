@@ -1,6 +1,6 @@
 # CV de Vincent Leostic
 
-Site CV multi-thèmes, en ligne sur [vincent-leostic.github.io](https://vincent-leostic.github.io/).
+Site CV multi-thèmes, en ligne sur [vincent.leostic.bzh](https://vincent.leostic.bzh/).
 
 Un même contenu, cinq mises en scène complètes. Le sélecteur en haut de page bascule d'un univers à l'autre, avec une transition circulaire (View Transitions). Le choix est conservé en localStorage et partageable via `?theme=` dans l'URL.
 
@@ -29,4 +29,4 @@ vp check       # formatage, lint et types
 
 ## Déploiement
 
-Chaque push sur `main` déclenche le workflow GitHub Actions qui génère le site statique (`nuxt build --preset github_pages`) et le publie sur GitHub Pages.
+Chaque push sur `main` déclenche le workflow GitHub Actions [deploy-ovh.yml](.github/workflows/deploy-ovh.yml) qui génère le site statique (`nuxt generate`) et le synchronise en SFTP (`lftp mirror`) sur l'hébergement mutualisé OVH derrière [vincent.leostic.bzh](https://vincent.leostic.bzh/).
