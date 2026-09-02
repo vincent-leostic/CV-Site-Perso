@@ -12,9 +12,14 @@ function printCv() {
   window.print();
 }
 
-/** Identifiant lisible d'un lien de profil, ex. github.com/foo -> "foo" */
-function linkHandle(url: string) {
-  return new URL(url).pathname.split("/").filter(Boolean).pop() ?? url;
+/** URL lisible sur papier, sans le protocole, ex. "github.com/vincent-leostic" */
+function printUrl(url: string) {
+  return url.replace(/^https?:\/\//, "").replace(/\/$/, "");
+}
+
+/** Domaine affiché d'un projet, sans le www */
+function projectHost(url: string) {
+  return new URL(url).hostname.replace(/^www\./, "");
 }
 
 /** Chaque casquette a sa couleur, portée par la classe du badge */
@@ -73,6 +78,24 @@ function badgeClass(badge: string) {
             </svg>
             <span>{{ cv.phone }}</span>
           </a>
+          <!-- L'adresse du site n'a de sens que sur papier : à l'écran, on y est déjà -->
+          <a class="c-row print-row" :href="cv.website">
+            <svg
+              class="c-ico"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              aria-hidden="true"
+            >
+              <circle cx="12" cy="12" r="10" />
+              <path d="M12 2a14.5 14.5 0 0 0 0 20 14.5 14.5 0 0 0 0-20" />
+              <path d="M2 12h20" />
+            </svg>
+            <span>{{ printUrl(cv.website) }}</span>
+          </a>
           <a
             v-for="link in cv.links"
             :key="link.label"
@@ -83,7 +106,7 @@ function badgeClass(badge: string) {
           >
             <TechIcon class="c-ico" :label="link.label" />
             <span class="label-screen">{{ link.label }}</span>
-            <span class="label-print">{{ linkHandle(link.url) }}</span>
+            <span class="label-print">{{ printUrl(link.url) }}</span>
           </a>
         </div>
 
@@ -151,6 +174,24 @@ function badgeClass(badge: string) {
               </ul>
             </li>
           </ol>
+        </section>
+
+        <section class="projects-sec">
+          <h2 class="sec-title">Projets perso</h2>
+          <ul class="projects">
+            <li v-for="proj in cv.personalProjects" :key="proj.title" class="project">
+              <a class="p-head" :href="proj.url" target="_blank" rel="noopener">
+                <span class="p-title">{{ proj.title }}</span>
+                <span class="p-host">{{ projectHost(proj.url) }} ↗</span>
+              </a>
+              <p class="p-desc">{{ proj.description }}</p>
+              <p v-if="proj.stack" class="p-stack">
+                <span v-for="tech in proj.stack" :key="tech" class="p-tech">
+                  <TechIcon :label="tech" branded />{{ tech }}
+                </span>
+              </p>
+            </li>
+          </ul>
         </section>
 
         <section class="cloud-sec">
@@ -273,8 +314,9 @@ function badgeClass(badge: string) {
   color: var(--text-muted);
 }
 
-/* Les identifiants complets ne servent que sur papier */
-.label-print {
+/* Les URLs complètes et la ligne du site ne servent que sur papier */
+.label-print,
+.print-row {
   display: none;
 }
 
@@ -369,6 +411,79 @@ function badgeClass(badge: string) {
 .chip .tech-icon {
   font-size: 1.25rem;
   color: var(--accent);
+}
+
+/* --- Projets perso --- */
+.projects {
+  list-style: none;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 0.8rem;
+}
+
+.project {
+  padding: 0.9rem 1.1rem;
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-left: 3px solid color-mix(in srgb, var(--accent) 55%, var(--border));
+  border-radius: 8px;
+  transition:
+    border-color 0.2s,
+    box-shadow 0.2s;
+}
+
+.project:hover {
+  border-color: color-mix(in srgb, var(--accent) 45%, var(--border));
+  box-shadow: var(--shadow);
+}
+
+.p-head {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 0.1rem;
+  margin-bottom: 0.35rem;
+}
+
+.p-head:hover .p-title,
+.p-head:focus-visible .p-title {
+  text-decoration: underline;
+}
+
+.p-title {
+  font-size: 1rem;
+  font-weight: 600;
+}
+
+.p-host {
+  font-size: 0.82rem;
+  color: var(--accent);
+  white-space: nowrap;
+}
+
+.p-desc {
+  font-size: 0.92rem;
+  color: var(--text-muted);
+  line-height: 1.5;
+}
+
+.p-stack {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.35rem;
+  margin-top: 0.5rem;
+}
+
+.p-tech {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  font-size: 0.78rem;
+  font-weight: 500;
+  color: var(--text-muted);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-pill);
+  padding: 0.12rem 0.55rem;
 }
 
 /* --- Contenu principal --- */
@@ -638,7 +753,7 @@ function badgeClass(badge: string) {
     color: #fff;
   }
 
-  /* Sur papier, l'identifiant remplace le libellé du lien */
+  /* Sur papier, l'URL complète remplace le libellé du lien */
   .label-screen {
     display: none;
   }
@@ -646,6 +761,10 @@ function badgeClass(badge: string) {
   .label-print {
     display: inline;
     overflow-wrap: anywhere;
+  }
+
+  .print-row {
+    display: inline-flex;
   }
 
   .side-sec {
@@ -828,6 +947,12 @@ function badgeClass(badge: string) {
 
   /* La section technos de la colonne claire disparaît : elle vit dans la bande */
   .cloud-sec {
+    display: none;
+  }
+
+  /* Les projets perso restent sur l'écran : la mise en page papier est
+     calibrée sans eux (et les liens ne se cliquent pas sur une feuille) */
+  .projects-sec {
     display: none;
   }
 

@@ -9,6 +9,11 @@ const initials = cv.name
   .split(" ")
   .map((part) => part.charAt(0))
   .join("·");
+
+/** Domaine affiché d'un ouvrage, sans le www */
+function projectHost(url: string) {
+  return new URL(url).hostname.replace(/^www\./, "");
+}
 </script>
 
 <template>
@@ -107,6 +112,25 @@ const initials = cv.name
           </p>
           <h3 class="entry-role">{{ edu.degree }}</h3>
           <p class="entry-place">{{ edu.school }}</p>
+        </article>
+      </section>
+
+      <!-- Chapitre IV : les projets perso -->
+      <section class="chapter-sec">
+        <h2 class="chapter">
+          <span class="chapter-num">Chapitre IV</span>
+          Des ouvrages personnels
+        </h2>
+        <article v-for="proj in cv.personalProjects" :key="proj.title" class="entry">
+          <p class="entry-head">
+            <span class="pilcrow" aria-hidden="true">¶</span>
+            <a class="period opus-link" :href="proj.url" target="_blank" rel="noopener">{{
+              projectHost(proj.url)
+            }}</a>
+          </p>
+          <h3 class="entry-role">{{ proj.title }}</h3>
+          <p v-if="proj.stack" class="entry-place">Œuvré en {{ proj.stack.join(", ") }}</p>
+          <p class="entry-text">{{ proj.description }}</p>
         </article>
       </section>
 
@@ -250,6 +274,10 @@ const initials = cv.name
   animation-delay: 0.55s;
 }
 
+.chapter-sec:nth-of-type(4) {
+  animation-delay: 0.7s;
+}
+
 .chapter {
   font-size: 1.55rem;
   font-weight: 400;
@@ -300,6 +328,13 @@ const initials = cv.name
   font-variant: small-caps;
   letter-spacing: 0.12em;
   color: var(--accent);
+}
+
+/* Lien vers un ouvrage : souligné à l'ancienne, comme les contacts */
+.opus-link {
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  text-decoration-thickness: 1px;
 }
 
 .entry-role {

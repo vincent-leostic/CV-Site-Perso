@@ -7,6 +7,7 @@ const COMMANDS = [
   "cat ./bio.txt",
   "ls ./contacts",
   "cat ./experiences.log",
+  "ls ./projets-perso",
   "./skills --graph",
   "cat ./formation.txt",
   "cat ./extras.txt",
@@ -28,6 +29,17 @@ const contactFiles = [
     external: true,
   })),
 ];
+
+// Fichiers listés par `ls ./projets-perso` : un raccourci .url par site
+const projectFiles = cv.personalProjects.map((proj) => ({
+  ...proj,
+  name: `${proj.title
+    .toLowerCase()
+    .normalize("NFD")
+    .replace(/[̀-ͯ]/g, "")
+    .replace(/[^a-z0-9]+/g, "-")}.url`,
+  host: new URL(proj.url).hostname.replace(/^www\./, ""),
+}));
 
 const shown = ref(0);
 const typed = ref("");
@@ -150,8 +162,27 @@ onUnmounted(() => {
               </div>
             </template>
 
-            <!-- compétences -->
+            <!-- projets perso -->
             <template v-else-if="i === 4">
+              <div v-for="proj in projectFiles" :key="proj.name" class="log-entry">
+                <p class="file-line">
+                  <a class="file" :href="proj.url" target="_blank" rel="noopener">{{
+                    proj.name
+                  }}</a>
+                  <span class="dim">→ {{ proj.host }}</span>
+                </p>
+                <p class="dim">
+                  #
+                  <template v-if="proj.stack">
+                    <span class="amber">[{{ proj.stack.join("|").toLowerCase() }}]</span>
+                  </template>
+                  {{ proj.description }}
+                </p>
+              </div>
+            </template>
+
+            <!-- compétences -->
+            <template v-else-if="i === 5">
               <div v-for="group in cv.skillGroups" :key="group.title" class="skill-group">
                 <p class="amber"># {{ group.title }}</p>
                 <p v-for="skill in group.skills" :key="skill" class="skill-line">
@@ -163,7 +194,7 @@ onUnmounted(() => {
             </template>
 
             <!-- formation -->
-            <template v-else-if="i === 5">
+            <template v-else-if="i === 6">
               <div v-for="edu in cv.education" :key="edu.degree" class="log-entry">
                 <p>
                   <span class="amber">[{{ edu.period }}]</span>

@@ -3,6 +3,11 @@ import { cv } from "~/data/cv";
 import TechIcon from "./TechIcon.vue";
 
 const telHref = `tel:${cv.phone.replaceAll(" ", "")}`;
+
+/** Domaine affiché d'un projet, sans le www */
+function projectHost(url: string) {
+  return new URL(url).hostname.replace(/^www\./, "");
+}
 </script>
 
 <template>
@@ -94,6 +99,31 @@ const telHref = `tel:${cv.phone.replaceAll(" ", "")}`;
             <TechIcon :label="skill" />{{ skill }}
           </span>
         </div>
+      </div>
+    </section>
+
+    <!-- Projets perso : les semis qui poussent à côté -->
+    <section class="sprouts">
+      <h2 class="n-title">Mes semis</h2>
+      <p class="sprouts-intro">Des sites qui ont poussé en dehors du travail.</p>
+      <div class="sprout-list">
+        <a
+          v-for="proj in cv.personalProjects"
+          :key="proj.title"
+          class="sprout"
+          :href="proj.url"
+          target="_blank"
+          rel="noopener"
+        >
+          <h3 class="sprout-title">{{ proj.title }}</h3>
+          <p class="sprout-host">{{ projectHost(proj.url) }}</p>
+          <p class="desc">{{ proj.description }}</p>
+          <div v-if="proj.stack" class="seeds sprout-seeds">
+            <span v-for="tech in proj.stack" :key="tech" class="seed">
+              <TechIcon :label="tech" />{{ tech }}
+            </span>
+          </div>
+        </a>
       </div>
     </section>
 
@@ -549,6 +579,71 @@ const telHref = `tel:${cv.phone.replaceAll(" ", "")}`;
 
 .seed:hover {
   transform: rotate(0deg) scale(1.06);
+}
+
+/* --- Les semis --- */
+.sprouts {
+  max-width: 940px;
+  margin: 0 auto;
+  padding: 3.5rem 1.5rem 0;
+  text-align: center;
+}
+
+.sprouts-intro {
+  color: var(--text-muted);
+  font-style: italic;
+  margin: -1.4rem 0 1.6rem;
+}
+
+.sprout-list {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 1.2rem;
+}
+
+.sprout {
+  display: block;
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: 24px;
+  padding: 1.4rem 1.5rem;
+  box-shadow: var(--shadow);
+  transition:
+    transform 0.25s,
+    box-shadow 0.25s;
+}
+
+.sprout:nth-child(odd) {
+  transform: rotate(-0.5deg);
+}
+
+.sprout:nth-child(even) {
+  transform: rotate(0.5deg);
+}
+
+.sprout:hover {
+  transform: rotate(0deg) translateY(-3px);
+  box-shadow: var(--shadow-hover);
+}
+
+.sprout-title {
+  font-size: 1.15rem;
+  font-weight: 600;
+}
+
+.sprout-host {
+  display: inline-block;
+  font-size: 0.76rem;
+  font-weight: 700;
+  color: var(--accent-2);
+  background: color-mix(in srgb, var(--accent-2) 14%, transparent);
+  border-radius: 999px;
+  padding: 0.12rem 0.65rem;
+  margin: 0.25rem 0 0.5rem;
+}
+
+.sprout-seeds {
+  margin-top: 0.8rem;
 }
 
 /* --- Les racines --- */

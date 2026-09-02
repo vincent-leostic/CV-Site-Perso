@@ -26,6 +26,16 @@ export interface Experience {
   missions?: Mission[];
 }
 
+export interface PersonalProject {
+  /** Nom du site ou du projet */
+  title: string;
+  description: string;
+  /** URL publique, ouverte dans un nouvel onglet */
+  url: string;
+  /** Technos marquantes, affichées en tags */
+  stack?: string[];
+}
+
 export interface SkillGroup {
   title: string;
   skills: string[];
@@ -48,6 +58,8 @@ export interface CvData {
   bio: string;
   /** Chemin de la photo de profil (dans public/) */
   photo: string;
+  /** URL publique du site : canonique SEO, et affichée sur le PDF imprimé */
+  website: string;
   email: string;
   /** Numéro affiché tel quel ; les thèmes en dérivent le lien tel: */
   phone: string;
@@ -56,6 +68,8 @@ export interface CvData {
   location: string;
   links: Link[];
   experiences: Experience[];
+  /** Sites réalisés en dehors du travail, avec lien vers le site en ligne */
+  personalProjects: PersonalProject[];
   skillGroups: SkillGroup[];
   education: Education[];
   languages: Language[];
@@ -74,13 +88,14 @@ export const cv: CvData = {
   title: "Développeur logiciel front, UI/UX et outillage IA",
   bio: "Développeur logiciel chez iD3i, à Brest, après une reconversion. Spécialisé front et UI/UX, je développe assisté par IA au quotidien et je construis l'outillage qui va avec.",
   photo: "/avatar.jpg",
+  website: "https://vincent.leostic.bzh",
   email: "vincent.leostic@gmail.com",
   phone: "06 13 39 80 06",
   age: 37,
   location: "Plougastel-Daoulas",
   links: [
     { label: "GitHub", url: "https://github.com/vincent-leostic" },
-    { label: "LinkedIn", url: "https://www.linkedin.com/in/vincent-leostic-43a613280" },
+    { label: "LinkedIn", url: "https://www.linkedin.com/in/vincent-leostic" },
   ],
   experiences: [
     {
@@ -137,6 +152,22 @@ export const cv: CvData = {
       period: "2008 – 2018",
       description:
         "Dix ans en salle : encadrement d'équipe, gestion du rush, relation client. Multiples restaurants, autant de façons de travailler.",
+    },
+  ],
+  personalProjects: [
+    {
+      title: "Ramonéa",
+      description:
+        "Site vitrine d'une entreprise de ramonage de la presqu'île de Crozon : prestations, tarifs, FAQ et contact, avec un back-office complet pour que l'artisan gère lui-même contenus, photos, traductions et SEO.",
+      url: "https://ramonea.fr",
+      stack: ["Vue.js 3", "TypeScript", "Supabase"],
+    },
+    {
+      title: "Les ateliers de Camille",
+      description:
+        "Site de Camille de Boiscuillé, psychopraticienne à Crozon : ses accompagnements (art-thérapie, EMDR, thérapie familiale) présentés dans un site statique ultra-léger, sans JavaScript ni cookies.",
+      url: "https://www.camilledeboiscuilletherapeute.com",
+      stack: ["Astro"],
     },
   ],
   skillGroups: [

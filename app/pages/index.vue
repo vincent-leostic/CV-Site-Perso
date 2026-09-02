@@ -5,9 +5,9 @@ const { currentTheme } = useTheme();
 
 // Référencement : le site doit sortir en tête sur « Vincent Leostic ».
 // Nom en premier dans le titre ; canonique vers le domaine .bzh pour que
-// le miroir GitHub Pages et les variantes ?theme= consolident vers la même
-// URL ; fiche Person (JSON-LD) qui relie le site aux profils GitHub/LinkedIn.
-const siteUrl = "https://vincent.leostic.bzh";
+// les variantes ?theme= consolident vers la même URL ; fiche Person
+// (JSON-LD) qui relie le site aux profils GitHub/LinkedIn.
+const siteUrl = cv.website;
 const seoTitle = `${cv.name} — ${cv.title}`;
 const seoDescription = `CV de ${cv.name}, développeur logiciel à Brest. Spécialisé front et UI/UX (Vue, Nuxt, TypeScript) et outillage de développement assisté par IA.`;
 

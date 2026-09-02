@@ -91,6 +91,25 @@ const telHref = `tel:${cv.phone.replaceAll(" ", "")}`;
           </div>
         </section>
 
+        <!-- Quêtes annexes : les projets perso -->
+        <section class="panel">
+          <h2 class="panel-title">Quêtes annexes</h2>
+          <a
+            v-for="proj in cv.personalProjects"
+            :key="proj.title"
+            class="quest"
+            :href="proj.url"
+            target="_blank"
+            rel="noopener"
+          >
+            <p class="quest-name">{{ proj.title }} <span class="quest-arrow">↗</span></p>
+            <p class="quest-desc">{{ proj.description }}</p>
+            <p v-if="proj.stack" class="quest-stack">
+              <span v-for="tech in proj.stack" :key="tech" class="obj-badge">{{ tech }}</span>
+            </p>
+          </a>
+        </section>
+
         <!-- Formation -->
         <section class="panel">
           <h2 class="panel-title">Formation</h2>
@@ -516,6 +535,53 @@ const telHref = `tel:${cv.phone.replaceAll(" ", "")}`;
   from {
     width: 0;
   }
+}
+
+/* --- Quêtes annexes --- */
+.quest {
+  display: block;
+  padding: 0.7rem 0.8rem;
+  border: 1px solid color-mix(in srgb, var(--accent) 25%, transparent);
+  clip-path: polygon(6px 0, 100% 0, 100% calc(100% - 6px), calc(100% - 6px) 100%, 0 100%, 0 6px);
+  transition: background-color 0.2s;
+}
+
+.quest:hover {
+  background: color-mix(in srgb, var(--accent) 10%, transparent);
+}
+
+.quest + .quest {
+  margin-top: 0.7rem;
+}
+
+.quest-name {
+  font-family: var(--font-heading);
+  font-size: 0.82rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--accent);
+}
+
+.quest-arrow {
+  color: var(--accent-2);
+}
+
+.quest-desc {
+  font-size: 0.85rem;
+  color: var(--text-muted);
+  margin-top: 0.25rem;
+}
+
+.quest-stack {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.35rem;
+  margin-top: 0.45rem;
+}
+
+.quest-stack .obj-badge {
+  margin-left: 0;
 }
 
 /* --- Formation --- */
