@@ -10,9 +10,13 @@ export default defineNuxtConfig({
   app: {
     head: {
       htmlAttrs: { lang: "fr" },
-      title: "CV - Portfolio",
+      title: "Vincent LEOSTIC — Développeur logiciel front, UI/UX et outillage IA",
       meta: [
-        { name: "description", content: "Mon CV en ligne" },
+        {
+          name: "description",
+          content:
+            "CV de Vincent LEOSTIC, développeur logiciel à Brest. Spécialisé front et UI/UX (Vue, Nuxt, TypeScript) et outillage de développement assisté par IA.",
+        },
         { name: "viewport", content: "width=device-width, initial-scale=1" },
       ],
       link: [

@@ -3,9 +3,45 @@ import { cv } from "~/data/cv";
 
 const { currentTheme } = useTheme();
 
+// Référencement : le site doit sortir en tête sur « Vincent Leostic ».
+// Nom en premier dans le titre ; canonique vers le domaine .bzh pour que
+// le miroir GitHub Pages et les variantes ?theme= consolident vers la même
+// URL ; fiche Person (JSON-LD) qui relie le site aux profils GitHub/LinkedIn.
+const siteUrl = "https://vincent.leostic.bzh";
+const seoTitle = `${cv.name} — ${cv.title}`;
+const seoDescription = `CV de ${cv.name}, développeur logiciel à Brest. Spécialisé front et UI/UX (Vue, Nuxt, TypeScript) et outillage de développement assisté par IA.`;
+
 useSeoMeta({
-  title: `CV - ${cv.name}`,
-  description: `CV en ligne de ${cv.name}, ${cv.title}`,
+  title: seoTitle,
+  description: seoDescription,
+  ogTitle: seoTitle,
+  ogDescription: seoDescription,
+  ogUrl: `${siteUrl}/`,
+  ogType: "profile",
+  ogImage: `${siteUrl}${cv.photo}`,
+  ogLocale: "fr_FR",
+  twitterCard: "summary",
+});
+
+useHead({
+  link: [{ rel: "canonical", href: `${siteUrl}/` }],
+  script: [
+    {
+      type: "application/ld+json",
+      innerHTML: JSON.stringify({
+        "@context": "https://schema.org",
+        "@type": "Person",
+        name: "Vincent Leostic",
+        alternateName: cv.name,
+        url: `${siteUrl}/`,
+        image: `${siteUrl}${cv.photo}`,
+        jobTitle: cv.title,
+        address: { "@type": "PostalAddress", addressLocality: cv.location, addressCountry: "FR" },
+        email: `mailto:${cv.email}`,
+        sameAs: cv.links.map((link) => link.url),
+      }),
+    },
+  ],
 });
 </script>
 
