@@ -1,0 +1,5 @@
+# Force le https : la redirection GitHub Pages (301) arrive en http,
+# et Google ne doit voir qu'une seule version du site.
+RewriteEngine On
+RewriteCond %{HTTPS} !=on
+RewriteRule ^ https://%{HTTP_HOST}%{REQUEST_URI} [R=301,L]
