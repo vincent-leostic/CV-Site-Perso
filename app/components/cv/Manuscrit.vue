@@ -1,8 +1,5 @@
 <script setup lang="ts">
 import { cv } from "~/data/cv";
-import TechIcon from "./TechIcon.vue";
-
-const telHref = `tel:${cv.phone.replaceAll(" ", "")}`;
 
 // Initiales gravées dans le sceau de cire (ex. « V·L »)
 const initials = cv.name
@@ -10,64 +7,63 @@ const initials = cv.name
   .map((part) => part.charAt(0))
   .join("·");
 
-/** Domaine affiché d'un ouvrage, sans le www */
-function projectHost(url: string) {
-  return new URL(url).hostname.replace(/^www\./, "");
-}
+// Le colophon date l'ouvrage de l'année du build
+const sealYear = toRoman(useRuntimeConfig().public.buildYear);
 </script>
 
 <template>
-  <div class="manuscrit">
-    <div class="page">
-      <p class="ornament" aria-hidden="true">❦</p>
-      <p class="incipit">Cy commence la chronique de</p>
-      <h1 class="title">{{ cv.name }}</h1>
-      <p class="subtitle">{{ cv.title }}</p>
+  <div class="layout manuscrit">
+    <div class="folio">
+      <p class="folio__ornament" aria-hidden="true">❦</p>
+      <p class="folio__incipit">Cy commence la chronique de</p>
+      <h1 class="folio__title">{{ cv.name }}</h1>
+      <p class="folio__subtitle">{{ cv.title }}</p>
 
       <img
-        class="portrait"
+        class="folio__portrait"
         :src="cv.photo"
         :alt="`Portrait de ${cv.name}`"
         width="200"
         height="200"
       />
 
-      <p class="bio">{{ cv.bio }}</p>
+      <p class="folio__bio">{{ cv.bio }}</p>
 
-      <p class="contact">
-        <span>{{ cv.age }} ans, {{ cv.location }}</span>
-        <span class="fleuron" aria-hidden="true">❧</span>
-        <a :href="`mailto:${cv.email}`">{{ cv.email }}</a>
-        <span class="fleuron" aria-hidden="true">❧</span>
-        <a :href="telHref">{{ cv.phone }}</a>
-        <template v-for="link in cv.links" :key="link.label">
-          <span class="fleuron" aria-hidden="true">❧</span>
-          <a :href="link.url" target="_blank" rel="noopener">{{ link.label }}</a>
-        </template>
-      </p>
+      <ul class="contact" role="list">
+        <li class="contact__item">{{ cv.age }} ans, {{ cv.location }}</li>
+        <li class="contact__item">
+          <a class="ink-link" :href="`mailto:${cv.email}`">{{ cv.email }}</a>
+        </li>
+        <li class="contact__item">
+          <a class="ink-link" :href="toTelHref(cv.phone)">{{ cv.phone }}</a>
+        </li>
+        <li v-for="link in cv.links" :key="link.label" class="contact__item">
+          <a class="ink-link" :href="link.url" target="_blank" rel="noopener">{{ link.label }}</a>
+        </li>
+      </ul>
 
       <!-- Chapitre I : les expériences -->
-      <section class="chapter-sec">
-        <h2 class="chapter">
-          <span class="chapter-num">Chapitre I</span>
+      <section class="chapter">
+        <h2 class="chapter__title">
+          <span class="chapter__num">Chapitre I</span>
           Des expériences
         </h2>
         <article v-for="exp in cv.experiences" :key="`${exp.role}-${exp.company}`" class="entry">
-          <p class="entry-head">
-            <span class="pilcrow" aria-hidden="true">¶</span>
-            <span class="period">{{ exp.period }}</span>
+          <p class="entry__head">
+            <span class="entry__pilcrow" aria-hidden="true">¶</span>
+            <span class="entry__period">{{ exp.period }}</span>
           </p>
-          <h3 class="entry-role">{{ exp.role }}</h3>
-          <p class="entry-place">{{ exp.company }}</p>
-          <p class="entry-text">{{ exp.description }}</p>
-          <ul v-if="exp.missions" class="entry-missions">
-            <li v-for="m in exp.missions" :key="m.title">
-              <span class="m-title">{{ m.title }}</span
-              ><span v-if="m.favorite" class="fav" role="img" aria-label="Mission favorite"> ★</span
-              ><template v-if="m.badges">
-                <span class="m-casquettes"
-                  >({{ m.badges.join(", ").toLowerCase() }})</span
-                ></template
+          <h3 class="entry__title">{{ exp.role }}</h3>
+          <p class="entry__place">{{ exp.company }}</p>
+          <p class="entry__text">{{ exp.description }}</p>
+          <ul v-if="exp.missions" class="entry__missions" role="list">
+            <li v-for="m in exp.missions" :key="m.title" class="mission">
+              <span class="mission__title">{{ m.title }}</span>
+              <span v-if="m.favorite" class="mission__fav" role="img" aria-label="Mission favorite"
+                >★</span
+              >
+              <span v-if="m.badges" class="mission__casquettes"
+                >({{ m.badges.join(", ").toLowerCase() }})</span
               >
               : {{ m.description }}
             </li>
@@ -76,69 +72,74 @@ function projectHost(url: string) {
       </section>
 
       <!-- Chapitre II : les compétences, en inventaire -->
-      <section class="chapter-sec">
-        <h2 class="chapter">
-          <span class="chapter-num">Chapitre II</span>
+      <section class="chapter">
+        <h2 class="chapter__title">
+          <span class="chapter__num">Chapitre II</span>
           Des sçavoirs
         </h2>
         <p v-for="group in cv.skillGroups" :key="group.title" class="savoir">
-          <span class="savoir-title">{{ group.title }}</span> :
-          <template v-for="(skill, i) in group.skills" :key="skill">
-            <span class="savoir-item"><TechIcon :label="skill" />{{ skill }}</span
+          <span class="savoir__title">{{ group.title }}</span> :
+          <template v-for="(skill, i) in group.skills" :key="skill.label">
+            <span class="savoir__item"
+              ><CvTechIcon v-if="skill.icon" class="savoir__icon" :name="skill.icon" />{{
+                skill.label
+              }}</span
             >{{ i < group.skills.length - 1 ? ", " : "." }}
           </template>
         </p>
         <p class="savoir">
-          <span class="savoir-title">Langues</span> :
+          <span class="savoir__title">Langues</span> :
           <template v-for="(lang, i) in cv.languages" :key="lang.name"
             >{{ lang.name }} ({{ lang.level }}){{ i < cv.languages.length - 1 ? ", " : "." }}
           </template>
         </p>
         <p class="savoir">
-          <span class="savoir-title">Passe-temps</span> : {{ cv.hobbies.join(", ") }}.
+          <span class="savoir__title">Passe-temps</span> : {{ cv.hobbies.join(", ") }}.
         </p>
       </section>
 
       <!-- Chapitre III : la formation -->
-      <section class="chapter-sec">
-        <h2 class="chapter">
-          <span class="chapter-num">Chapitre III</span>
+      <section class="chapter">
+        <h2 class="chapter__title">
+          <span class="chapter__num">Chapitre III</span>
           De la formation
         </h2>
         <article v-for="edu in cv.education" :key="edu.degree" class="entry">
-          <p class="entry-head">
-            <span class="pilcrow" aria-hidden="true">¶</span>
-            <span class="period">{{ edu.period }}</span>
+          <p class="entry__head">
+            <span class="entry__pilcrow" aria-hidden="true">¶</span>
+            <span class="entry__period">{{ edu.period }}</span>
           </p>
-          <h3 class="entry-role">{{ edu.degree }}</h3>
-          <p class="entry-place">{{ edu.school }}</p>
+          <h3 class="entry__title">{{ edu.degree }}</h3>
+          <p class="entry__place">{{ edu.school }}</p>
         </article>
       </section>
 
       <!-- Chapitre IV : les projets perso -->
-      <section class="chapter-sec">
-        <h2 class="chapter">
-          <span class="chapter-num">Chapitre IV</span>
+      <section class="chapter">
+        <h2 class="chapter__title">
+          <span class="chapter__num">Chapitre IV</span>
           Des ouvrages personnels
         </h2>
         <article v-for="proj in cv.personalProjects" :key="proj.title" class="entry">
-          <p class="entry-head">
-            <span class="pilcrow" aria-hidden="true">¶</span>
-            <a class="period opus-link" :href="proj.url" target="_blank" rel="noopener">{{
-              projectHost(proj.url)
+          <p class="entry__head">
+            <span class="entry__pilcrow" aria-hidden="true">¶</span>
+            <a class="entry__period ink-link" :href="proj.url" target="_blank" rel="noopener">{{
+              hostOf(proj.url)
             }}</a>
           </p>
-          <h3 class="entry-role">{{ proj.title }}</h3>
-          <p v-if="proj.stack" class="entry-place">Œuvré en {{ proj.stack.join(", ") }}</p>
-          <p class="entry-text">{{ proj.description }}</p>
+          <h3 class="entry__title">{{ proj.title }}</h3>
+          <p v-if="proj.stack" class="entry__place">
+            Œuvré en {{ proj.stack.map((tech) => tech.label).join(", ") }}
+          </p>
+          <p class="entry__text">{{ proj.description }}</p>
         </article>
       </section>
 
       <!-- Colophon et sceau -->
       <div class="colophon">
-        <p class="colophon-text">Fait &amp; scellé en l'an MMXXVI</p>
+        <p class="colophon__text">Fait &amp; scellé en l'an {{ sealYear }}</p>
         <div class="seal" aria-hidden="true">
-          <span class="seal-initials">{{ initials }}</span>
+          <span class="seal__initials">{{ initials }}</span>
         </div>
       </div>
     </div>
@@ -146,36 +147,26 @@ function projectHost(url: string) {
 </template>
 
 <style scoped>
-.manuscrit {
-  max-width: 880px;
-  margin: 0 auto;
-  padding: 2.5rem 1.5rem 3.5rem;
-}
-
-/* La page du manuscrit : cadre double, papier plus clair */
-.page {
+/* Le folio du manuscrit : cadre double, papier plus clair */
+.folio {
+  --enter-y: 12px;
   background: var(--bg-card);
   border: 5px double var(--border);
   box-shadow: var(--shadow);
   padding: 3rem clamp(1.5rem, 6vw, 4rem);
   text-align: center;
-  animation: page-in 0.7s cubic-bezier(0.22, 1, 0.36, 1) backwards;
+  /* E-mail et domaines, sans espace, déborderaient sur petit écran */
+  overflow-wrap: break-word;
+  animation: enter 0.7s var(--ease-out) backwards;
 }
 
-@keyframes page-in {
-  from {
-    opacity: 0;
-    transform: translateY(12px);
-  }
-}
-
-.ornament {
+.folio__ornament {
   color: var(--accent-2);
   font-size: 1.5rem;
   margin-bottom: 0.6rem;
 }
 
-.incipit {
+.folio__incipit {
   font-family: var(--font-heading);
   font-style: italic;
   color: var(--text-muted);
@@ -183,7 +174,7 @@ function projectHost(url: string) {
 }
 
 /* Le titre apparaît comme de l'encre qui sèche */
-.title {
+.folio__title {
   font-size: clamp(2rem, 5.5vw, 2.7rem);
   font-weight: 400;
   margin-bottom: 0.1rem;
@@ -197,7 +188,7 @@ function projectHost(url: string) {
   }
 }
 
-.subtitle {
+.folio__subtitle {
   font-family: var(--font-heading);
   font-style: italic;
   font-size: 1.2rem;
@@ -206,7 +197,7 @@ function projectHost(url: string) {
 }
 
 /* Portrait ovale façon gravure */
-.portrait {
+.folio__portrait {
   width: 112px;
   height: 128px;
   object-fit: cover;
@@ -222,7 +213,7 @@ function projectHost(url: string) {
 }
 
 /* Paragraphe d'introduction avec lettrine */
-.bio {
+.folio__bio {
   text-align: justify;
   hyphens: auto;
   font-size: 1.08rem;
@@ -231,7 +222,7 @@ function projectHost(url: string) {
   margin: 0 auto 1.4rem;
 }
 
-.bio::first-letter {
+.folio__bio::first-letter {
   font-family: var(--font-heading);
   font-size: 3.1em;
   line-height: 0.78;
@@ -240,45 +231,54 @@ function projectHost(url: string) {
   color: var(--accent);
 }
 
+/* Contacts en ligne, séparés par des fleurons */
 .contact {
+  list-style: none;
   font-size: 0.98rem;
   margin-bottom: 2.2rem;
 }
 
-.contact a {
+.contact__item {
+  display: inline;
+}
+
+.contact__item + .contact__item::before {
+  content: "❧" / "";
+  color: var(--accent-2);
+  margin: 0 0.6rem;
+}
+
+/* Lien souligné à l'ancienne : contacts et ouvrages */
+.ink-link {
   text-decoration: underline;
   text-underline-offset: 3px;
   text-decoration-thickness: 1px;
 }
 
-.fleuron {
-  color: var(--accent-2);
-  margin: 0 0.6rem;
-}
-
 /* --- Chapitres --- */
-.chapter-sec {
+.chapter {
+  --enter-y: 12px;
   margin-top: 2.4rem;
-  animation: page-in 0.6s cubic-bezier(0.22, 1, 0.36, 1) backwards;
+  animation: enter 0.6s var(--ease-out) backwards;
 }
 
-.chapter-sec:nth-of-type(1) {
+.chapter:nth-of-type(1) {
   animation-delay: 0.25s;
 }
 
-.chapter-sec:nth-of-type(2) {
+.chapter:nth-of-type(2) {
   animation-delay: 0.4s;
 }
 
-.chapter-sec:nth-of-type(3) {
+.chapter:nth-of-type(3) {
   animation-delay: 0.55s;
 }
 
-.chapter-sec:nth-of-type(4) {
+.chapter:nth-of-type(4) {
   animation-delay: 0.7s;
 }
 
-.chapter {
+.chapter__title {
   font-size: 1.55rem;
   font-weight: 400;
   margin-bottom: 1.3rem;
@@ -287,7 +287,7 @@ function projectHost(url: string) {
   gap: 0.1rem;
 }
 
-.chapter-num {
+.chapter__num {
   font-family: var(--font-body);
   font-variant: small-caps;
   letter-spacing: 0.22em;
@@ -296,7 +296,7 @@ function projectHost(url: string) {
 }
 
 /* Filets de part et d'autre du titre de chapitre */
-.chapter::after {
+.chapter__title::after {
   content: "";
   width: 5.5rem;
   height: 1px;
@@ -315,41 +315,34 @@ function projectHost(url: string) {
   margin-top: 1.4rem;
 }
 
-.entry-head {
+.entry__head {
   font-size: 0.92rem;
 }
 
-.pilcrow {
+.entry__pilcrow {
   color: var(--accent);
   margin-right: 0.45rem;
 }
 
-.period {
+.entry__period {
   font-variant: small-caps;
   letter-spacing: 0.12em;
   color: var(--accent);
 }
 
-/* Lien vers un ouvrage : souligné à l'ancienne, comme les contacts */
-.opus-link {
-  text-decoration: underline;
-  text-underline-offset: 3px;
-  text-decoration-thickness: 1px;
-}
-
-.entry-role {
+.entry__title {
   font-size: 1.22rem;
   font-weight: 400;
 }
 
-.entry-place {
+.entry__place {
   font-style: italic;
   color: var(--text-muted);
   font-size: 0.98rem;
   margin-bottom: 0.3rem;
 }
 
-.entry-text {
+.entry__text {
   text-align: justify;
   hyphens: auto;
   font-size: 1rem;
@@ -357,7 +350,7 @@ function projectHost(url: string) {
   white-space: pre-line;
 }
 
-.entry-missions {
+.entry__missions {
   margin-top: 0.4rem;
   list-style: none;
   display: flex;
@@ -367,22 +360,23 @@ function projectHost(url: string) {
   line-height: 1.6;
 }
 
-.entry-missions li::before {
-  content: "· ";
+.mission::before {
+  content: "· " / "";
   color: var(--accent);
 }
 
-.entry-missions .m-title {
+.mission__title {
   font-variant: small-caps;
   letter-spacing: 0.04em;
   color: var(--accent);
 }
 
-.entry-missions .fav {
-  color: #a97d10;
+.mission__fav {
+  margin-left: 0.25em;
+  color: var(--fav);
 }
 
-.entry-missions .m-casquettes {
+.mission__casquettes {
   font-style: italic;
   color: var(--text-muted);
   margin-left: 0.3rem;
@@ -398,18 +392,18 @@ function projectHost(url: string) {
   line-height: 1.7;
 }
 
-.savoir-title {
+.savoir__title {
   font-variant: small-caps;
   letter-spacing: 0.1em;
   color: var(--accent);
 }
 
-.savoir-item {
+.savoir__item {
   white-space: nowrap;
 }
 
 /* Icônes « gravées » : encre sépia, légèrement estompées */
-.savoir-item .tech-icon {
+.savoir__icon {
   font-size: 0.85em;
   margin-right: 0.3em;
   opacity: 0.75;
@@ -424,7 +418,7 @@ function projectHost(url: string) {
   gap: 0.9rem;
 }
 
-.colophon-text {
+.colophon__text {
   font-family: var(--font-heading);
   font-style: italic;
   color: var(--text-muted);
@@ -464,7 +458,7 @@ function projectHost(url: string) {
   border: 1px solid rgba(255, 255, 255, 0.22);
 }
 
-.seal-initials {
+.seal__initials {
   font-family: var(--font-heading);
   font-size: 1.25rem;
   color: rgba(255, 235, 220, 0.55);
@@ -472,7 +466,7 @@ function projectHost(url: string) {
 }
 
 @media (max-width: 640px) {
-  .page {
+  .folio {
     padding: 2rem 1.2rem;
   }
 }

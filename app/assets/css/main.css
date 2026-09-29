@@ -1,36 +1,17 @@
 /* ============================================================
    Thèmes — chaque skin est un layout complet (components/cv/*),
-   ce fichier fournit : variables, base, décors de fond et la
-   transition de thème. Le look par défaut = thème Sérieux.
+   ce fichier fournit : variables, base, blocs et animations
+   partagés, décors de fond et la transition de thème. Le look
+   par défaut = thème Sérieux.
    ============================================================ */
 
 :root {
   /* Largeur du conteneur global (header + thèmes pleine largeur) */
   --container: 1240px;
-}
-
-/* Impression : seule la feuille du CV, sans chrome ni décors de fond.
-   Marges de page à 0 pour que le navigateur n'imprime pas ses propres
-   en-têtes et pieds de page (date, URL, numérotation). */
-@page {
-  size: A4;
-  margin: 0;
-}
-
-@media print {
-  .header,
-  .footer {
-    display: none !important;
-  }
-
-  body {
-    background: #fff !important;
-  }
-
-  body::before,
-  body::after {
-    display: none !important;
-  }
+  /* Largeur du bloc .layout, redéfinie par les thèmes plus étroits */
+  --layout-max: var(--container);
+  /* Courbe des entrées et des glissements, commune à tous les thèmes */
+  --ease-out: cubic-bezier(0.22, 1, 0.36, 1);
 }
 
 :root,
@@ -46,6 +27,7 @@
   --accent-hover: #2f49b8;
   --accent-2: #3b5bdb;
   --border: #e5e5e1;
+  --fav: #ae821d;
   --shadow: 0 1px 2px rgba(22, 26, 41, 0.04), 0 8px 24px rgba(22, 26, 41, 0.05);
   --shadow-hover: 0 2px 4px rgba(22, 26, 41, 0.05), 0 14px 36px rgba(22, 26, 41, 0.09);
   --radius-pill: 999px;
@@ -63,6 +45,7 @@
   --accent-hover: #7ce6ff;
   --accent-2: #a78bfa;
   --border: #1f2b4a;
+  --fav: #f0b429;
   --shadow: 0 12px 32px rgba(0, 0, 0, 0.45);
   --shadow-hover: 0 16px 40px rgba(0, 0, 0, 0.55);
   --radius-pill: 6px;
@@ -75,11 +58,14 @@
   --bg-card: #fffdf6;
   --bg-header: rgba(255, 253, 246, 0.8);
   --text: #313a2d;
-  --text-muted: #6f7d66;
+  --text-muted: #626f5a;
   --accent: #477c57;
   --accent-hover: #375f43;
   --accent-2: #c2703e;
+  /* Terracotta assombrie : --accent-2 ne sert qu'aux décors */
+  --accent-2-text: #985831;
   --border: #e2dcc6;
+  --fav: #b5840f;
   --shadow: 0 2px 6px rgba(88, 98, 74, 0.06), 0 18px 44px rgba(88, 98, 74, 0.1);
   --shadow-hover: 0 4px 10px rgba(88, 98, 74, 0.08), 0 24px 56px rgba(88, 98, 74, 0.16);
   --radius-pill: 999px;
@@ -92,14 +78,16 @@
   --bg-card: #f6edd8;
   --bg-header: rgba(240, 230, 205, 0.85);
   --text: #3a2f1e;
-  --text-muted: #7a6a4f;
+  --text-muted: #6f6048;
   --accent: #7a1f2b;
   --accent-hover: #5e1620;
   --accent-2: #8a6d1f;
   --border: #cbb98f;
+  --fav: #a97d10;
   --shadow: 0 2px 8px rgba(80, 60, 20, 0.12), 0 14px 34px rgba(80, 60, 20, 0.12);
   --shadow-hover: 0 4px 12px rgba(80, 60, 20, 0.14), 0 20px 44px rgba(80, 60, 20, 0.18);
   --radius-pill: 8px;
+  --layout-max: 880px;
 }
 
 [data-theme="terminal"] {
@@ -114,9 +102,13 @@
   --accent-hover: #a8ffc4;
   --accent-2: #ffb000;
   --border: #1d4028;
-  --shadow: 0 0 24px rgba(51, 255, 119, 0.08), 0 12px 32px rgba(0, 0, 0, 0.5);
-  --shadow-hover: 0 0 32px rgba(51, 255, 119, 0.12), 0 16px 40px rgba(0, 0, 0, 0.6);
+  --fav: var(--accent-2);
+  --shadow:
+    0 0 24px color-mix(in srgb, var(--accent) 8%, transparent), 0 12px 32px rgba(0, 0, 0, 0.5);
+  --shadow-hover:
+    0 0 32px color-mix(in srgb, var(--accent) 12%, transparent), 0 16px 40px rgba(0, 0, 0, 0.6);
   --radius-pill: 4px;
+  --layout-max: 1020px;
 }
 
 /* ============================================================
@@ -129,19 +121,6 @@
   box-sizing: border-box;
   margin: 0;
   padding: 0;
-}
-
-html {
-  font-size: 16px;
-  scroll-behavior: smooth;
-}
-
-/* Les tailles du site sont en rem : réduire la racine à l'impression
-   compacte tout proportionnellement pour tenir le CV sur une page */
-@media print {
-  html {
-    font-size: 13.5px;
-  }
 }
 
 body {
@@ -167,7 +146,7 @@ a {
   transition: color 0.2s;
 }
 
-a:hover {
+a:is(:hover, :focus-visible) {
   color: var(--accent-hover);
 }
 
@@ -181,13 +160,69 @@ a:hover {
 }
 
 /* ============================================================
+   Blocs et animations partagés par les thèmes
+   ============================================================ */
+
+/* Conteneur centré des layouts (sauf Nature, pleine largeur) */
+.layout {
+  max-width: var(--layout-max);
+  margin-inline: auto;
+  padding: 2.5rem 1.5rem 3rem;
+}
+
+@media (max-width: 400px) {
+  .layout {
+    padding-inline: 0.75rem;
+  }
+}
+
+/* Entrée commune : fondu, plus un décalage et une échelle réglés par
+   l'élément animé via --enter-x, --enter-y et --enter-s. Non héritées :
+   un élément animé dans un autre n'en reprend pas les réglages. */
+@property --enter-x {
+  syntax: "<length-percentage>";
+  inherits: false;
+  initial-value: 0px;
+}
+
+@property --enter-y {
+  syntax: "<length-percentage>";
+  inherits: false;
+  initial-value: 0px;
+}
+
+@property --enter-s {
+  syntax: "<number>";
+  inherits: false;
+  initial-value: 1;
+}
+
+@keyframes enter {
+  from {
+    opacity: 0;
+    transform: translate(var(--enter-x), var(--enter-y)) scale(var(--enter-s));
+  }
+}
+
+/* Curseurs clignotants (Gaming, Terminal) */
+@keyframes blink {
+  50% {
+    opacity: 0;
+  }
+}
+
+/* ============================================================
    Décors de fond par thème
    ============================================================ */
 
 /* Gaming : grille HUD discrète + halo cyan en haut d'écran */
 [data-theme="gaming"] body {
   background-image:
-    radial-gradient(ellipse 90% 55% at 50% -10%, rgba(45, 212, 255, 0.07), transparent 65%),
+    radial-gradient(
+      ellipse 90% 55% at 50% -10%,
+      color-mix(in srgb, var(--accent) 7%, transparent),
+      transparent 65%
+    ),
     linear-gradient(rgba(96, 128, 255, 0.05) 1px, transparent 1px),
     linear-gradient(90deg, rgba(96, 128, 255, 0.05) 1px, transparent 1px);
   background-size:
@@ -200,9 +235,21 @@ a:hover {
 /* Nature : halos organiques sauge et terracotta */
 [data-theme="nature"] body {
   background-image:
-    radial-gradient(ellipse 60% 45% at 12% 0%, rgba(71, 124, 87, 0.1), transparent 70%),
-    radial-gradient(ellipse 55% 40% at 95% 15%, rgba(194, 112, 62, 0.08), transparent 70%),
-    radial-gradient(ellipse 70% 50% at 50% 110%, rgba(71, 124, 87, 0.08), transparent 70%);
+    radial-gradient(
+      ellipse 60% 45% at 12% 0%,
+      color-mix(in srgb, var(--accent) 10%, transparent),
+      transparent 70%
+    ),
+    radial-gradient(
+      ellipse 55% 40% at 95% 15%,
+      color-mix(in srgb, var(--accent-2) 8%, transparent),
+      transparent 70%
+    ),
+    radial-gradient(
+      ellipse 70% 50% at 50% 110%,
+      color-mix(in srgb, var(--accent) 8%, transparent),
+      transparent 70%
+    );
   background-attachment: fixed;
 }
 
@@ -219,7 +266,11 @@ a:hover {
 /* Terminal : scanlines CRT + halo phosphore */
 [data-theme="terminal"] body {
   background-image:
-    radial-gradient(ellipse 100% 90% at 50% 10%, rgba(51, 255, 119, 0.05), transparent 70%),
+    radial-gradient(
+      ellipse 100% 90% at 50% 10%,
+      color-mix(in srgb, var(--accent) 5%, transparent),
+      transparent 70%
+    ),
     repeating-linear-gradient(
       0deg,
       rgba(0, 0, 0, 0.22) 0px,
@@ -242,15 +293,55 @@ a:hover {
 }
 
 /* ============================================================
-   Accessibilité : neutralise toutes les animations si demandé
+   Impression : la feuille du CV (thème Sérieux, imposé par
+   useTheme le temps de l'impression), sans décors de fond.
+   Marges de page à 0 pour que le navigateur n'imprime pas ses
+   propres en-têtes et pieds de page (date, URL, numérotation).
    ============================================================ */
+
+@page {
+  size: A4;
+  margin: 0;
+}
+
+@media print {
+  /* Les tailles du site sont en rem : réduire la racine compacte tout
+     proportionnellement pour tenir le CV sur une page */
+  html {
+    font-size: 13.5px;
+  }
+
+  body {
+    background: #fff !important;
+  }
+
+  /* Un élément saisi en pleine animation d'entrée s'imprimerait invisible */
+  *,
+  *::before,
+  *::after {
+    animation: none !important;
+    transition: none !important;
+  }
+}
+
+/* ============================================================
+   Accessibilité : neutralise animations et délais si demandé
+   ============================================================ */
+
+@media (prefers-reduced-motion: no-preference) {
+  html {
+    scroll-behavior: smooth;
+  }
+}
 
 @media (prefers-reduced-motion: reduce) {
   *,
   *::before,
   *::after {
     animation-duration: 0.01ms !important;
+    animation-delay: 0s !important;
     animation-iteration-count: 1 !important;
     transition-duration: 0.01ms !important;
+    transition-delay: 0s !important;
   }
 }

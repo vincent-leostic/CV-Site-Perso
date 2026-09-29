@@ -1,204 +1,221 @@
 <script setup lang="ts">
-import { cv } from "~/data/cv";
-import TechIcon from "./TechIcon.vue";
+import { cv, type Casquette } from "~/data/cv";
 
-const telHref = `tel:${cv.phone.replaceAll(" ", "")}`;
-
-// Nuage de technos : tous les groupes à plat, les icônes en avant
+// Nuage de technos : tous les groupes à plat
 const allSkills = cv.skillGroups.flatMap((group) => group.skills);
+
+/** Chaque casquette a sa couleur, portée par un modificateur du badge */
+const BADGE_MODIFIERS: Record<Casquette, string> = {
+  "Chef de projet": "lead",
+  Développeur: "dev",
+  "Responsable technique": "tech",
+  "Responsable fonctionnel": "func",
+  IA: "ai",
+  "En autonomie": "solo",
+};
 
 /** Le PDF, c'est simplement la version imprimée : les styles print s'occupent du reste */
 function printCv() {
   window.print();
 }
-
-/** URL lisible sur papier, sans le protocole, ex. "github.com/vincent-leostic" */
-function printUrl(url: string) {
-  return url.replace(/^https?:\/\//, "").replace(/\/$/, "");
-}
-
-/** Domaine affiché d'un projet, sans le www */
-function projectHost(url: string) {
-  return new URL(url).hostname.replace(/^www\./, "");
-}
-
-/** Chaque casquette a sa couleur, portée par la classe du badge */
-function badgeClass(badge: string) {
-  const slug = badge
-    .toLowerCase()
-    .normalize("NFD")
-    .replace(/[̀-ͯ]/g, "")
-    .replace(/[^a-z]+/g, "-");
-  return `m-badge badge-${slug}`;
-}
 </script>
 
 <template>
-  <div class="serieux">
+  <div class="layout serieux">
     <div class="sheet">
       <!-- Colonne latérale : identité, contact, compétences -->
-      <aside class="side">
-        <img class="avatar" :src="cv.photo" :alt="`Photo de ${cv.name}`" width="200" height="200" />
-        <h1 class="name">{{ cv.name }}</h1>
-        <p class="role">{{ cv.title }}</p>
-        <p class="age">{{ cv.age }} ans · {{ cv.location }}</p>
-        <p class="bio">{{ cv.bio }}</p>
-
-        <div class="contact">
-          <a class="c-row" :href="`mailto:${cv.email}`">
-            <svg
-              class="c-ico"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              stroke-width="2"
-              stroke-linecap="round"
-              stroke-linejoin="round"
-              aria-hidden="true"
-            >
-              <rect width="20" height="16" x="2" y="4" rx="2" />
-              <path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7" />
-            </svg>
-            <span>{{ cv.email }}</span>
-          </a>
-          <a class="c-row" :href="telHref">
-            <svg
-              class="c-ico"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              stroke-width="2"
-              stroke-linecap="round"
-              stroke-linejoin="round"
-              aria-hidden="true"
-            >
-              <path
-                d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"
-              />
-            </svg>
-            <span>{{ cv.phone }}</span>
-          </a>
-          <!-- L'adresse du site n'a de sens que sur papier : à l'écran, on y est déjà -->
-          <a class="c-row print-row" :href="cv.website">
-            <svg
-              class="c-ico"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              stroke-width="2"
-              stroke-linecap="round"
-              stroke-linejoin="round"
-              aria-hidden="true"
-            >
-              <circle cx="12" cy="12" r="10" />
-              <path d="M12 2a14.5 14.5 0 0 0 0 20 14.5 14.5 0 0 0 0-20" />
-              <path d="M2 12h20" />
-            </svg>
-            <span>{{ printUrl(cv.website) }}</span>
-          </a>
-          <a
-            v-for="link in cv.links"
-            :key="link.label"
-            class="c-row"
-            :href="link.url"
-            target="_blank"
-            rel="noopener"
-          >
-            <TechIcon class="c-ico" :label="link.label" />
-            <span class="label-screen">{{ link.label }}</span>
-            <span class="label-print">{{ printUrl(link.url) }}</span>
-          </a>
+      <div class="sheet__side">
+        <div class="identity">
+          <img
+            class="identity__avatar"
+            :src="cv.photo"
+            :alt="`Photo de ${cv.name}`"
+            width="200"
+            height="200"
+          />
+          <h1 class="identity__name">{{ cv.name }}</h1>
+          <p class="identity__role">{{ cv.title }}</p>
+          <p class="identity__meta">{{ cv.age }} ans · {{ cv.location }}</p>
+          <p class="identity__bio">{{ cv.bio }}</p>
         </div>
 
+        <ul class="contact" role="list">
+          <li class="contact__item">
+            <a class="contact__link" :href="`mailto:${cv.email}`">
+              <svg
+                class="contact__icon"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                aria-hidden="true"
+              >
+                <rect width="20" height="16" x="2" y="4" rx="2" />
+                <path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7" />
+              </svg>
+              <span>{{ cv.email }}</span>
+            </a>
+          </li>
+          <li class="contact__item">
+            <a class="contact__link" :href="toTelHref(cv.phone)">
+              <svg
+                class="contact__icon"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                aria-hidden="true"
+              >
+                <path
+                  d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"
+                />
+              </svg>
+              <span>{{ cv.phone }}</span>
+            </a>
+          </li>
+          <!-- L'adresse du site n'a de sens que sur papier : à l'écran, on y est déjà -->
+          <li class="contact__item contact__item--print">
+            <a class="contact__link" :href="cv.website">
+              <svg
+                class="contact__icon"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                aria-hidden="true"
+              >
+                <circle cx="12" cy="12" r="10" />
+                <path d="M12 2a14.5 14.5 0 0 0 0 20 14.5 14.5 0 0 0 0-20" />
+                <path d="M2 12h20" />
+              </svg>
+              <span>{{ bareUrl(cv.website) }}</span>
+            </a>
+          </li>
+          <li v-for="link in cv.links" :key="link.label" class="contact__item">
+            <a class="contact__link" :href="link.url" target="_blank" rel="noopener">
+              <CvTechIcon v-if="link.icon" class="contact__icon" :name="link.icon" />
+              <span class="contact__label contact__label--screen">{{ link.label }}</span>
+              <span class="contact__label contact__label--print">{{ bareUrl(link.url) }}</span>
+            </a>
+          </li>
+        </ul>
+
         <!-- Version compacte du nuage, réservée à l'impression (bande de gauche) -->
-        <div class="side-sec side-technos">
-          <h2 class="side-title">Technos & outils</h2>
-          <ul class="cloud cloud-side">
-            <li v-for="skill in allSkills" :key="skill" class="chip">
-              <TechIcon :label="skill" branded />{{ skill }}
+        <div class="side-section side-section--print">
+          <h2 class="side-section__title">Technos & outils</h2>
+          <ul class="tech-list tech-list--compact" role="list">
+            <li v-for="skill in allSkills" :key="skill.label" class="tech-list__item">
+              <CvTechIcon v-if="skill.icon" class="tech-list__icon" :name="skill.icon" branded />{{
+                skill.label
+              }}
             </li>
           </ul>
         </div>
 
-        <div class="side-extras">
-          <div class="side-sec">
-            <h2 class="side-title">Formation</h2>
-            <p v-for="edu in cv.education" :key="edu.degree" class="side-line">
-              <strong>{{ edu.period }}</strong> : {{ edu.degree }}, {{ edu.school }}
-            </p>
-          </div>
-
-          <div class="side-sec">
-            <h2 class="side-title">Langues</h2>
-            <p v-for="lang in cv.languages" :key="lang.name" class="side-line">
-              <strong>{{ lang.name }}</strong> : {{ lang.level }}
-            </p>
-          </div>
-
-          <div class="side-sec">
-            <h2 class="side-title">Hobbies</h2>
-            <p class="side-line">{{ cv.hobbies.join(" · ") }}</p>
-          </div>
+        <div class="side-section">
+          <h2 class="side-section__title">Formation</h2>
+          <p v-for="edu in cv.education" :key="edu.degree" class="side-section__line">
+            <strong class="side-section__key">{{ edu.period }}</strong> : {{ edu.degree }},
+            {{ edu.school }}
+          </p>
         </div>
 
-        <button type="button" class="print-btn" @click="printCv">Imprimer / PDF</button>
-      </aside>
+        <div class="side-section">
+          <h2 class="side-section__title">Langues</h2>
+          <p v-for="lang in cv.languages" :key="lang.name" class="side-section__line">
+            <strong class="side-section__key">{{ lang.name }}</strong> : {{ lang.level }}
+          </p>
+        </div>
+
+        <div class="side-section">
+          <h2 class="side-section__title">Hobbies</h2>
+          <p class="side-section__line">{{ cv.hobbies.join(" · ") }}</p>
+        </div>
+
+        <button type="button" class="print-button" @click="printCv">Imprimer / PDF</button>
+      </div>
 
       <!-- Colonne principale : parcours en timeline -->
-      <div class="content">
-        <section>
-          <h2 class="sec-title">Expériences</h2>
+      <div class="sheet__main">
+        <section class="sheet__section">
+          <h2 class="sheet__title">Expériences</h2>
           <ol class="timeline">
-            <li v-for="exp in cv.experiences" :key="`${exp.role}-${exp.company}`" class="tl-item">
-              <div class="tl-head">
-                <p class="tl-period">{{ exp.period }}</p>
-                <h3 class="tl-role">{{ exp.role }}</h3>
-                <p class="tl-company">{{ exp.company }}</p>
+            <li
+              v-for="exp in cv.experiences"
+              :key="`${exp.role}-${exp.company}`"
+              class="timeline__item"
+            >
+              <div class="timeline__head">
+                <p class="timeline__period">{{ exp.period }}</p>
+                <h3 class="timeline__role">{{ exp.role }}</h3>
+                <p class="timeline__company">{{ exp.company }}</p>
               </div>
-              <p class="tl-desc">{{ exp.description }}</p>
-              <ul v-if="exp.missions" class="tl-missions">
-                <li v-for="m in exp.missions" :key="m.title">
-                  <p class="m-title">
+              <p class="timeline__desc">{{ exp.description }}</p>
+              <ul v-if="exp.missions" class="timeline__missions" role="list">
+                <li v-for="m in exp.missions" :key="m.title" class="card mission">
+                  <p class="mission__title">
                     {{ m.title }}
-                    <span v-if="m.favorite" class="fav" role="img" aria-label="Mission favorite"
+                    <span
+                      v-if="m.favorite"
+                      class="mission__fav"
+                      role="img"
+                      aria-label="Mission favorite"
                       >★</span
                     >
                   </p>
-                  <p v-if="m.badges" class="m-badges">
-                    <span v-for="badge in m.badges" :key="badge" :class="badgeClass(badge)">{{
-                      badge
-                    }}</span>
-                  </p>
-                  <p class="m-desc">{{ m.description }}</p>
+                  <ul v-if="m.badges" class="mission__badges" role="list">
+                    <li
+                      v-for="badge in m.badges"
+                      :key="badge"
+                      class="badge"
+                      :class="`badge--${BADGE_MODIFIERS[badge]}`"
+                    >
+                      {{ badge }}
+                    </li>
+                  </ul>
+                  <p class="mission__desc">{{ m.description }}</p>
                 </li>
               </ul>
             </li>
           </ol>
         </section>
 
-        <section class="projects-sec">
-          <h2 class="sec-title">Projets perso</h2>
-          <ul class="projects">
-            <li v-for="proj in cv.personalProjects" :key="proj.title" class="project">
-              <a class="p-head" :href="proj.url" target="_blank" rel="noopener">
-                <span class="p-title">{{ proj.title }}</span>
-                <span class="p-host">{{ projectHost(proj.url) }} ↗</span>
+        <!-- Les projets perso restent sur l'écran : la mise en page papier est
+             calibrée sans eux (et les liens ne se cliquent pas sur une feuille) -->
+        <section class="sheet__section sheet__section--screen">
+          <h2 class="sheet__title">Projets perso</h2>
+          <ul class="projects" role="list">
+            <li v-for="proj in cv.personalProjects" :key="proj.title" class="card project">
+              <a class="project__link" :href="proj.url" target="_blank" rel="noopener">
+                <span class="project__title">{{ proj.title }}</span>
+                <span class="project__host"
+                  >{{ hostOf(proj.url) }} <span aria-hidden="true">↗</span></span
+                >
               </a>
-              <p class="p-desc">{{ proj.description }}</p>
-              <p v-if="proj.stack" class="p-stack">
-                <span v-for="tech in proj.stack" :key="tech" class="p-tech">
-                  <TechIcon :label="tech" branded />{{ tech }}
-                </span>
-              </p>
+              <p class="project__desc">{{ proj.description }}</p>
+              <ul v-if="proj.stack" class="project__stack" role="list">
+                <li v-for="tech in proj.stack" :key="tech.label" class="project__tech">
+                  <CvTechIcon v-if="tech.icon" :name="tech.icon" branded />{{ tech.label }}
+                </li>
+              </ul>
             </li>
           </ul>
         </section>
 
-        <section class="cloud-sec">
-          <h2 class="sec-title">Technos & outils</h2>
-          <ul class="cloud">
-            <li v-for="skill in allSkills" :key="skill" class="chip">
-              <TechIcon :label="skill" branded />{{ skill }}
+        <!-- En impression, le nuage vit dans la bande (version compacte) -->
+        <section class="sheet__section sheet__section--screen">
+          <h2 class="sheet__title">Technos & outils</h2>
+          <ul class="tech-list" role="list">
+            <li v-for="skill in allSkills" :key="skill.label" class="tech-list__item">
+              <CvTechIcon v-if="skill.icon" class="tech-list__icon" :name="skill.icon" branded />{{
+                skill.label
+              }}
             </li>
           </ul>
         </section>
@@ -209,13 +226,12 @@ function badgeClass(badge: string) {
 
 <style scoped>
 .serieux {
-  max-width: var(--container);
-  margin: 0 auto;
-  padding: 2.5rem 1.5rem 3rem;
+  --border-accent: color-mix(in srgb, var(--accent) 45%, var(--border));
 }
 
 /* La "feuille" : une page imprimée haut de gamme */
 .sheet {
+  --enter-y: 14px;
   display: grid;
   grid-template-columns: 300px 1fr;
   gap: 3rem;
@@ -223,27 +239,33 @@ function badgeClass(badge: string) {
   border: 1px solid var(--border);
   padding: 3rem;
   box-shadow: var(--shadow);
-  animation: sheet-in 0.6s cubic-bezier(0.22, 1, 0.36, 1) backwards;
+  animation: enter 0.6s var(--ease-out) backwards;
 }
 
-@keyframes sheet-in {
-  from {
-    opacity: 0;
-    transform: translateY(14px);
-  }
-}
-
-/* --- Sidebar --- */
-.side {
+/* --- Colonne latérale --- */
+.sheet__side {
   align-self: start;
-  position: sticky;
-  top: 5rem;
   display: flex;
   flex-direction: column;
   gap: 0.4rem;
 }
 
-.avatar {
+/* Collante seulement si elle tient dans la fenêtre : sinon Langues,
+   Hobbies et le bouton d'impression resteraient hors champ */
+@media screen and (min-width: 761px) and (min-height: 66rem) {
+  .sheet__side {
+    position: sticky;
+    top: 5rem;
+  }
+}
+
+.identity {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+}
+
+.identity__avatar {
   width: 88px;
   height: 88px;
   object-fit: cover;
@@ -253,30 +275,30 @@ function badgeClass(badge: string) {
   transition: filter 0.4s;
 }
 
-.avatar:hover {
+.identity__avatar:hover {
   filter: grayscale(0);
 }
 
-.name {
+.identity__name {
   font-size: 1.8rem;
   font-weight: 800;
   letter-spacing: -0.02em;
   line-height: 1.15;
 }
 
-.role {
+.identity__role {
   color: var(--accent);
   font-weight: 600;
   font-size: 1.05rem;
 }
 
-.age {
+.identity__meta {
   color: var(--text-muted);
   font-size: 0.95rem;
   margin-bottom: 0.8rem;
 }
 
-.bio {
+.identity__bio {
   color: var(--text-muted);
   font-size: 1rem;
   line-height: 1.65;
@@ -286,6 +308,7 @@ function badgeClass(badge: string) {
 }
 
 .contact {
+  list-style: none;
   display: flex;
   flex-direction: column;
   gap: 0.45rem;
@@ -295,19 +318,18 @@ function badgeClass(badge: string) {
   margin-bottom: 1.2rem;
 }
 
-.contact a:hover,
-.contact a:focus-visible {
-  text-decoration: underline;
-}
-
-.c-row {
+.contact__link {
   display: inline-flex;
   align-items: center;
   gap: 0.45rem;
   min-width: 0;
 }
 
-.c-ico {
+.contact__link:is(:hover, :focus-visible) {
+  text-decoration: underline;
+}
+
+.contact__icon {
   width: 1em;
   height: 1em;
   flex: none;
@@ -315,27 +337,21 @@ function badgeClass(badge: string) {
 }
 
 /* Les URLs complètes et la ligne du site ne servent que sur papier */
-.label-print,
-.print-row {
+.contact__label--print,
+.contact__item--print {
   display: none;
 }
 
-/* À l'écran, le wrapper est transparent : les sections restent des enfants
-   directs de la sidebar ; il ne sert qu'à la grille d'impression. */
-.side-extras {
-  display: contents;
-}
-
-/* Le nuage compact de la bande n'existe qu'à l'impression */
-.side-technos {
-  display: none;
-}
-
-.side-sec {
+.side-section {
   margin-bottom: 1.1rem;
 }
 
-.side-title {
+/* Le nuage compact de la bande n'existe qu'à l'impression */
+.side-section--print {
+  display: none;
+}
+
+.side-section__title {
   font-size: 0.78rem;
   font-weight: 700;
   text-transform: uppercase;
@@ -344,18 +360,18 @@ function badgeClass(badge: string) {
   margin-bottom: 0.35rem;
 }
 
-.side-line {
+.side-section__line {
   font-size: 0.95rem;
   color: var(--text-muted);
   line-height: 1.55;
 }
 
-.side-line strong {
+.side-section__key {
   color: var(--text);
   font-weight: 600;
 }
 
-.print-btn {
+.print-button {
   align-self: start;
   margin-top: 0.3rem;
   padding: 0.45rem 1rem;
@@ -364,7 +380,7 @@ function badgeClass(badge: string) {
   font-weight: 600;
   color: var(--accent);
   background: none;
-  border: 1px solid color-mix(in srgb, var(--accent) 45%, var(--border));
+  border: 1px solid var(--border-accent);
   border-radius: var(--radius-pill);
   cursor: pointer;
   transition:
@@ -372,21 +388,270 @@ function badgeClass(badge: string) {
     color 0.2s;
 }
 
-.print-btn:hover,
-.print-btn:focus-visible {
+.print-button:is(:hover, :focus-visible) {
   background: var(--accent);
   color: var(--bg-card);
 }
 
+/* --- Colonne principale --- */
+.sheet__main {
+  display: flex;
+  flex-direction: column;
+  gap: 2.5rem;
+  min-width: 0;
+}
+
+.sheet__title {
+  font-size: 0.85rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.14em;
+  color: var(--accent);
+  display: flex;
+  align-items: center;
+  gap: 0.8rem;
+  margin-bottom: 1.4rem;
+}
+
+/* Filet qui prolonge le titre de section */
+.sheet__title::after {
+  content: "";
+  flex: 1;
+  height: 1px;
+  background: var(--border);
+}
+
+/* --- Timeline --- */
+.timeline {
+  list-style: none;
+  border-left: 1px solid var(--border);
+  display: flex;
+  flex-direction: column;
+  gap: 1.8rem;
+}
+
+.timeline__item {
+  --enter-x: 10px;
+  position: relative;
+  padding-left: 1.6rem;
+  animation: enter 0.55s var(--ease-out) backwards;
+}
+
+.timeline__item:nth-child(1) {
+  animation-delay: 0.15s;
+}
+
+.timeline__item:nth-child(2) {
+  animation-delay: 0.25s;
+}
+
+.timeline__item:nth-child(3) {
+  animation-delay: 0.35s;
+}
+
+/* Point de la timeline */
+.timeline__item::before {
+  content: "";
+  position: absolute;
+  left: -4.5px;
+  top: 0.45rem;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--accent);
+}
+
+/* À l'écran, l'en-tête de job est transparent : il ne sert qu'à la
+   languette de la version imprimée */
+.timeline__head {
+  display: contents;
+}
+
+.timeline__period {
+  font-size: 0.85rem;
+  color: var(--text-muted);
+  font-variant-numeric: tabular-nums;
+  margin-bottom: 0.15rem;
+}
+
+.timeline__role {
+  font-size: 1.2rem;
+  font-weight: 700;
+}
+
+.timeline__company {
+  font-size: 1rem;
+  color: var(--accent);
+  margin-bottom: 0.35rem;
+}
+
+.timeline__desc {
+  font-size: 1rem;
+  color: var(--text-muted);
+  white-space: pre-line;
+}
+
+/* Missions en cartes : l'expérience occupe le terrain */
+.timeline__missions {
+  margin-top: 0.9rem;
+  list-style: none;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(min(250px, 100%), 1fr));
+  gap: 0.6rem;
+}
+
+/* --- Cartes : missions et projets perso --- */
+.card {
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-left: 3px solid color-mix(in srgb, var(--accent) 55%, var(--border));
+  border-radius: 8px;
+}
+
+.mission {
+  line-height: 1.5;
+  padding: 0.7rem 0.9rem;
+}
+
+.mission__title {
+  font-size: 0.98rem;
+  font-weight: 600;
+  margin-bottom: 0.25rem;
+}
+
+.mission__fav {
+  color: var(--fav);
+  margin-left: 0.15rem;
+}
+
+.mission__badges {
+  list-style: none;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.28rem;
+  margin: 0.3rem 0 0.4rem;
+}
+
+.mission__desc {
+  font-size: 0.92rem;
+  color: var(--text-muted);
+}
+
+/* --- Badges de casquette : une couleur par casquette --- */
+.badge {
+  font-size: 0.75rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+  color: var(--badge, var(--accent));
+  background: color-mix(in srgb, var(--badge, var(--accent)) 10%, transparent);
+  border: 1px solid color-mix(in srgb, var(--badge, var(--accent)) 28%, transparent);
+  border-radius: var(--radius-pill);
+  padding: 0.05rem 0.5rem;
+}
+
+.badge--lead {
+  --badge: #3b5bdb;
+}
+
+.badge--dev {
+  --badge: #237532;
+}
+
+.badge--tech {
+  --badge: #b04409;
+}
+
+.badge--func {
+  --badge: #0a7283;
+}
+
+.badge--ai {
+  --badge: #9c36b5;
+}
+
+.badge--solo {
+  --badge: #5d6470;
+}
+
+/* --- Projets perso --- */
+.projects {
+  list-style: none;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(min(280px, 100%), 1fr));
+  gap: 0.8rem;
+}
+
+.project {
+  padding: 0.9rem 1.1rem;
+  transition:
+    border-color 0.2s,
+    box-shadow 0.2s;
+}
+
+.project:is(:hover, :focus-within) {
+  border-color: var(--border-accent);
+  box-shadow: var(--shadow);
+}
+
+.project__link {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 0.1rem;
+  margin-bottom: 0.35rem;
+}
+
+.project__link:is(:hover, :focus-visible) .project__title {
+  text-decoration: underline;
+}
+
+.project__title {
+  font-size: 1rem;
+  font-weight: 600;
+}
+
+.project__host {
+  font-size: 0.82rem;
+  color: var(--accent);
+  white-space: nowrap;
+}
+
+.project__desc {
+  font-size: 0.92rem;
+  color: var(--text-muted);
+  line-height: 1.5;
+}
+
+.project__stack {
+  list-style: none;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.35rem;
+  margin-top: 0.5rem;
+}
+
+.project__tech {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  font-size: 0.78rem;
+  font-weight: 500;
+  color: var(--text-muted);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-pill);
+  padding: 0.12rem 0.55rem;
+}
+
 /* --- Nuage de technos --- */
-.cloud {
+.tech-list {
   list-style: none;
   display: flex;
   flex-wrap: wrap;
   gap: 0.65rem;
 }
 
-.chip {
+.tech-list__item {
   display: inline-flex;
   align-items: center;
   gap: 0.55rem;
@@ -402,278 +667,44 @@ function badgeClass(badge: string) {
     transform 0.2s;
 }
 
-.chip:hover {
-  border-color: color-mix(in srgb, var(--accent) 45%, var(--border));
+.tech-list__item:hover {
+  border-color: var(--border-accent);
   box-shadow: var(--shadow);
   transform: translateY(-1px);
 }
 
-.chip .tech-icon {
+.tech-list__icon {
   font-size: 1.25rem;
   color: var(--accent);
 }
 
-/* --- Projets perso --- */
-.projects {
-  list-style: none;
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-  gap: 0.8rem;
-}
-
-.project {
-  padding: 0.9rem 1.1rem;
-  background: var(--bg);
-  border: 1px solid var(--border);
-  border-left: 3px solid color-mix(in srgb, var(--accent) 55%, var(--border));
-  border-radius: 8px;
-  transition:
-    border-color 0.2s,
-    box-shadow 0.2s;
-}
-
-.project:hover {
-  border-color: color-mix(in srgb, var(--accent) 45%, var(--border));
-  box-shadow: var(--shadow);
-}
-
-.p-head {
-  display: flex;
-  flex-direction: column;
-  align-items: flex-start;
-  gap: 0.1rem;
-  margin-bottom: 0.35rem;
-}
-
-.p-head:hover .p-title,
-.p-head:focus-visible .p-title {
-  text-decoration: underline;
-}
-
-.p-title {
-  font-size: 1rem;
-  font-weight: 600;
-}
-
-.p-host {
-  font-size: 0.82rem;
-  color: var(--accent);
-  white-space: nowrap;
-}
-
-.p-desc {
-  font-size: 0.92rem;
-  color: var(--text-muted);
-  line-height: 1.5;
-}
-
-.p-stack {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 0.35rem;
-  margin-top: 0.5rem;
-}
-
-.p-tech {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.35rem;
-  font-size: 0.78rem;
-  font-weight: 500;
-  color: var(--text-muted);
-  border: 1px solid var(--border);
-  border-radius: var(--radius-pill);
-  padding: 0.12rem 0.55rem;
-}
-
-/* --- Contenu principal --- */
-.content {
-  display: flex;
-  flex-direction: column;
-  gap: 2.5rem;
-  min-width: 0;
-}
-
-.sec-title {
-  font-size: 0.85rem;
-  font-weight: 700;
-  text-transform: uppercase;
-  letter-spacing: 0.14em;
-  color: var(--accent);
-  display: flex;
-  align-items: center;
-  gap: 0.8rem;
-  margin-bottom: 1.4rem;
-}
-
-/* Filet qui prolonge le titre de section */
-.sec-title::after {
-  content: "";
-  flex: 1;
-  height: 1px;
-  background: var(--border);
-}
-
-.timeline {
-  list-style: none;
-  border-left: 1px solid var(--border);
-  display: flex;
-  flex-direction: column;
-  gap: 1.8rem;
-}
-
-/* À l'écran, l'en-tête de job est transparent : il ne sert qu'à la
-   languette de la version imprimée */
-.tl-head {
-  display: contents;
-}
-
-.tl-item {
-  position: relative;
-  padding-left: 1.6rem;
-  animation: item-in 0.55s cubic-bezier(0.22, 1, 0.36, 1) backwards;
-}
-
-.tl-item:nth-child(1) {
-  animation-delay: 0.15s;
-}
-
-.tl-item:nth-child(2) {
-  animation-delay: 0.25s;
-}
-
-.tl-item:nth-child(3) {
-  animation-delay: 0.35s;
-}
-
-@keyframes item-in {
-  from {
-    opacity: 0;
-    transform: translateX(10px);
+@media screen and (max-width: 760px) {
+  .sheet {
+    grid-template-columns: 1fr;
+    gap: 2rem;
+    padding: 1.8rem;
   }
 }
 
-/* Point de la timeline */
-.tl-item::before {
-  content: "";
-  position: absolute;
-  left: -4.5px;
-  top: 0.45rem;
-  width: 8px;
-  height: 8px;
-  border-radius: 50%;
-  background: var(--accent);
-}
-
-.tl-period {
-  font-size: 0.85rem;
-  color: var(--text-muted);
-  font-variant-numeric: tabular-nums;
-  margin-bottom: 0.15rem;
-}
-
-.tl-role {
-  font-size: 1.2rem;
-  font-weight: 700;
-}
-
-.tl-company {
-  font-size: 1rem;
-  color: var(--accent);
-  margin-bottom: 0.35rem;
-}
-
-.tl-desc {
-  font-size: 1rem;
-  color: var(--text-muted);
-  white-space: pre-line;
-}
-
-/* Missions en cartes : l'expérience occupe le terrain */
-.tl-missions {
-  margin-top: 0.9rem;
-  list-style: none;
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
-  gap: 0.6rem;
-}
-
-.tl-missions li {
-  line-height: 1.5;
-  padding: 0.7rem 0.9rem;
-  background: var(--bg);
-  border: 1px solid var(--border);
-  border-left: 3px solid color-mix(in srgb, var(--accent) 55%, var(--border));
-  border-radius: 8px;
-}
-
-.m-title {
-  font-size: 0.98rem;
-  font-weight: 600;
-  margin-bottom: 0.25rem;
-}
-
-.m-desc {
-  font-size: 0.92rem;
-  color: var(--text-muted);
-}
-
-.fav {
-  color: #f0b429;
-  margin-left: 0.15rem;
-}
-
-.m-badges {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 0.28rem;
-  margin: 0.3rem 0 0.4rem;
-}
-
-.m-badge {
-  font-size: 0.56rem;
-  font-weight: 600;
-  text-transform: uppercase;
-  letter-spacing: 0.04em;
-  color: var(--badge, var(--accent));
-  background: color-mix(in srgb, var(--badge, var(--accent)) 10%, transparent);
-  border: 1px solid color-mix(in srgb, var(--badge, var(--accent)) 28%, transparent);
-  border-radius: var(--radius-pill);
-  padding: 0.07rem 0.42rem;
-}
-
-/* Une couleur par casquette */
-.badge-chef-de-projet {
-  --badge: #3b5bdb;
-}
-
-.badge-developpeur {
-  --badge: #2f9e44;
-}
-
-.badge-responsable-technique {
-  --badge: #e8590c;
-}
-
-.badge-responsable-fonctionnel {
-  --badge: #0c8599;
-}
-
-.badge-ia {
-  --badge: #9c36b5;
-}
-
-.badge-en-autonomie {
-  --badge: #5d6470;
+@media screen and (max-width: 400px) {
+  .sheet {
+    padding: 1.2rem;
+  }
 }
 
 /* --- Impression : CV moderne à bande latérale encrée.
    Colonne bleu profond avec l'identité en blanc, répétée sur chaque
-   page ; colonne claire pour le parcours, cartes et chips teintées. --- */
+   page ; colonne claire pour le parcours, missions en liste. --- */
 @media print {
   .serieux {
+    --ink: #232f7a;
+    --ink-soft: #bcc8ff;
+    --ink-pale: #dde3ff;
     max-width: none;
     padding: 0;
+    /* Aplats imprimés tels quels : la propriété s'hérite dans toute la feuille */
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
   }
 
   /* La bande encrée : en position fixe, elle se répète sur chaque page */
@@ -682,30 +713,26 @@ function badgeClass(badge: string) {
     position: fixed;
     inset: 0 auto 0 0;
     width: 62mm;
-    background: #232f7a;
-    -webkit-print-color-adjust: exact;
-    print-color-adjust: exact;
+    background: var(--ink);
   }
 
   .sheet {
-    display: grid;
     grid-template-columns: 62mm 1fr;
     gap: 0;
     padding: 0;
     border: 0;
     box-shadow: none;
-    animation: none;
   }
 
-  /* --- Colonne encre : identité et infos clés en blanc --- */
-  .side {
+  /* --- Colonne encre : identité et infos clés en blanc.
+     Positionnée pour passer au-dessus de la bande fixe. --- */
+  .sheet__side {
     position: relative;
-    top: 0;
     padding: 7mm 5mm 10mm 7mm;
     color: #fff;
   }
 
-  .avatar {
+  .identity__avatar {
     width: 30mm;
     height: 30mm;
     border: 2px solid rgba(255, 255, 255, 0.85);
@@ -713,24 +740,24 @@ function badgeClass(badge: string) {
     filter: none;
   }
 
-  .name {
+  .identity__name {
     font-size: 17pt;
     color: #fff;
   }
 
-  .role {
-    color: #bcc8ff;
+  .identity__role {
+    color: var(--ink-soft);
     font-size: 10.5pt;
   }
 
-  .age {
-    color: #bcc8ff;
+  .identity__meta {
+    color: var(--ink-soft);
     font-size: 9pt;
     margin-bottom: 3mm;
   }
 
-  .bio {
-    color: #dde3ff;
+  .identity__bio {
+    color: var(--ink-pale);
     font-size: 9pt;
     border: 0;
     padding-bottom: 0;
@@ -745,49 +772,58 @@ function badgeClass(badge: string) {
     font-size: 9pt;
   }
 
-  .contact a {
-    color: #fff;
-  }
-
-  .contact .c-ico {
+  .contact__link,
+  .contact__icon {
     color: #fff;
   }
 
   /* Sur papier, l'URL complète remplace le libellé du lien */
-  .label-screen {
+  .contact__label--screen {
     display: none;
   }
 
-  .label-print {
+  .contact__label--print {
     display: inline;
     overflow-wrap: anywhere;
   }
 
-  .print-row {
-    display: inline-flex;
+  .contact__item--print {
+    display: block;
   }
 
-  .side-sec {
+  .side-section {
     margin-bottom: 3.5mm;
     break-inside: avoid;
   }
 
   /* Le nuage compact rejoint la bande, avant la formation */
-  .side-technos {
+  .side-section--print {
     display: block;
+  }
+
+  .side-section__title {
+    color: #9daaf0;
+  }
+
+  .side-section__line {
+    color: var(--ink-pale);
+    font-size: 9pt;
+  }
+
+  .side-section__key {
+    color: #fff;
   }
 
   /* Icônes seules : pastilles rondes façon photo, le logo remplit la
      pastille et le blanc ne se lit plus que comme un fin liseré */
-  .cloud-side {
+  .tech-list--compact {
     display: grid;
     grid-template-columns: repeat(5, 1fr);
     gap: 1.8mm;
   }
 
-  .cloud-side .chip {
+  .tech-list--compact .tech-list__item {
     display: flex;
-    align-items: center;
     justify-content: center;
     gap: 0;
     aspect-ratio: 1;
@@ -796,48 +832,38 @@ function badgeClass(badge: string) {
     border: 0;
     padding: 0;
     border-radius: 50%;
-    -webkit-print-color-adjust: exact;
-    print-color-adjust: exact;
   }
 
-  .cloud-side .chip:not(:has(.tech-icon)) {
+  .tech-list--compact .tech-list__item:not(:has(.tech-list__icon)) {
     display: none;
   }
 
-  .cloud-side .tech-icon {
+  .tech-list--compact .tech-list__icon {
     width: 74%;
     height: 74%;
   }
 
-  .side-title {
-    color: #9daaf0;
-  }
-
-  .side-line {
-    color: #dde3ff;
-    font-size: 9pt;
-  }
-
-  .side-line strong {
-    color: #fff;
-  }
-
-  .print-btn {
+  .print-button {
     display: none;
   }
 
   /* --- Colonne claire : le parcours --- */
-  .content {
+  .sheet__main {
     display: block;
     padding: 10mm 10mm 10mm 8mm;
   }
 
-  .content section {
+  .sheet__section {
     margin-bottom: 2.5mm;
   }
 
-  /* Les languettes suffisent : pas de titre « Expériences » en print */
-  .content .sec-title {
+  /* Les languettes suffisent : pas de titre de section en print */
+  .sheet__title {
+    display: none;
+  }
+
+  /* Projets perso et nuage de technos : réservés à l'écran */
+  .sheet__section--screen {
     display: none;
   }
 
@@ -848,74 +874,71 @@ function badgeClass(badge: string) {
     border-left: 0;
   }
 
-  .tl-item {
-    animation: none;
+  .timeline__item {
     padding-left: 0;
     margin-bottom: 2.5mm;
   }
 
   /* De l'air entre deux expériences */
-  .tl-item + .tl-item {
+  .timeline__item + .timeline__item {
     margin-top: 5mm;
   }
 
   /* Les entrées courtes (sans cartes de missions) ne se coupent pas
      entre deux pages */
-  .tl-item:not(:has(.tl-missions)) {
+  .timeline__item:not(:has(.timeline__missions)) {
     break-inside: avoid;
   }
 
-  .tl-item::before {
+  .timeline__item::before {
     display: none;
   }
 
-  .tl-head {
+  .timeline__head {
     display: block;
-    background: #232f7a;
+    background: var(--ink);
     margin: 0 0 2mm -8mm;
     padding: 1.8mm 4mm 2mm 8mm;
     border-radius: 0 3mm 3mm 0;
     break-inside: avoid;
-    -webkit-print-color-adjust: exact;
-    print-color-adjust: exact;
   }
 
-  .tl-head .tl-period {
-    color: #bcc8ff;
+  .timeline__period {
+    color: var(--ink-soft);
     margin-bottom: 0.4mm;
   }
 
-  .tl-head .tl-role {
+  .timeline__role {
     color: #fff;
   }
 
-  .tl-head .tl-company {
-    color: #dde3ff;
+  .timeline__company {
+    color: var(--ink-pale);
     margin-bottom: 0;
   }
 
   /* Missions en liste simple : pastille devant chaque intitulé,
      encadrée d'un titre et d'une ouverture */
-  .tl-missions {
+  .timeline__missions {
     margin-top: 2.5mm;
     grid-template-columns: 1fr;
     gap: 2mm;
   }
 
-  .tl-missions::before {
+  .timeline__missions::before {
     content: "Mes missions";
     font-weight: 700;
     font-size: 1.05rem;
-    color: #232f7a;
+    color: var(--ink);
   }
 
-  .tl-missions::after {
+  .timeline__missions::after {
     content: "et bien plus encore";
     font-style: italic;
     color: var(--text-muted);
   }
 
-  .tl-missions li {
+  .mission {
     break-inside: avoid;
     position: relative;
     padding: 0 0 0 4.5mm;
@@ -925,7 +948,7 @@ function badgeClass(badge: string) {
   }
 
   /* La pastille */
-  .tl-missions li::before {
+  .mission::before {
     content: "";
     position: absolute;
     left: 0;
@@ -933,54 +956,13 @@ function badgeClass(badge: string) {
     width: 2mm;
     height: 2mm;
     border-radius: 50%;
-    background: #232f7a;
-    -webkit-print-color-adjust: exact;
-    print-color-adjust: exact;
+    background: var(--ink);
   }
 
   /* En impression, les casquettes restent sobres : marine uniforme */
-  .m-badge {
-    --badge: #232f7a;
-    -webkit-print-color-adjust: exact;
-    print-color-adjust: exact;
-  }
-
-  /* La section technos de la colonne claire disparaît : elle vit dans la bande */
-  .cloud-sec {
-    display: none;
-  }
-
-  /* Les projets perso restent sur l'écran : la mise en page papier est
-     calibrée sans eux (et les liens ne se cliquent pas sur une feuille) */
-  .projects-sec {
-    display: none;
-  }
-
-  .cloud {
-    gap: 2mm;
-  }
-
-  .chip {
-    break-inside: avoid;
-    box-shadow: none;
-    padding: 1.2mm 3mm;
-    font-size: 9pt;
-    background: #f1f3fd;
-    border-color: transparent;
-    -webkit-print-color-adjust: exact;
-    print-color-adjust: exact;
-  }
-}
-
-@media screen and (max-width: 760px) {
-  .sheet {
-    grid-template-columns: 1fr;
-    gap: 2rem;
-    padding: 1.8rem;
-  }
-
-  .side {
-    position: static;
+  .badge {
+    --badge: var(--ink);
+    font-size: 0.62rem;
   }
 }
 </style>

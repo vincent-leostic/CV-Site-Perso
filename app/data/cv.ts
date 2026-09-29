@@ -1,19 +1,31 @@
-export interface Link {
+import type { IconName } from "./icons";
+
+/** Libellé affiché, accompagné d'une icône de marque s'il y en a une */
+export interface Tech {
   label: string;
+  icon?: IconName;
+}
+
+export interface Link extends Tech {
   url: string;
 }
 
-/**
- * Casquettes possibles : "Chef de projet", "Développeur", "Responsable
- * technique", "Responsable fonctionnel", "IA", "En autonomie".
- */
+/** Casquettes tenues sur une mission ; chaque thème leur associe un style */
+export type Casquette =
+  | "Chef de projet"
+  | "Développeur"
+  | "Responsable technique"
+  | "Responsable fonctionnel"
+  | "IA"
+  | "En autonomie";
+
 export interface Mission {
   /** Nom court du projet */
   title: string;
   description: string;
   /** Casquettes tenues sur la mission, affichées en badges */
-  badges?: string[];
-  /** Mission préférée : affiche une étoile jaune à côté du titre */
+  badges?: Casquette[];
+  /** Mission préférée : affiche une étoile à côté du titre */
   favorite?: boolean;
 }
 
@@ -33,12 +45,17 @@ export interface PersonalProject {
   /** URL publique, ouverte dans un nouvel onglet */
   url: string;
   /** Technos marquantes, affichées en tags */
-  stack?: string[];
+  stack?: Tech[];
+}
+
+export interface Skill extends Tech {
+  /** Maîtrise sur 100 : barres d'XP (Gaming) et jauges ASCII (Terminal) */
+  level: number;
 }
 
 export interface SkillGroup {
   title: string;
-  skills: string[];
+  skills: Skill[];
 }
 
 export interface Education {
@@ -94,8 +111,8 @@ export const cv: CvData = {
   age: 37,
   location: "Plougastel-Daoulas",
   links: [
-    { label: "GitHub", url: "https://github.com/vincent-leostic" },
-    { label: "LinkedIn", url: "https://www.linkedin.com/in/vincent-leostic" },
+    { label: "GitHub", url: "https://github.com/vincent-leostic", icon: "github" },
+    { label: "LinkedIn", url: "https://www.linkedin.com/in/vincent-leostic", icon: "linkedin" },
   ],
   experiences: [
     {
@@ -160,32 +177,58 @@ export const cv: CvData = {
       description:
         "Site vitrine d'une entreprise de ramonage de la presqu'île de Crozon : prestations, tarifs, FAQ et contact, avec un back-office complet pour que l'artisan gère lui-même contenus, photos, traductions et SEO.",
       url: "https://ramonea.fr",
-      stack: ["Vue.js 3", "TypeScript", "Supabase"],
+      stack: [
+        { label: "Vue.js 3", icon: "vue" },
+        { label: "TypeScript", icon: "typescript" },
+        { label: "Supabase" },
+      ],
     },
     {
       title: "Les ateliers de Camille",
       description:
         "Site de Camille de Boiscuillé, psychopraticienne à Crozon : ses accompagnements (art-thérapie, EMDR, thérapie familiale) présentés dans un site statique ultra-léger, sans JavaScript ni cookies.",
       url: "https://www.camilledeboiscuilletherapeute.com",
-      stack: ["Astro"],
+      stack: [{ label: "Astro", icon: "astro" }],
     },
   ],
   skillGroups: [
     {
       title: "Frontend & UI/UX",
-      skills: ["Vue.js 3", "Nuxt", "Astro", "TypeScript", "CSS moderne", "Design d'interface"],
+      skills: [
+        { label: "Vue.js 3", icon: "vue", level: 90 },
+        { label: "Nuxt", icon: "nuxt", level: 85 },
+        { label: "Astro", icon: "astro", level: 70 },
+        { label: "TypeScript", icon: "typescript", level: 85 },
+        { label: "CSS moderne", icon: "css", level: 90 },
+        { label: "Design d'interface", icon: "figma", level: 80 },
+      ],
     },
     {
       title: "Outillage IA",
-      skills: ["Claude Code", "Skills & hooks", "Agents", "Intégration LLM"],
+      skills: [
+        { label: "Claude Code", icon: "claude", level: 95 },
+        { label: "Skills & hooks", level: 90 },
+        { label: "Agents", level: 85 },
+        { label: "Intégration LLM", level: 75 },
+      ],
     },
     {
       title: "Backend",
-      skills: ["Node.js", "C#", "PostgreSQL"],
+      skills: [
+        { label: "Node.js", icon: "node", level: 70 },
+        { label: "C#", icon: "csharp", level: 65 },
+        { label: "PostgreSQL", icon: "postgresql", level: 65 },
+      ],
     },
     {
       title: "DevOps & outils",
-      skills: ["Git", "GitLab CI/CD", "GitHub Actions", "Multi-projets en ESN", "Veille technique"],
+      skills: [
+        { label: "Git", icon: "git", level: 85 },
+        { label: "GitLab CI/CD", icon: "gitlab", level: 70 },
+        { label: "GitHub Actions", icon: "github", level: 70 },
+        { label: "Multi-projets en ESN", level: 85 },
+        { label: "Veille technique", level: 85 },
+      ],
     },
   ],
   education: [

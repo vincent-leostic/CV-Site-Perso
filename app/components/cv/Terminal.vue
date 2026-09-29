@@ -1,29 +1,27 @@
 <script setup lang="ts">
 import { cv } from "~/data/cv";
-import TechIcon from "./TechIcon.vue";
 
-const COMMANDS = [
-  "whoami",
-  "cat ./bio.txt",
-  "ls ./contacts",
-  "cat ./experiences.log",
-  "ls ./projets-perso",
-  "./skills --graph",
-  "cat ./formation.txt",
-  "cat ./extras.txt",
-];
+/** Commandes tapées l'une après l'autre ; `id` choisit la sortie affichée */
+const STEPS = [
+  { id: "whoami", cmd: "whoami" },
+  { id: "bio", cmd: "cat ./bio.txt" },
+  { id: "contacts", cmd: "ls ./contacts" },
+  { id: "experiences", cmd: "cat ./experiences.log" },
+  { id: "projects", cmd: "ls ./projets-perso" },
+  { id: "skills", cmd: "./skills --graph" },
+  { id: "education", cmd: "cat ./formation.txt" },
+  { id: "extras", cmd: "cat ./extras.txt" },
+] as const;
 
-// Fichiers listés par `ls ./contacts` : le mail puis les liens
+/** Session déjà jouée pendant la visite : on affiche tout d'emblée */
+const PLAYED_KEY = "cv-terminal-played";
+
+// Fichiers listés par `ls ./contacts` : le mail, le téléphone puis les liens
 const contactFiles = [
   { name: "mail.txt", href: `mailto:${cv.email}`, value: cv.email, external: false },
-  {
-    name: "tel.txt",
-    href: `tel:${cv.phone.replaceAll(" ", "")}`,
-    value: cv.phone,
-    external: false,
-  },
+  { name: "tel.txt", href: toTelHref(cv.phone), value: cv.phone, external: false },
   ...cv.links.map((link) => ({
-    name: `${link.label.toLowerCase()}.url`,
+    name: `${slugify(link.label)}.url`,
     href: link.url,
     value: link.label,
     external: true,
@@ -33,20 +31,16 @@ const contactFiles = [
 // Fichiers listés par `ls ./projets-perso` : un raccourci .url par site
 const projectFiles = cv.personalProjects.map((proj) => ({
   ...proj,
-  name: `${proj.title
-    .toLowerCase()
-    .normalize("NFD")
-    .replace(/[̀-ͯ]/g, "")
-    .replace(/[^a-z0-9]+/g, "-")}.url`,
-  host: new URL(proj.url).hostname.replace(/^www\./, ""),
+  name: `${slugify(proj.title)}.url`,
+  host: hostOf(proj.url),
 }));
 
 const shown = ref(0);
 const typed = ref("");
 const done = ref(false);
+const screenEl = ref<HTMLElement | null>(null);
 
 let alive = true;
-let skipped = false;
 
 function delay(ms: number) {
   return new Promise((resolve) => setTimeout(resolve, ms));
@@ -58,167 +52,194 @@ function bar(level: number): string {
   return "█".repeat(filled) + "░".repeat(12 - filled);
 }
 
-/** Un clic sur l'écran affiche tout immédiatement */
-function skip() {
-  skipped = true;
-  shown.value = COMMANDS.length;
+function hasPlayed(): boolean {
+  try {
+    return sessionStorage.getItem(PLAYED_KEY) !== null;
+  } catch {
+    return false;
+  }
+}
+
+/** Fin de session, tapée ou sautée : tout est affiché */
+function finish() {
+  shown.value = STEPS.length;
   done.value = true;
+  window.removeEventListener("keydown", onKeydown);
+  try {
+    sessionStorage.setItem(PLAYED_KEY, "1");
+  } catch {
+    /* stockage bloqué : l'animation rejouera à la prochaine visite */
+  }
+}
+
+/** Le bouton disparaît une fois tout affiché : le focus passe à l'écran */
+async function skip() {
+  finish();
+  await nextTick();
+  screenEl.value?.focus();
+}
+
+function onKeydown(event: KeyboardEvent) {
+  if (event.key === "Escape") void skip();
 }
 
 onMounted(async () => {
-  if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
-    skip();
+  if (window.matchMedia("(prefers-reduced-motion: reduce)").matches || hasPlayed()) {
+    finish();
     return;
   }
-  for (let i = 0; i < COMMANDS.length; i++) {
-    if (!alive || skipped) return;
+  window.addEventListener("keydown", onKeydown);
+  for (const [i, step] of STEPS.entries()) {
     typed.value = "";
     await delay(i === 0 ? 400 : 260);
-    for (const char of COMMANDS[i] as string) {
-      if (!alive || skipped) return;
+    for (const char of step.cmd) {
+      if (!alive || done.value) return;
       typed.value += char;
       await delay(24 + Math.random() * 40);
     }
     await delay(140);
-    if (!alive || skipped) return;
+    if (!alive || done.value) return;
     shown.value = i + 1;
   }
-  done.value = true;
+  finish();
 });
 
 onUnmounted(() => {
   alive = false;
+  window.removeEventListener("keydown", onKeydown);
 });
 </script>
 
 <template>
-  <div class="terminal">
-    <div class="window" @click="skip">
-      <div class="titlebar">
-        <span class="dot dot-r" aria-hidden="true" />
-        <span class="dot dot-y" aria-hidden="true" />
-        <span class="dot dot-g" aria-hidden="true" />
-        <span class="title">vincent@cv: bash</span>
+  <div class="layout terminal">
+    <div class="window">
+      <div class="window__bar">
+        <span class="window__dot window__dot--red" aria-hidden="true" />
+        <span class="window__dot window__dot--yellow" aria-hidden="true" />
+        <span class="window__dot window__dot--green" aria-hidden="true" />
+        <span class="window__title">vincent@cv: bash</span>
+        <button v-if="!done" type="button" class="window__skip" @click="skip">
+          Tout afficher <kbd class="window__key">Échap</kbd>
+        </button>
       </div>
 
-      <div class="screen">
-        <template v-for="(cmd, i) in COMMANDS" :key="cmd">
-          <p v-if="shown >= i" class="prompt-line">
-            <span class="prompt">vincent@cv:~$</span>
-            <span class="cmd">{{ shown > i ? cmd : typed }}</span>
-            <span v-if="shown === i && !done" class="caret" aria-hidden="true" />
+      <div ref="screenEl" class="window__screen" tabindex="-1" :aria-busy="!done">
+        <template v-for="(step, i) in STEPS" :key="step.id">
+          <p v-if="shown >= i" class="prompt">
+            <span class="prompt__user">vincent@cv:~$</span>
+            <span>{{ shown > i ? step.cmd : typed }}</span>
+            <span v-if="shown === i && !done" class="prompt__caret" aria-hidden="true" />
           </p>
 
           <div v-if="shown > i" class="output">
-            <!-- whoami -->
-            <template v-if="i === 0">
-              <p class="big">{{ cv.name }}</p>
-              <p class="amber">{{ cv.title }}</p>
-              <p class="dim">{{ cv.age }} ans · {{ cv.location }}</p>
+            <template v-if="step.id === 'whoami'">
+              <p class="output__big">{{ cv.name }}</p>
+              <p class="output__amber">{{ cv.title }}</p>
+              <p class="output__dim">{{ cv.age }} ans · {{ cv.location }}</p>
             </template>
 
-            <!-- bio -->
-            <template v-else-if="i === 1">
+            <template v-else-if="step.id === 'bio'">
               <p>{{ cv.bio }}</p>
             </template>
 
-            <!-- contacts -->
-            <template v-else-if="i === 2">
-              <p v-for="file in contactFiles" :key="file.name" class="file-line">
+            <ul v-else-if="step.id === 'contacts'" class="files" role="list">
+              <li v-for="file in contactFiles" :key="file.name" class="files__item">
                 <a
-                  class="file"
+                  class="files__name"
                   :href="file.href"
                   :target="file.external ? '_blank' : undefined"
                   :rel="file.external ? 'noopener' : undefined"
+                  >{{ file.name }}</a
                 >
-                  {{ file.name }}
-                </a>
-                <span class="dim">→ {{ file.value }}</span>
-              </p>
-            </template>
+                <span class="output__dim">→ {{ file.value }}</span>
+              </li>
+            </ul>
 
-            <!-- expériences -->
-            <template v-else-if="i === 3">
+            <template v-else-if="step.id === 'experiences'">
               <div
                 v-for="exp in cv.experiences"
                 :key="`${exp.role}-${exp.company}`"
-                class="log-entry"
+                class="output__entry"
               >
                 <p>
-                  <span class="amber">[{{ exp.period }}]</span>
-                  <span class="strong"> {{ exp.role }}</span>
+                  <span class="output__amber">[{{ exp.period }}]</span>{{ " " }}
+                  <span class="output__strong">{{ exp.role }}</span>
                 </p>
-                <p class="dim"># {{ exp.company }}</p>
-                <p class="dim">{{ exp.description }}</p>
-                <p v-for="m in exp.missions ?? []" :key="m.title" class="dim">
-                  - <span class="strong">{{ m.title }}</span
-                  ><span v-if="m.favorite" class="amber" role="img" aria-label="Mission favorite">
-                    ★</span
-                  ><template v-if="m.badges">
-                    <span class="amber">[{{ m.badges.join("|").toLowerCase() }}]</span></template
+                <p class="output__dim"># {{ exp.company }}</p>
+                <p class="output__dim">{{ exp.description }}</p>
+                <p v-for="m in exp.missions ?? []" :key="m.title" class="output__dim">
+                  - <span class="output__strong">{{ m.title }}</span>
+                  <span
+                    v-if="m.favorite"
+                    class="output__amber"
+                    role="img"
+                    aria-label="Mission favorite"
+                    >{{ " " }}★</span
+                  >
+                  <span v-if="m.badges" class="output__amber"
+                    >{{ " " }}[{{ m.badges.join("|").toLowerCase() }}]</span
                   >
                   : {{ m.description }}
                 </p>
               </div>
             </template>
 
-            <!-- projets perso -->
-            <template v-else-if="i === 4">
-              <div v-for="proj in projectFiles" :key="proj.name" class="log-entry">
-                <p class="file-line">
-                  <a class="file" :href="proj.url" target="_blank" rel="noopener">{{
+            <template v-else-if="step.id === 'projects'">
+              <div v-for="proj in projectFiles" :key="proj.name" class="output__entry">
+                <p class="files__item">
+                  <a class="files__name" :href="proj.url" target="_blank" rel="noopener">{{
                     proj.name
                   }}</a>
-                  <span class="dim">→ {{ proj.host }}</span>
+                  <span class="output__dim">→ {{ proj.host }}</span>
                 </p>
-                <p class="dim">
+                <p class="output__dim">
                   #
-                  <template v-if="proj.stack">
-                    <span class="amber">[{{ proj.stack.join("|").toLowerCase() }}]</span>
-                  </template>
+                  <span v-if="proj.stack" class="output__amber"
+                    >[{{ proj.stack.map((tech) => tech.label.toLowerCase()).join("|") }}]</span
+                  >
                   {{ proj.description }}
                 </p>
               </div>
             </template>
 
-            <!-- compétences -->
-            <template v-else-if="i === 5">
-              <div v-for="group in cv.skillGroups" :key="group.title" class="skill-group">
-                <p class="amber"># {{ group.title }}</p>
-                <p v-for="skill in group.skills" :key="skill" class="skill-line">
-                  <span class="skill-name"><TechIcon :label="skill" />{{ skill }}</span>
-                  <span class="gauge">[{{ bar(statLevel(skill)) }}]</span>
-                  <span class="amber">{{ statLevel(skill) }}%</span>
+            <template v-else-if="step.id === 'skills'">
+              <div v-for="group in cv.skillGroups" :key="group.title" class="output__entry">
+                <p class="output__amber"># {{ group.title }}</p>
+                <p v-for="skill in group.skills" :key="skill.label" class="skill">
+                  <span class="skill__name">
+                    <CvTechIcon v-if="skill.icon" class="skill__icon" :name="skill.icon" />
+                    {{ skill.label }}
+                  </span>
+                  <span class="skill__gauge">[{{ bar(skill.level) }}]</span>
+                  <span class="skill__value">{{ skill.level }}%</span>
                 </p>
               </div>
             </template>
 
-            <!-- formation -->
-            <template v-else-if="i === 6">
-              <div v-for="edu in cv.education" :key="edu.degree" class="log-entry">
+            <template v-else-if="step.id === 'education'">
+              <div v-for="edu in cv.education" :key="edu.degree" class="output__entry">
                 <p>
-                  <span class="amber">[{{ edu.period }}]</span>
-                  <span class="strong"> {{ edu.degree }}</span>
+                  <span class="output__amber">[{{ edu.period }}]</span>{{ " " }}
+                  <span class="output__strong">{{ edu.degree }}</span>
                 </p>
-                <p class="dim"># {{ edu.school }}</p>
+                <p class="output__dim"># {{ edu.school }}</p>
               </div>
             </template>
 
-            <!-- langues & hobbies -->
             <template v-else>
-              <p class="amber"># Langues</p>
-              <p v-for="lang in cv.languages" :key="lang.name" class="dim">
-                - <span class="strong">{{ lang.name }}</span> : {{ lang.level }}
+              <p class="output__amber"># Langues</p>
+              <p v-for="lang in cv.languages" :key="lang.name" class="output__dim">
+                - <span class="output__strong">{{ lang.name }}</span> : {{ lang.level }}
               </p>
-              <p class="amber"># Hobbies</p>
-              <p class="dim">- {{ cv.hobbies.join(", ") }}</p>
+              <p class="output__amber"># Hobbies</p>
+              <p class="output__dim">- {{ cv.hobbies.join(", ") }}</p>
             </template>
           </div>
         </template>
 
-        <p v-if="done" class="prompt-line">
-          <span class="prompt">vincent@cv:~$</span>
-          <span class="caret" aria-hidden="true" />
+        <p v-if="done" class="prompt">
+          <span class="prompt__user">vincent@cv:~$</span>
+          <span class="prompt__caret" aria-hidden="true" />
         </p>
       </div>
     </div>
@@ -226,12 +247,6 @@ onUnmounted(() => {
 </template>
 
 <style scoped>
-.terminal {
-  max-width: 1020px;
-  margin: 0 auto;
-  padding: 2.5rem 1.5rem 3rem;
-}
-
 /* Allumage du tube cathodique */
 .window {
   background: var(--bg-card);
@@ -239,7 +254,7 @@ onUnmounted(() => {
   border-radius: 8px;
   overflow: hidden;
   box-shadow: var(--shadow);
-  animation: crt-on 0.45s cubic-bezier(0.22, 1, 0.36, 1) backwards;
+  animation: crt-on 0.45s var(--ease-out) backwards;
 }
 
 @keyframes crt-on {
@@ -257,61 +272,89 @@ onUnmounted(() => {
   }
 }
 
-.titlebar {
+.window__bar {
   display: flex;
   align-items: center;
   gap: 0.45rem;
   padding: 0.55rem 0.9rem;
   border-bottom: 1px solid var(--border);
-  background: rgba(51, 255, 119, 0.04);
+  background: color-mix(in srgb, var(--accent) 4%, transparent);
 }
 
-.dot {
+.window__dot {
   width: 10px;
   height: 10px;
   border-radius: 50%;
   opacity: 0.75;
 }
 
-.dot-r {
+.window__dot--red {
   background: #ff5f57;
 }
 
-.dot-y {
+.window__dot--yellow {
   background: #febc2e;
 }
 
-.dot-g {
+.window__dot--green {
   background: #28c840;
 }
 
-.title {
+.window__title {
   margin-left: 0.5rem;
   font-size: 1rem;
   color: var(--text-muted);
 }
 
-.screen {
+.window__skip {
+  margin-left: auto;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.1rem 0.6rem;
+  font: inherit;
+  font-size: 1rem;
+  color: var(--accent);
+  background: none;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-pill);
+  cursor: pointer;
+  transition:
+    border-color 0.2s,
+    background-color 0.2s;
+}
+
+.window__skip:is(:hover, :focus-visible) {
+  border-color: var(--accent);
+  background: color-mix(in srgb, var(--accent) 10%, transparent);
+}
+
+.window__key {
+  font: inherit;
+  color: var(--text-muted);
+}
+
+.window__screen {
   padding: 1.6rem 1.7rem 2rem;
   font-size: 1.18rem;
   line-height: 1.55;
   min-height: 480px;
-  text-shadow: 0 0 6px rgba(51, 255, 119, 0.3);
+  text-shadow: 0 0 6px color-mix(in srgb, var(--accent) 30%, transparent);
 }
 
-.prompt-line {
+.prompt {
   display: flex;
   align-items: baseline;
   gap: 0.55rem;
   flex-wrap: wrap;
 }
 
-.prompt {
+.prompt__user {
   color: var(--accent);
   white-space: nowrap;
 }
 
-.caret {
+.prompt__caret {
   display: inline-block;
   width: 0.55em;
   height: 1em;
@@ -320,70 +363,55 @@ onUnmounted(() => {
   animation: blink 1.05s steps(2) infinite;
 }
 
-@keyframes blink {
-  50% {
-    opacity: 0;
-  }
-}
-
 .output {
   margin: 0.4rem 0 1.2rem;
 }
 
-.big {
+.output__big {
   font-size: 2.1rem;
   line-height: 1.15;
   color: var(--accent);
-  text-shadow: 0 0 12px rgba(51, 255, 119, 0.45);
+  text-shadow: 0 0 12px color-mix(in srgb, var(--accent) 45%, transparent);
 }
 
-.amber {
+.output__amber {
   color: var(--accent-2);
-  text-shadow: 0 0 6px rgba(255, 176, 0, 0.3);
+  text-shadow: 0 0 6px color-mix(in srgb, var(--accent-2) 30%, transparent);
 }
 
-.dim {
+.output__dim {
   color: var(--text-muted);
+  white-space: pre-line;
 }
 
-.strong {
+.output__strong {
   color: var(--text);
 }
 
-.file-line {
+.output__entry + .output__entry {
+  margin-top: 0.8rem;
+}
+
+.files {
+  list-style: none;
+}
+
+.files__item {
   display: flex;
   gap: 0.7rem;
   flex-wrap: wrap;
 }
 
-.file {
+.files__name {
   color: var(--accent-2);
-  text-decoration: none;
 }
 
-.file:hover {
+.files__name:is(:hover, :focus-visible) {
   text-decoration: underline;
   color: var(--accent-hover);
 }
 
-.log-entry + .log-entry {
-  margin-top: 0.8rem;
-}
-
-.log-entry .dim {
-  white-space: pre-line;
-}
-
-/* L'espace entre [période] et l'intitulé (le template Vue le compacte) */
-.log-entry .strong {
-  margin-left: 0.45rem;
-}
-
-.skill-group + .skill-group {
-  margin-top: 0.8rem;
-}
-
-.skill-line {
+.skill {
   display: grid;
   grid-template-columns: minmax(0, 1fr) auto auto;
   gap: 0.8rem;
@@ -391,33 +419,38 @@ onUnmounted(() => {
 }
 
 /* Icônes façon glyphes Nerd Font, teintées phosphore */
-.skill-name {
+.skill__name {
   display: inline-flex;
   align-items: center;
   gap: 0.5rem;
   min-width: 0;
 }
 
-.skill-name .tech-icon {
+.skill__icon {
   font-size: 0.85em;
   opacity: 0.9;
 }
 
-.gauge {
+.skill__gauge {
   letter-spacing: 0.04em;
 }
 
+.skill__value {
+  color: var(--accent-2);
+  text-shadow: 0 0 6px color-mix(in srgb, var(--accent-2) 30%, transparent);
+}
+
 @media (max-width: 560px) {
-  .screen {
+  .window__screen {
     padding: 1.2rem 1rem 1.6rem;
     font-size: 1.05rem;
   }
 
-  .skill-line {
+  .skill {
     grid-template-columns: minmax(0, 1fr) auto;
   }
 
-  .skill-line .amber {
+  .skill__value {
     display: none;
   }
 }

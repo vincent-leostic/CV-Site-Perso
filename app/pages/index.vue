@@ -18,9 +18,12 @@ useSeoMeta({
   ogDescription: seoDescription,
   ogUrl: `${siteUrl}/`,
   ogType: "profile",
-  ogImage: `${siteUrl}${cv.photo}`,
+  ogImage: `${siteUrl}/og-image.png`,
+  ogImageWidth: 1200,
+  ogImageHeight: 630,
+  ogImageAlt: `${cv.name}, ${cv.title}`,
   ogLocale: "fr_FR",
-  twitterCard: "summary",
+  twitterCard: "summary_large_image",
 });
 
 useHead({
@@ -46,11 +49,11 @@ useHead({
 </script>
 
 <template>
-  <div class="page">
-    <header class="header">
-      <div class="header-inner">
-        <div class="header-brand">{{ cv.name }}</div>
-        <ThemeSwitcher />
+  <div class="site">
+    <header class="site-header">
+      <div class="site-header__inner">
+        <p class="site-header__brand">{{ cv.name }}</p>
+        <ThemeSwitcher class="site-header__switcher" />
       </div>
     </header>
 
@@ -58,7 +61,7 @@ useHead({
          données (~/data/cv). Le composant est remonté à chaque changement
          de thème : sa chorégraphie d'entrée rejoue sous la révélation
          circulaire. -->
-    <main class="main">
+    <main class="site-main">
       <CvSerieux v-if="currentTheme === 'serieux'" />
       <CvGaming v-else-if="currentTheme === 'gaming'" />
       <CvNature v-else-if="currentTheme === 'nature'" />
@@ -66,20 +69,20 @@ useHead({
       <CvTerminal v-else />
     </main>
 
-    <footer class="footer">
+    <footer class="site-footer">
       <p>Fait avec Nuxt & TypeScript</p>
     </footer>
   </div>
 </template>
 
 <style scoped>
-.page {
+.site {
   min-height: 100vh;
   display: flex;
   flex-direction: column;
 }
 
-.header {
+.site-header {
   position: sticky;
   top: 0;
   z-index: 100;
@@ -91,7 +94,7 @@ useHead({
     border-color 0.3s;
 }
 
-.header-inner {
+.site-header__inner {
   max-width: var(--container);
   margin: 0 auto;
   padding: 0.8rem 1.5rem;
@@ -101,23 +104,51 @@ useHead({
   gap: 1rem;
 }
 
-.header-brand {
+/* Le nom se tronque plutôt que de pousser le sélecteur hors de l'écran */
+.site-header__brand {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
   font-family: var(--font-heading);
   font-weight: 700;
   font-size: 1.05rem;
   color: var(--accent);
-  white-space: nowrap;
 }
 
-.main {
+.site-header__switcher {
+  flex: none;
+}
+
+.site-main {
   flex: 1;
 }
 
-.footer {
+/* Le HTML pré-rendu contient le layout Sérieux : masqué tant que le
+   layout du thème choisi n'est pas monté (voir shared/theme.ts) */
+:global(.theme-pending) .site-main {
+  visibility: hidden;
+}
+
+.site-footer {
   text-align: center;
   padding: 1.5rem;
   color: var(--text-muted);
   font-size: 0.85rem;
   border-top: 1px solid var(--border);
+}
+
+@media (max-width: 400px) {
+  .site-header__inner {
+    padding-inline: 0.75rem;
+    gap: 0.5rem;
+  }
+}
+
+@media print {
+  .site-header,
+  .site-footer {
+    display: none;
+  }
 }
 </style>
