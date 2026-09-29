@@ -26,9 +26,10 @@ export default defineNuxtConfig({
       htmlAttrs: { lang: "fr" },
     },
   },
-  // /cv est le gabarit du PDF : pré-rendue pour que scripts/cv-pdf.mjs
-  // l'imprime, puis retirée du site publié
+  // Gabarits du PDF (/cv) et de la miniature de partage (/og) : pré-rendus
+  // pour que scripts/cv-pdf.mjs et scripts/og-image.mjs les impriment ou
+  // les capturent, puis retirés du site publié
   nitro: {
-    prerender: { routes: ["/cv"] },
+    prerender: { routes: ["/cv", "/og"] },
   },
 });

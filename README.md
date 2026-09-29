@@ -8,6 +8,8 @@ Palette « rossignol », parce que LEOSTIC vient du breton eostig, rossignol : b
 
 Le CV est une feuille A4 d'une page aux couleurs du site : en-tête brun (photo, titre, disponibilité, coordonnées), parcours et projets perso à gauche, compétences, formation, langues et loisirs dans une colonne chamois. Sa source est la page `/cv` ([app/components/CvSheet.vue](app/components/CvSheet.vue)), cotée en mm et en pt. Après `nuxt generate`, [scripts/cv-pdf.mjs](scripts/cv-pdf.mjs) l'imprime avec Chrome en mode headless dans `cv-vincent-leostic.pdf`, puis retire `/cv` du site publié : le PDF suit toujours le contenu du site. Le script prévient si le CV dépasse une page ou si son poids s'écarte de celui annoncé. Chrome est cherché dans `CHROME_PATH`, puis aux emplacements habituels.
 
+La miniature de partage (`og-image.png`, 1200 × 630) suit le même chemin : [scripts/og-image.mjs](scripts/og-image.mjs) capture la page `/og` ([app/pages/og.vue](app/pages/og.vue)), qui reprend l'accroche, puis la retire du site. Les deux gabarits répondent 404 en ligne.
+
 En développement, les liens « Télécharger mon CV » ouvrent `/cv`, un aperçu fidèle du PDF avec la limite de la page A4 en pointillés : le PDF n'existe qu'après le build.
 
 Les anciens thèmes ludiques (Gaming, Nature, Manuscrit, Terminal) restent récupérables via le tag git `themes-ludiques`.
