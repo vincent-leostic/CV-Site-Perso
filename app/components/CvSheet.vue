@@ -479,13 +479,4 @@ const liveProjects = cv.personalProjects.filter(
 .skill-list__name {
   font-weight: 600;
 }
-
-/* --- Impression : la feuille occupe la page, à 1 mm près. À 297 mm
-   pile, l'arrondi de Chrome la fait déborder d'une fraction de pixel et
-   ajoute une page blanche ; le millimètre retiré est du blanc. --- */
-@media print {
-  .cv-sheet {
-    height: 296mm;
-  }
-}
 </style>

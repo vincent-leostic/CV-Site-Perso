@@ -3,10 +3,7 @@ import { cv } from "~/data/cv";
 
 // Gabarit du PDF téléchargeable (scripts/cv-pdf.mjs) : retiré du site
 // publié une fois le PDF imprimé. En développement, sert d'aperçu.
-useSeoMeta({
-  title: `${cv.name} - CV`,
-  robots: "noindex, nofollow",
-});
+useBuildOnlyPage(`${cv.name} - CV`);
 </script>
 
 <template>
@@ -63,9 +60,12 @@ useSeoMeta({
 }
 
 @media print {
+  /* Un conteneur défilant (overflow auto) ajoute une page blanche à
+     l'impression dans Chrome */
   .cv-preview {
     min-height: 0;
     padding: 0;
+    overflow: visible;
     background: none;
   }
 
