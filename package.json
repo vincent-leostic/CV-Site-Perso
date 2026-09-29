@@ -5,7 +5,7 @@
   "scripts": {
     "build": "nuxt build",
     "dev": "nuxt dev",
-    "generate": "nuxt generate",
+    "generate": "nuxt generate && node scripts/cv-pdf.mjs",
     "preview": "nuxt preview",
     "prepare": "vp config",
     "test": "vp test"
@@ -17,6 +17,7 @@
   },
   "devDependencies": {
     "@nuxt/fonts": "^0.14.0",
+    "@types/node": "^22.20.4",
     "typescript": "^5.7.0",
     "vite-plus": "^0.1.13",
     "vue-tsc": "^3.3.11"

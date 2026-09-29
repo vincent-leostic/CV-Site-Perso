@@ -1,114 +1,51 @@
 /* ============================================================
-   Thèmes — chaque skin est un layout complet (components/cv/*),
-   ce fichier fournit : variables, base, blocs et animations
-   partagés, décors de fond et la transition de thème. Le look
-   par défaut = thème Sérieux.
+   Portfolio de Vincent LEOSTIC : tokens, base, blocs partagés
+   (section, bouton, conteneur du CV) et impression.
+   Palette « rossignol » (LEOSTIC vient du breton eostig, rossignol) :
+   dos brun, queue rousse pour la touche vive, ventre chamois et
+   gorge crème. Les tokens sont nommés par rôle, pas par couleur.
    ============================================================ */
 
 :root {
-  /* Largeur du conteneur global (header + thèmes pleine largeur) */
-  --container: 1240px;
-  /* Largeur du bloc .layout, redéfinie par les thèmes plus étroits */
-  --layout-max: var(--container);
-  /* Courbe des entrées et des glissements, commune à tous les thèmes */
+  /* Largeur du contenu du portfolio */
+  --container: 1120px;
+  /* Courbe des survols et apparitions */
   --ease-out: cubic-bezier(0.22, 1, 0.36, 1);
-}
 
-:root,
-[data-theme="serieux"] {
   --font-body: "Inter", "Segoe UI", system-ui, sans-serif;
-  --font-heading: "Inter", "Segoe UI", system-ui, sans-serif;
-  --bg: #f6f6f4;
+  /* Titres : grotesque à caractère ; le texte courant reste en Inter */
+  --font-heading: "Bricolage Grotesque", "Segoe UI", system-ui, sans-serif;
+
+  /* Crème de la gorge */
+  --bg: #faf6f0;
   --bg-card: #ffffff;
-  --bg-header: rgba(255, 255, 255, 0.82);
-  --text: #1c1f26;
-  --text-muted: #5d6470;
-  --accent: #3b5bdb;
-  --accent-hover: #2f49b8;
-  --accent-2: #3b5bdb;
-  --border: #e5e5e1;
-  --fav: #ae821d;
-  --shadow: 0 1px 2px rgba(22, 26, 41, 0.04), 0 8px 24px rgba(22, 26, 41, 0.05);
-  --shadow-hover: 0 2px 4px rgba(22, 26, 41, 0.05), 0 14px 36px rgba(22, 26, 41, 0.09);
+  /* Chamois du ventre : sépare une bande de ses voisines */
+  --bg-tint: #f2e7d8;
+  /* Brun-noir de l'œil */
+  --text: #2a1f17;
+  --text-muted: #6d5b4c;
+  --border: #e8ddd0;
+
+  /* Brun du dos : liens, titres, fin du dégradé de l'accroche */
+  --accent: #7a4f2f;
+  --accent-hover: #5f3c23;
+  /* Brun sombre : accroche, bloc contact, bande du CV imprimé */
+  --dark: #3a2a1e;
+  /* Texte sur fond sombre : blanc, ou crème pour le secondaire */
+  --on-dark: #ffffff;
+  --on-dark-soft: #f6ece1;
+  /* Roux de la queue : fonds de boutons et décors, avec du texte encre dessus */
+  --highlight: #e8793f;
+  --highlight-hover: #ee9160;
+  /* Roux assombri, lisible en texte sur fond clair */
+  --highlight-text: #a8481d;
+  /* Roux éclairci, lisible en texte sur le brun sombre */
+  --highlight-on-dark: #f2a06c;
+
+  --shadow: 0 1px 2px rgba(58, 42, 30, 0.05), 0 8px 24px rgba(58, 42, 30, 0.07);
+  --shadow-hover: 0 2px 4px rgba(58, 42, 30, 0.07), 0 18px 40px rgba(58, 42, 30, 0.14);
+  --radius: 16px;
   --radius-pill: 999px;
-}
-
-[data-theme="gaming"] {
-  --font-body: "Inter", "Segoe UI", system-ui, sans-serif;
-  --font-heading: "Chakra Petch", "Segoe UI", sans-serif;
-  --bg: #090d16;
-  --bg-card: #0f1526;
-  --bg-header: rgba(9, 13, 22, 0.78);
-  --text: #dbe3f8;
-  --text-muted: #8290b2;
-  --accent: #2dd4ff;
-  --accent-hover: #7ce6ff;
-  --accent-2: #a78bfa;
-  --border: #1f2b4a;
-  --fav: #f0b429;
-  --shadow: 0 12px 32px rgba(0, 0, 0, 0.45);
-  --shadow-hover: 0 16px 40px rgba(0, 0, 0, 0.55);
-  --radius-pill: 6px;
-}
-
-[data-theme="nature"] {
-  --font-body: "Nunito Sans", "Segoe UI", system-ui, sans-serif;
-  --font-heading: "Fraunces", Georgia, serif;
-  --bg: #f3f0e4;
-  --bg-card: #fffdf6;
-  --bg-header: rgba(255, 253, 246, 0.8);
-  --text: #313a2d;
-  --text-muted: #626f5a;
-  --accent: #477c57;
-  --accent-hover: #375f43;
-  --accent-2: #c2703e;
-  /* Terracotta assombrie : --accent-2 ne sert qu'aux décors */
-  --accent-2-text: #985831;
-  --border: #e2dcc6;
-  --fav: #b5840f;
-  --shadow: 0 2px 6px rgba(88, 98, 74, 0.06), 0 18px 44px rgba(88, 98, 74, 0.1);
-  --shadow-hover: 0 4px 10px rgba(88, 98, 74, 0.08), 0 24px 56px rgba(88, 98, 74, 0.16);
-  --radius-pill: 999px;
-}
-
-[data-theme="manuscrit"] {
-  --font-body: "EB Garamond", Georgia, serif;
-  --font-heading: "IM Fell English", Georgia, serif;
-  --bg: #ece1c9;
-  --bg-card: #f6edd8;
-  --bg-header: rgba(240, 230, 205, 0.85);
-  --text: #3a2f1e;
-  --text-muted: #6f6048;
-  --accent: #7a1f2b;
-  --accent-hover: #5e1620;
-  --accent-2: #8a6d1f;
-  --border: #cbb98f;
-  --fav: #a97d10;
-  --shadow: 0 2px 8px rgba(80, 60, 20, 0.12), 0 14px 34px rgba(80, 60, 20, 0.12);
-  --shadow-hover: 0 4px 12px rgba(80, 60, 20, 0.14), 0 20px 44px rgba(80, 60, 20, 0.18);
-  --radius-pill: 8px;
-  --layout-max: 880px;
-}
-
-[data-theme="terminal"] {
-  --font-body: "VT323", "Consolas", monospace;
-  --font-heading: "VT323", "Consolas", monospace;
-  --bg: #050a06;
-  --bg-card: #0a120c;
-  --bg-header: rgba(5, 10, 6, 0.85);
-  --text: #7dffa3;
-  --text-muted: #3f9f5f;
-  --accent: #33ff77;
-  --accent-hover: #a8ffc4;
-  --accent-2: #ffb000;
-  --border: #1d4028;
-  --fav: var(--accent-2);
-  --shadow:
-    0 0 24px color-mix(in srgb, var(--accent) 8%, transparent), 0 12px 32px rgba(0, 0, 0, 0.5);
-  --shadow-hover:
-    0 0 32px color-mix(in srgb, var(--accent) 12%, transparent), 0 16px 40px rgba(0, 0, 0, 0.6);
-  --radius-pill: 4px;
-  --layout-max: 1020px;
 }
 
 /* ============================================================
@@ -128,14 +65,12 @@ body {
   color: var(--text);
   font-family: var(--font-body);
   line-height: 1.6;
-  transition:
-    background-color 0.3s ease,
-    color 0.3s ease;
 }
 
 h1,
 h2,
-h3 {
+h3,
+h4 {
   font-family: var(--font-heading);
   line-height: 1.25;
 }
@@ -151,152 +86,182 @@ a:is(:hover, :focus-visible) {
 }
 
 ::selection {
-  background: color-mix(in srgb, var(--accent) 25%, transparent);
+  background: color-mix(in srgb, var(--highlight) 30%, transparent);
 }
 
+/* Les sections sombres passent --focus en blanc */
 :focus-visible {
-  outline: 2px solid var(--accent);
-  outline-offset: 2px;
+  outline: 2px solid var(--focus, var(--accent));
+  outline-offset: 3px;
 }
 
 /* ============================================================
-   Blocs et animations partagés par les thèmes
+   Blocs partagés
    ============================================================ */
 
-/* Conteneur centré des layouts (sauf Nature, pleine largeur) */
-.layout {
-  max-width: var(--layout-max);
+/* Section du portfolio : pleine largeur, contenu centré */
+.section {
+  padding: 5rem 1.5rem;
+  /* L'en-tête collant ne masque pas le titre après un clic sur une ancre */
+  scroll-margin-top: 4rem;
+}
+
+.section--alt {
+  background: var(--bg-card);
+}
+
+.section--tint {
+  background: var(--bg-tint);
+}
+
+.section__inner {
+  max-width: var(--container);
   margin-inline: auto;
-  padding: 2.5rem 1.5rem 3rem;
+}
+
+/* Surtitre souligné de roux */
+.section__kicker {
+  font-size: 0.8rem;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--highlight-text);
+  text-decoration: underline 3px var(--highlight);
+  text-decoration-skip-ink: none;
+  text-underline-offset: 0.55em;
+  margin-bottom: 0.9rem;
+}
+
+.section__title {
+  font-size: clamp(1.75rem, 4vw, 2.4rem);
+  font-weight: 800;
+  letter-spacing: -0.02em;
+  line-height: 1.15;
+}
+
+.section__intro {
+  margin-top: 0.8rem;
+  max-width: 42rem;
+  font-size: 1.05rem;
+  color: var(--text-muted);
+}
+
+/* Bouton : un lien ou un <button>. Le roux porte du texte encre. */
+.button {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.55rem;
+  padding: 0.75rem 1.35rem;
+  border: 2px solid transparent;
+  border-radius: var(--radius-pill);
+  font: inherit;
+  font-size: 0.95rem;
+  font-weight: 700;
+  line-height: 1.2;
+  cursor: pointer;
+  transition:
+    background-color 0.2s,
+    border-color 0.2s,
+    box-shadow 0.2s,
+    transform 0.2s var(--ease-out);
+}
+
+.button--primary {
+  background: var(--highlight);
+  color: var(--text);
+  box-shadow: 0 8px 22px color-mix(in srgb, var(--highlight) 35%, transparent);
+}
+
+.button--primary:is(:hover, :focus-visible) {
+  background: var(--highlight-hover);
+  color: var(--text);
+  transform: translateY(-2px);
+}
+
+/* Contour de la couleur du texte environnant (blanc sur l'accroche) */
+.button--ghost {
+  color: inherit;
+  border-color: color-mix(in srgb, currentColor 45%, transparent);
+}
+
+.button--ghost:is(:hover, :focus-visible) {
+  color: inherit;
+  border-color: currentColor;
+  background: color-mix(in srgb, currentColor 10%, transparent);
+}
+
+.button--small {
+  padding: 0.5rem 1rem;
+  font-size: 0.85rem;
+  box-shadow: none;
+}
+
+.button__icon {
+  width: 1.15em;
+  height: 1.15em;
+  flex: none;
+}
+
+/* Texte réservé aux lecteurs d'écran, ex. « (nouvel onglet) » */
+.visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+
+/* Précision discrète dans un bouton, ex. le format d'un fichier */
+.button__meta {
+  font-weight: 500;
+  opacity: 0.8;
+}
+
+/* Petit intitulé en capitales rousses : thèmes des loisirs, infos pratiques */
+.caption {
+  font-size: 0.8rem;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--highlight-text);
+}
+
+/* Étiquette de techno, avec son icône de marque en couleur. Le fond
+   teinté se lit aussi bien sur blanc que sur le fond de page. */
+.tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  padding: 0.35rem 0.8rem;
+  border-radius: var(--radius-pill);
+  background: color-mix(in srgb, var(--accent) 7%, transparent);
+  font-size: 0.88rem;
+  font-weight: 500;
+  color: var(--text);
+}
+
+.tag__icon {
+  font-size: 1.1em;
+}
+
+/* Étiquette mise en avant : texte encre sur roux (5,5:1) */
+.tag--highlight {
+  background: var(--highlight);
+  font-weight: 600;
+  color: var(--text);
 }
 
 @media (max-width: 400px) {
-  .layout {
+  .section {
     padding-inline: 0.75rem;
   }
 }
 
-/* Entrée commune : fondu, plus un décalage et une échelle réglés par
-   l'élément animé via --enter-x, --enter-y et --enter-s. Non héritées :
-   un élément animé dans un autre n'en reprend pas les réglages. */
-@property --enter-x {
-  syntax: "<length-percentage>";
-  inherits: false;
-  initial-value: 0px;
-}
-
-@property --enter-y {
-  syntax: "<length-percentage>";
-  inherits: false;
-  initial-value: 0px;
-}
-
-@property --enter-s {
-  syntax: "<number>";
-  inherits: false;
-  initial-value: 1;
-}
-
-@keyframes enter {
-  from {
-    opacity: 0;
-    transform: translate(var(--enter-x), var(--enter-y)) scale(var(--enter-s));
-  }
-}
-
-/* Curseurs clignotants (Gaming, Terminal) */
-@keyframes blink {
-  50% {
-    opacity: 0;
-  }
-}
-
 /* ============================================================
-   Décors de fond par thème
-   ============================================================ */
-
-/* Gaming : grille HUD discrète + halo cyan en haut d'écran */
-[data-theme="gaming"] body {
-  background-image:
-    radial-gradient(
-      ellipse 90% 55% at 50% -10%,
-      color-mix(in srgb, var(--accent) 7%, transparent),
-      transparent 65%
-    ),
-    linear-gradient(rgba(96, 128, 255, 0.05) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(96, 128, 255, 0.05) 1px, transparent 1px);
-  background-size:
-    100% 100%,
-    36px 36px,
-    36px 36px;
-  background-attachment: fixed;
-}
-
-/* Nature : halos organiques sauge et terracotta */
-[data-theme="nature"] body {
-  background-image:
-    radial-gradient(
-      ellipse 60% 45% at 12% 0%,
-      color-mix(in srgb, var(--accent) 10%, transparent),
-      transparent 70%
-    ),
-    radial-gradient(
-      ellipse 55% 40% at 95% 15%,
-      color-mix(in srgb, var(--accent-2) 8%, transparent),
-      transparent 70%
-    ),
-    radial-gradient(
-      ellipse 70% 50% at 50% 110%,
-      color-mix(in srgb, var(--accent) 8%, transparent),
-      transparent 70%
-    );
-  background-attachment: fixed;
-}
-
-/* Manuscrit : parchemin — vignettage des bords + grain (bruit SVG) */
-[data-theme="manuscrit"] body {
-  background-image:
-    radial-gradient(ellipse 90% 60% at 50% 0%, rgba(120, 90, 40, 0.07), transparent 60%),
-    radial-gradient(ellipse 70% 55% at 100% 100%, rgba(120, 90, 40, 0.12), transparent 55%),
-    radial-gradient(ellipse 70% 55% at 0% 100%, rgba(120, 90, 40, 0.1), transparent 55%),
-    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='240' height='240'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.75' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 0.42 0 0 0 0 0.32 0 0 0 0 0.16 0 0 0 0.05 0'/%3E%3C/filter%3E%3Crect width='240' height='240' filter='url(%23n)'/%3E%3C/svg%3E");
-  background-attachment: fixed;
-}
-
-/* Terminal : scanlines CRT + halo phosphore */
-[data-theme="terminal"] body {
-  background-image:
-    radial-gradient(
-      ellipse 100% 90% at 50% 10%,
-      color-mix(in srgb, var(--accent) 5%, transparent),
-      transparent 70%
-    ),
-    repeating-linear-gradient(
-      0deg,
-      rgba(0, 0, 0, 0.22) 0px,
-      rgba(0, 0, 0, 0.22) 1px,
-      transparent 1px,
-      transparent 3px
-    );
-  background-attachment: fixed;
-}
-
-/* ============================================================
-   Transition de thème — révélation circulaire (View Transitions)
-   Le clip-path est animé depuis useTheme.switchTheme().
-   ============================================================ */
-
-::view-transition-old(root),
-::view-transition-new(root) {
-  animation: none;
-  mix-blend-mode: normal;
-}
-
-/* ============================================================
-   Impression : la feuille du CV (thème Sérieux, imposé par
-   useTheme le temps de l'impression), sans décors de fond.
-   Marges de page à 0 pour que le navigateur n'imprime pas ses
-   propres en-têtes et pieds de page (date, URL, numérotation).
+   Impression. Par défaut : marges nulles pour le gabarit du PDF
+   (page /cv), une feuille A4 qui gère elle-même ses marges. Le
+   portfolio, lui, s'imprime avec des marges.
    ============================================================ */
 
 @page {
@@ -304,13 +269,11 @@ a:is(:hover, :focus-visible) {
   margin: 0;
 }
 
-@media print {
-  /* Les tailles du site sont en rem : réduire la racine compacte tout
-     proportionnellement pour tenir le CV sur une page */
-  html {
-    font-size: 13.5px;
-  }
+@page portfolio {
+  margin: 14mm;
+}
 
+@media print {
   body {
     background: #fff !important;
   }

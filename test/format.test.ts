@@ -1,5 +1,27 @@
 import { describe, expect, test } from "vite-plus/test";
-import { bareUrl, hostOf, slugify, toRoman, toTelHref } from "../app/utils/format";
+import { bareUrl, hostOf, listFr, sentenceList, toTelHref } from "../app/utils/format";
+
+describe("listFr", () => {
+  test("sépare par des virgules et termine par « et »", () => {
+    expect(listFr(["Sabaton", "Ghost", "Rammstein"])).toBe("Sabaton, Ghost et Rammstein");
+    expect(listFr(["Hellfest", "Motocultor"])).toBe("Hellfest et Motocultor");
+    expect(listFr(["NieR"])).toBe("NieR");
+  });
+});
+
+describe("sentenceList", () => {
+  test("met en minuscule les éléments qui suivent le premier", () => {
+    expect(sentenceList(["Product Owner", "Chef de projet", "Développeur"])).toBe(
+      "Product Owner, chef de projet et développeur",
+    );
+  });
+
+  test("garde les sigles et les termes à majuscule interne", () => {
+    expect(sentenceList(["Développeur", "IA", "Product Owner"])).toBe(
+      "Développeur, IA et Product Owner",
+    );
+  });
+});
 
 describe("toTelHref", () => {
   test("retire les espaces du numéro affiché", () => {
@@ -23,26 +45,5 @@ describe("bareUrl", () => {
     expect(bareUrl("https://www.linkedin.com/in/vincent-leostic")).toBe(
       "linkedin.com/in/vincent-leostic",
     );
-  });
-});
-
-describe("slugify", () => {
-  test("donne un identifiant ASCII sans accents", () => {
-    expect(slugify("Ramonéa")).toBe("ramonea");
-    expect(slugify("Les ateliers de Camille")).toBe("les-ateliers-de-camille");
-    expect(slugify("  GitLab CI/CD  ")).toBe("gitlab-ci-cd");
-  });
-});
-
-describe("toRoman", () => {
-  test.each([
-    [1, "I"],
-    [4, "IV"],
-    [9, "IX"],
-    [14, "XIV"],
-    [1990, "MCMXC"],
-    [2026, "MMXXVI"],
-  ])("%i → %s", (value, roman) => {
-    expect(toRoman(value)).toBe(roman);
   });
 });

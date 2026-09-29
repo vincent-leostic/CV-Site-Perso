@@ -35,7 +35,8 @@ jobs:
           node-version: 22
           cache: npm
 
-      - name: Vérifier puis générer le site statique
+      # `generate` imprime aussi le CV en PDF avec le Chrome préinstallé du runner
+      - name: Vérifier puis générer le site statique et le CV en PDF
         if: env.OVH_READY == 'true'
         run: |
           npm ci

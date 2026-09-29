@@ -1,3 +1,8 @@
+/** Texte insécable (espaces → espaces insécables), ex. un numéro de téléphone affiché */
+export function noBreak(text: string): string {
+  return text.replaceAll(" ", " ");
+}
+
 /** Lien d'appel d'un numéro affiché avec espaces, ex. "06 13 39 80 06" → "tel:0613398006" */
 export function toTelHref(phone: string): string {
   return `tel:${phone.replaceAll(" ", "")}`;
@@ -8,49 +13,33 @@ export function hostOf(url: string): string {
   return new URL(url).hostname.replace(/^www\./, "");
 }
 
+const FRENCH_LIST = new Intl.ListFormat("fr", { style: "long", type: "conjunction" });
+
+/** Liste de noms en français, ex. ["Sabaton", "Ghost", "Rammstein"] → "Sabaton, Ghost et Rammstein" */
+export function listFr(items: string[]): string {
+  return FRENCH_LIST.format(items);
+}
+
+/**
+ * Liste en phrase : après le premier élément, les suivants passent en
+ * minuscule, sauf les sigles et termes à majuscule interne (« IA »,
+ * « Product Owner »). Ex. ["Product Owner", "Chef de projet", "Développeur"]
+ * → "Product Owner, chef de projet et développeur".
+ */
+export function sentenceList(items: string[]): string {
+  return listFr(
+    items.map((item, index) =>
+      index === 0 || /\p{Lu}/u.test(item.slice(1))
+        ? item
+        : item.charAt(0).toLocaleLowerCase("fr") + item.slice(1),
+    ),
+  );
+}
+
 /** URL lisible sur papier, sans protocole, www ni barre finale, ex. "github.com/vincent-leostic" */
 export function bareUrl(url: string): string {
   return url
     .replace(/^https?:\/\//, "")
     .replace(/^www\./, "")
     .replace(/\/$/, "");
-}
-
-/** Identifiant ASCII en minuscules, ex. "Les ateliers de Camille" → "les-ateliers-de-camille" */
-export function slugify(text: string): string {
-  return text
-    .toLowerCase()
-    .normalize("NFD")
-    .replace(/[̀-ͯ]/g, "") // accents détachés par NFD
-    .replace(/[^a-z0-9]+/g, "-")
-    .replace(/^-|-$/g, "");
-}
-
-const ROMAN_NUMERALS: [number, string][] = [
-  [1000, "M"],
-  [900, "CM"],
-  [500, "D"],
-  [400, "CD"],
-  [100, "C"],
-  [90, "XC"],
-  [50, "L"],
-  [40, "XL"],
-  [10, "X"],
-  [9, "IX"],
-  [5, "V"],
-  [4, "IV"],
-  [1, "I"],
-];
-
-/** Chiffres romains, ex. 2026 → "MMXXVI" */
-export function toRoman(value: number): string {
-  let rest = value;
-  let roman = "";
-  for (const [amount, numeral] of ROMAN_NUMERALS) {
-    while (rest >= amount) {
-      roman += numeral;
-      rest -= amount;
-    }
-  }
-  return roman;
 }

@@ -4,6 +4,8 @@ import type { IconName } from "./icons";
 export interface Tech {
   label: string;
   icon?: IconName;
+  /** Affichée sur le site mais absente du CV en PDF */
+  siteOnly?: boolean;
 }
 
 export interface Link extends Tech {
@@ -12,20 +14,20 @@ export interface Link extends Tech {
 
 /** Casquettes tenues sur une mission ; chaque thème leur associe un style */
 export type Casquette =
+  | "Product Owner"
   | "Chef de projet"
   | "Développeur"
   | "Responsable technique"
   | "Responsable fonctionnel"
-  | "IA"
-  | "En autonomie";
+  | "IA";
 
 export interface Mission {
   /** Nom court du projet */
   title: string;
   description: string;
-  /** Casquettes tenues sur la mission, affichées en badges ou en texte selon le thème */
+  /** Casquettes tenues sur la mission */
   badges?: Casquette[];
-  /** Mission préférée : affiche une étoile à côté du titre */
+  /** Mission coup de cœur, signalée à côté du titre */
   favorite?: boolean;
 }
 
@@ -42,28 +44,30 @@ export interface PersonalProject {
   /** Nom du site ou du projet */
   title: string;
   description: string;
-  /** URL publique, ouverte dans un nouvel onglet */
-  url: string;
+  /** URL publique, ouverte dans un nouvel onglet ; absente tant que rien n'est en ligne */
+  url?: string;
+  /** Projet en cours de développement : pas d'aperçu, carte à part */
+  inProgress?: boolean;
   /** Technos marquantes, affichées en tags */
   stack?: Tech[];
-}
-
-export interface Skill extends Tech {
-  /** Maîtrise sur 100 : barres d'XP (Gaming) et jauges ASCII (Terminal) */
-  level: number;
+  /** Capture de la page d'accueil (dans public/), 1280×800 */
+  image?: string;
 }
 
 export interface SkillGroup {
   title: string;
-  skills: Skill[];
+  skills: Tech[];
 }
 
 export interface Education {
   degree: string;
-  school: string;
+  /** Organisme, omis quand il n'a pas à figurer sur le CV */
+  school?: string;
   period: string;
   /** Fiche officielle de la certification (France compétences), liée depuis l'intitulé */
   url?: string;
+  /** Diplôme pas encore obtenu : absent des diplômes déclarés au référencement */
+  inProgress?: boolean;
 }
 
 export interface Language {
@@ -71,10 +75,61 @@ export interface Language {
   level: string;
 }
 
+/** Section « À propos » du portfolio (absente du CV en PDF) */
+export interface About {
+  title: string;
+  /** Phrase d'ouverture, avant les questions-réponses */
+  intro: string;
+  faq: { question: string; answer: string }[];
+  /** Façon de travailler, étape par étape */
+  method: { title: string; detail: string }[];
+  /** Anecdote de l'encadré « Le saviez-vous ? » */
+  funFact?: string;
+}
+
+/** Étape de la frise du parcours (portfolio) */
+export interface Milestone {
+  period: string;
+  title: string;
+  detail: string;
+  /** Étape en cours ou à venir : la frise y mène en pointillé */
+  status?: "current" | "future";
+  /** Lien depuis le titre : page externe (nouvel onglet) ou ancre du site */
+  url?: string;
+}
+
+/** Tuile de la mosaïque « En dehors du code » (portfolio) */
+export interface InterestTile {
+  title: string;
+  /** Phrase courte sous le titre */
+  text?: string;
+  /** Favoris en texte, éventuellement sous un intitulé */
+  lists?: { label?: string; items: string[] }[];
+}
+
+export interface Interests {
+  /** Fil rouge qui ouvre la section */
+  intro: string;
+  /** Tuile phare, sur fond sombre */
+  featured: { caption: string; title: string; text: string };
+  /** Écoute du moment, tuile rousse */
+  nowPlaying: { caption: string; title: string };
+  tiles: InterestTile[];
+}
+
 export interface CvData {
   name: string;
   title: string;
   bio: string;
+  about: About;
+  /** Frise du parcours, de la plus ancienne étape à la plus récente */
+  milestones: Milestone[];
+  /** Loisirs détaillés ; `hobbies` en reste la version courte (PDF) */
+  interests: Interests;
+  /** Disponibilité pour un nouveau poste, mise en avant dans le parcours */
+  availability: string;
+  /** Mobilité, affichée dans le parcours */
+  mobility: string;
   /** Chemin de la photo de profil (dans public/) */
   photo: string;
   /** URL publique du site : canonique SEO, et affichée sur le PDF imprimé */
@@ -104,8 +159,104 @@ export interface CvData {
  */
 export const cv: CvData = {
   name: "Vincent LEOSTIC",
-  title: "Développeur logiciel front-end et UI/UX",
-  bio: "Développeur logiciel chez iD3i, à Brest, après une reconversion. Spécialisé front et UI/UX, je conçois et développe des applications métier, du besoin jusqu'à la production.",
+  title: "Développeur logiciel front-end, UI/UX et accessibilité",
+  bio: "Je conçois et développe des applications métier, du besoin jusqu'à la production, en soignant chaque détail de l'interface.",
+  about: {
+    title: "Des interfaces qui font « wow »",
+    intro:
+      "Après dix ans en restauration, j'avais fait le tour du métier : en 2018, je me suis reconverti dans le développement.",
+    faq: [
+      {
+        question: "Ce que j'aime ?",
+        answer:
+          "C'est concevoir des interfaces soignées, qui font dire « wow » dès qu'on arrive dessus. Mes premières étaient un peu criardes : j'ai appris à la dure, et j'en ai gardé le goût du détail juste.",
+      },
+      {
+        question: "Le projet dont je suis le plus fier ?",
+        answer:
+          "Une application pour la sécurité incendie, qui aide les pompiers à préparer leurs interventions. Savoir qu'elle servira à protéger et aider des gens compte beaucoup pour moi.",
+      },
+      {
+        question: "En dehors du travail ?",
+        answer:
+          "J'écoute beaucoup de musique, surtout du métal. Côté jeux, j'aime la grande stratégie, Europa Universalis en tête, et Final Fantasy XIV, mon jeu de cœur, pour lequel je développe une application destinée aux complétionnistes.",
+      },
+    ],
+    method: [
+      { title: "Écouter", detail: "Le besoin, tel que les utilisateurs le vivent." },
+      { title: "Comprendre", detail: "Les usages, les contraintes et les objectifs." },
+      {
+        title: "Concevoir par itérations",
+        detail: "Une première version de ma vision, que j'affine pas à pas.",
+      },
+      { title: "Faire valider", detail: "Chaque version est validée avant d'aller plus loin." },
+    ],
+    funFact: "Mon nom de famille, LEOSTIC, vient du breton « eostig », qui signifie « rossignol ».",
+  },
+  milestones: [
+    { period: "2008 – 2018", title: "Restauration", detail: "Serveur, puis responsable de salle." },
+    {
+      period: "2018",
+      title: "Reconversion",
+      detail: "Titre professionnel Développeur logiciel, à l'AFPA.",
+    },
+    {
+      period: "Depuis 2019",
+      title: "Développeur logiciel",
+      detail:
+        "En ESN à Brest, chez iD3i : des missions variées, avec le front et l'UI/UX pour spécialité.",
+    },
+    {
+      period: "En cours",
+      title: "Expert en développement logiciel",
+      detail: "Titre de niveau 7 (Bac+5), par VAE.",
+      status: "current",
+      url: "https://www.francecompetences.fr/recherche/rncp/41330",
+    },
+    {
+      period: "Demain",
+      title: "Chez vous ?",
+      detail: "Un poste à temps plein dans votre équipe : parlons-en.",
+      status: "future",
+      url: "#contact",
+    },
+  ],
+  interests: {
+    intro:
+      "Un fil rouge : dans Final Fantasy XIV comme autour d'une table de jeu de rôle, je joue tank. Avancer en équipe en tenant un rôle essentiel, c'est important pour moi.",
+    featured: {
+      caption: "Jeu de cœur",
+      title: "Final Fantasy XIV",
+      text: "Tank paladin depuis la refonte de 2013. J'adore son histoire et ses personnages, au point de développer une application pour ses complétionnistes.",
+    },
+    nowPlaying: { caption: "En ce moment", title: "Royal Sorrow" },
+    tiles: [
+      {
+        title: "Musique",
+        text: "Surtout du métal, et beaucoup de musiques de jeux vidéo.",
+        lists: [
+          { items: ["Electric Callboy", "Sabaton", "Ghost", "Rammstein", "Motörhead"] },
+          { label: "Musiques de jeux", items: ["Clair Obscur : Expedition 33", "NieR"] },
+          { label: "Festivals", items: ["Hellfest", "Motocultor"] },
+        ],
+      },
+      {
+        title: "Jeux vidéo",
+        text: "L'Histoire me passionne depuis toujours, et j'aime les jeux portés par leur récit.",
+        lists: [
+          {
+            label: "Stratégie",
+            items: ["Europa Universalis", "Total War", "Anno", "Ixion", "Frostpunk 1 & 2"],
+          },
+          { label: "Récits", items: ["Tunic", "Outer Wilds", "Baldur's Gate 3"] },
+        ],
+      },
+      {
+        title: "Autour d'une table",
+        text: "Les échecs, les petits jeux rapides, les parties de Risk à rallonge… et le jeu de rôle, que j'aimerais pratiquer plus souvent.",
+      },
+    ],
+  },
   photo: "/avatar.jpg",
   website: "https://vincent.leostic.bzh",
   email: "vincent.leostic@gmail.com",
@@ -127,15 +278,8 @@ export const cv: CvData = {
         {
           title: "Gestion d'adhérents de clubs de sport",
           description:
-            "Application qui centralise la vie d'un club de sport : fiches adhérents et inscriptions. Livrée en production dans les délais et le budget alloués.",
-          badges: [
-            "Chef de projet",
-            "Développeur",
-            "Responsable technique",
-            "Responsable fonctionnel",
-            "IA",
-            "En autonomie",
-          ],
+            "Application qui centralise la vie d'un club de sport : fiches adhérents et inscriptions.",
+          badges: ["Product Owner", "Chef de projet", "Développeur"],
         },
         {
           title: "Planification en restauration",
@@ -147,7 +291,7 @@ export const cv: CvData = {
           title: "Sécurité incendie",
           description:
             "Application de création des fiches d'aide à l'intervention pour les pompiers, retrouvées en saisissant les informations d'un lieu et générées en PDF. Moteur de dessin sur photo prise par drone pour délimiter les zones sensibles et à risque.",
-          badges: ["Chef de projet", "Développeur", "Responsable fonctionnel"],
+          badges: ["Product Owner", "Chef de projet", "Développeur"],
           favorite: true,
         },
         {
@@ -179,6 +323,7 @@ export const cv: CvData = {
       description:
         "Site vitrine d'une entreprise de ramonage de la presqu'île de Crozon : prestations, tarifs, FAQ et contact, avec un back-office complet pour que l'artisan gère lui-même contenus, photos, traductions et SEO.",
       url: "https://ramonea.fr",
+      image: "/projects/ramonea.webp",
       stack: [
         { label: "Vue.js 3", icon: "vue" },
         { label: "TypeScript", icon: "typescript" },
@@ -190,57 +335,77 @@ export const cv: CvData = {
       description:
         "Site de Camille de Boiscuillé, psychopraticienne à Crozon : ses accompagnements (art-thérapie, EMDR, thérapie familiale) présentés dans un site statique ultra-léger, sans JavaScript ni cookies.",
       url: "https://www.camilledeboiscuilletherapeute.com",
+      image: "/projects/camille.webp",
       stack: [{ label: "Astro", icon: "astro" }],
+    },
+    {
+      title: "Application pour Final Fantasy XIV",
+      description:
+        "Une application destinée aux complétionnistes de Final Fantasy XIV, mon jeu de cœur, pour suivre sa progression dans tout ce que le jeu a à collectionner.",
+      inProgress: true,
     },
   ],
   skillGroups: [
     {
       title: "Frontend & UI/UX",
       skills: [
-        { label: "Vue.js 3", icon: "vue", level: 90 },
-        { label: "Nuxt", icon: "nuxt", level: 85 },
-        { label: "Astro", icon: "astro", level: 70 },
-        { label: "TypeScript", icon: "typescript", level: 85 },
-        { label: "CSS moderne", icon: "css", level: 90 },
-        { label: "Design d'interface", icon: "figma", level: 80 },
+        { label: "Accessibilité (WCAG)" },
+        { label: "Vue.js 3", icon: "vue" },
+        { label: "Nuxt", icon: "nuxt" },
+        { label: "Astro", icon: "astro" },
+        { label: "TypeScript", icon: "typescript" },
+        { label: "CSS moderne", icon: "css" },
+        { label: "Design d'interface", icon: "figma" },
       ],
     },
     {
       title: "Backend",
       skills: [
-        { label: "Node.js", icon: "node", level: 70 },
-        { label: "C#", icon: "csharp", level: 65 },
-        { label: "PostgreSQL", icon: "postgresql", level: 65 },
+        { label: "Node.js", icon: "node", siteOnly: true },
+        { label: "C#", icon: "csharp" },
+        { label: "PostgreSQL", icon: "postgresql" },
+        { label: "Supabase" },
       ],
     },
     {
       title: "DevOps & outils",
       skills: [
-        { label: "Git", icon: "git", level: 85 },
-        { label: "GitLab CI/CD", icon: "gitlab", level: 70 },
-        { label: "GitHub Actions", icon: "github", level: 70 },
-        { label: "Multi-projets en ESN", level: 85 },
-        { label: "Veille technique", level: 85 },
+        { label: "Git", icon: "git" },
+        { label: "GitLab CI/CD", icon: "gitlab" },
+        { label: "GitHub Actions", icon: "github" },
+        { label: "Déploiement (Vercel, OVH)" },
       ],
     },
     {
       title: "Développement assisté par IA",
       skills: [
-        { label: "Claude Code", icon: "claude", level: 85 },
-        { label: "Skills, hooks & agents", level: 80 },
-        { label: "Intégration LLM", level: 70 },
+        { label: "Claude Code", icon: "claude" },
+        { label: "Skills, hooks & agents" },
+        { label: "Intégration LLM" },
+      ],
+    },
+    {
+      title: "Divers",
+      skills: [
+        { label: "Gestion de projet" },
+        { label: "Recueil du besoin & spécifications" },
+        { label: "Relation client" },
+        { label: "SEO" },
+        { label: "Multi-projets en ESN" },
+        { label: "Veille technique" },
+        { label: "Projets perso" },
       ],
     },
   ],
   education: [
     {
       degree: "Expert en développement logiciel, niveau 7 (Bac+5)",
-      school: "OpenClassrooms",
       period: "VAE en cours",
       url: "https://www.francecompetences.fr/recherche/rncp/41330",
+      inProgress: true,
     },
     {
-      degree: "Titre professionnel Développeur logiciel (équivalent BAC+2)",
+      degree: "Titre professionnel Développeur logiciel (Bac+2)",
       school: "AFPA",
       period: "2018",
     },
@@ -249,8 +414,16 @@ export const cv: CvData = {
     { name: "Français", level: "langue maternelle" },
     {
       name: "Anglais",
-      level: "courant et professionnel, lecture technique fluide ; l'oral manque de pratique",
+      level: "courant et professionnel",
     },
   ],
-  hobbies: ["Jeux vidéo", "Jeux de société", "Soirées entre amis", "Développer à temps perdu"],
+  availability: "Immédiate",
+  mobility: "Permis B",
+  hobbies: [
+    "Musique (métal)",
+    "Jeux vidéo",
+    "Jeux de société",
+    "Soirées entre amis",
+    "Développer à temps perdu",
+  ],
 };

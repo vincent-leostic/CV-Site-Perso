@@ -1,3 +1,4 @@
+import { existsSync } from "node:fs";
 import { describe, expect, test } from "vite-plus/test";
 import { cv } from "../app/data/cv";
 import { ICONS } from "../app/data/icons";
@@ -13,7 +14,7 @@ describe("données du CV", () => {
     const urls = [
       cv.website,
       ...cv.links.map((link) => link.url),
-      ...cv.personalProjects.map((proj) => proj.url),
+      ...cv.personalProjects.flatMap((proj) => (proj.url ? [proj.url] : [])),
       ...cv.education.flatMap((edu) => (edu.url ? [edu.url] : [])),
     ];
     for (const url of urls) {
@@ -39,7 +40,7 @@ describe("données du CV", () => {
     }
     expect(duplicates(cv.personalProjects.map((proj) => proj.title))).toEqual([]);
     expect(duplicates(cv.skillGroups.map((group) => group.title))).toEqual([]);
-    // Sérieux met toutes les compétences à plat dans un seul nuage
+    // Le CV met toutes les compétences à plat dans un seul nuage
     expect(
       duplicates(cv.skillGroups.flatMap((group) => group.skills.map((skill) => skill.label))),
     ).toEqual([]);
@@ -47,11 +48,9 @@ describe("données du CV", () => {
     expect(duplicates(cv.languages.map((lang) => lang.name))).toEqual([]);
   });
 
-  test("les niveaux de compétence sont des entiers entre 0 et 100", () => {
-    for (const skill of cv.skillGroups.flatMap((group) => group.skills)) {
-      expect(Number.isInteger(skill.level), skill.label).toBe(true);
-      expect(skill.level, skill.label).toBeGreaterThanOrEqual(0);
-      expect(skill.level, skill.label).toBeLessThanOrEqual(100);
+  test("chaque capture de projet existe dans public/", () => {
+    for (const proj of cv.personalProjects) {
+      if (proj.image) expect(existsSync(`public${proj.image}`), proj.image).toBe(true);
     }
   });
 

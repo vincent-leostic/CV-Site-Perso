@@ -1,5 +1,3 @@
-import { themeInitScript } from "./shared/theme";
-
 // https://nuxt.com/docs/api/configuration/nuxt-config
 export default defineNuxtConfig({
   compatibilityDate: "2025-01-01",
@@ -9,36 +7,28 @@ export default defineNuxtConfig({
     strict: true,
   },
   css: ["~/assets/css/main.css"],
-  runtimeConfig: {
-    public: {
-      // Année du build, gravée dans le colophon du thème Manuscrit
-      buildYear: new Date().getFullYear(),
-    },
-  },
-  // Polices auto-hébergées au build (pas de requête vers Google à la visite) ;
-  // chaque thème ne télécharge que les siennes. Seule Inter (thème par
-  // défaut) est préchargée.
+  // Polices auto-hébergées au build : aucune requête vers Google à la visite.
+  // Inter pour le texte, Bricolage Grotesque pour les titres, avec son axe
+  // de taille optique (dessin plus expressif en grand).
   fonts: {
-    defaults: { subsets: ["latin"], styles: ["normal"], preload: false },
+    defaults: { subsets: ["latin"], styles: ["normal"] },
     families: [
-      { name: "Inter", weights: [400, 500, 600, 700, 800], preload: true },
-      { name: "Chakra Petch", weights: [500, 600, 700] },
-      { name: "Nunito Sans", weights: [400, 600, 700, 800] },
+      { name: "Inter", weights: [400, 500, 600, 700, 800] },
       {
-        name: "Fraunces",
-        weights: [500, 600, 700],
-        providerOptions: { google: { experimental: { variableAxis: { opsz: [["9", "144"]] } } } },
+        name: "Bricolage Grotesque",
+        weights: [600, 700, 800],
+        providerOptions: { google: { experimental: { variableAxis: { opsz: [["12", "96"]] } } } },
       },
-      { name: "EB Garamond", weights: [400, 500, 600, 700], styles: ["normal", "italic"] },
-      { name: "IM Fell English", weights: [400], styles: ["normal", "italic"] },
-      { name: "VT323", weights: [400] },
     ],
   },
   app: {
     head: {
       htmlAttrs: { lang: "fr" },
-      // Applique le thème avant le premier rendu (voir shared/theme.ts)
-      script: [{ innerHTML: themeInitScript }],
     },
+  },
+  // /cv est le gabarit du PDF : pré-rendue pour que scripts/cv-pdf.mjs
+  // l'imprime, puis retirée du site publié
+  nitro: {
+    prerender: { routes: ["/cv"] },
   },
 });

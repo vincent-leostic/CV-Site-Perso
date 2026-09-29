@@ -1,0 +1,8 @@
+{
+  // Les tests tournent dans Node (vp test) : types Node en plus de ceux de l'app
+  "extends": "../.nuxt/tsconfig.app.json",
+  "compilerOptions": {
+    "types": ["node"]
+  },
+  "include": ["./**/*.ts", "../app/**/*", "../.nuxt/nuxt.d.ts"]
+}
