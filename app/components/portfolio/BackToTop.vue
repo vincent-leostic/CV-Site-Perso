@@ -22,7 +22,13 @@ onUnmounted(() => observer?.disconnect());
        respecte prefers-reduced-motion. Masqué (v-show), il sort de
        l'ordre de tabulation. -->
   <Transition name="back-to-top">
-    <a v-show="visible" class="back-to-top" href="#top" :aria-label="ui.backToTop">
+    <a
+      v-show="visible"
+      class="back-to-top"
+      href="#top"
+      :aria-label="ui.backToTop"
+      data-umami-event="back-to-top"
+    >
       <LineIcon class="back-to-top__icon" name="arrow-up" />
     </a>
   </Transition>

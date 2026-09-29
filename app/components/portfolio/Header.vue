@@ -1,17 +1,8 @@
 <script setup lang="ts">
-import type { SectionId } from "~/data/types";
+import { SECTION_IDS } from "~/data/content";
 
 const { cv, ui } = useContent();
 const pdf = useCvPdf();
-
-const SECTIONS: SectionId[] = [
-  "a-propos",
-  "projets",
-  "competences",
-  "parcours",
-  "loisirs",
-  "contact",
-];
 
 // Menu déroulant sous 1080px. Il se ferme au choix d'une section, avec
 // Échap (le focus revient au bouton) et dès qu'on clique ou tabule hors
@@ -68,10 +59,15 @@ onUnmounted(() => document.removeEventListener("pointerdown", onPointerDown));
         :aria-label="ui.header.navLabel"
       >
         <ul class="site-header__links" role="list">
-          <li v-for="id in SECTIONS" :key="id" class="site-header__item">
-            <a class="site-header__link" :href="`#${id}`" @click="open = false">{{
-              ui.header.sections[id]
-            }}</a>
+          <li v-for="id in SECTION_IDS" :key="id" class="site-header__item">
+            <a
+              class="site-header__link"
+              :href="`#${id}`"
+              data-umami-event="nav-link"
+              :data-umami-event-section="id"
+              @click="open = false"
+              >{{ ui.header.sections[id] }}</a
+            >
           </li>
         </ul>
       </nav>
@@ -79,6 +75,9 @@ onUnmounted(() => document.removeEventListener("pointerdown", onPointerDown));
         class="button button--primary button--small site-header__cv"
         :href="pdf.href"
         :download="pdf.download"
+        data-umami-event="cv-download"
+        :data-umami-event-lang="pdf.lang"
+        data-umami-event-from="header"
       >
         <LineIcon class="button__icon" name="download" /><span class="site-header__cv-label">{{
           ui.header.cv

@@ -22,6 +22,8 @@ const { cv, ui } = useContent();
             <a
               v-if="step.url"
               class="milestone__link"
+              data-umami-event="milestone-link"
+              :data-umami-event-target="step.url"
               :href="step.url"
               :target="step.url.startsWith('http') ? '_blank' : undefined"
               :rel="step.url.startsWith('http') ? 'noopener' : undefined"

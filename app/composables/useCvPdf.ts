@@ -12,6 +12,7 @@ export function useCvPdf() {
   return computed(() => {
     const file = CV_PDF_FILES[locale.value as Locale];
     return {
+      lang: locale.value,
       href: import.meta.dev ? localePath("/cv") : `/${file}`,
       download: import.meta.dev ? undefined : file,
       meta: ui.value.pdfMeta(CV_PDF_KB),

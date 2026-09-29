@@ -172,6 +172,8 @@ export interface UiText {
   seo: { title: string; description: string; ogImageAlt: string };
   skipLink: string;
   footer: string;
+  /** Mention de la mesure d'audience, en pied de page */
+  analytics: string;
   backToTop: string;
   header: {
     navLabel: string;

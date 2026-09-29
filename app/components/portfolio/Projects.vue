@@ -63,7 +63,13 @@ const projectsInProgress = computed(() =>
             <div class="project-card__body">
               <h4 class="project-card__title">
                 <!-- Le lien s'étend à toute la carte ; son nom reste le titre -->
-                <a class="project-card__link" :href="proj.url" target="_blank" rel="noopener"
+                <a
+                  class="project-card__link"
+                  :href="proj.url"
+                  target="_blank"
+                  rel="noopener"
+                  data-umami-event="project-open"
+                  :data-umami-event-project="proj.title"
                   >{{ proj.title }}<span class="visually-hidden">{{ ui.newTab }}</span></a
                 >
               </h4>

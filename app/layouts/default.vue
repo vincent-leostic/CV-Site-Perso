@@ -13,6 +13,7 @@ const { ui } = useContent();
     </main>
     <footer class="site__footer">
       <p>{{ ui.footer }}</p>
+      <p class="site__analytics">{{ ui.analytics }}</p>
     </footer>
   </div>
 </template>
@@ -54,6 +55,12 @@ const { ui } = useContent();
   color: var(--on-dark-soft);
   background: var(--dark);
   border-top: 1px solid color-mix(in srgb, var(--on-dark) 12%, transparent);
+}
+
+.site__analytics {
+  margin-top: 0.25rem;
+  font-size: 0.78rem;
+  opacity: 0.85;
 }
 
 @media print {

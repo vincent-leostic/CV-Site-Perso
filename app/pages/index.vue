@@ -7,6 +7,7 @@ import type { Locale } from "~/data/types";
 // Canonique, hreflang, og:url et og:locale viennent de useLocaleHead
 // (app.vue).
 const { cv, ui } = useContent();
+useSectionTracking();
 const { locale } = useI18n();
 const localePath = useLocalePath();
 

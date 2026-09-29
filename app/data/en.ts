@@ -291,6 +291,7 @@ export const ui: UiText = {
   },
   skipLink: "Skip to content",
   footer: `Site designed and built by ${COMMON.name}, with Nuxt and TypeScript.`,
+  analytics: "Anonymous visit statistics, no cookies.",
   backToTop: "Back to top of page",
   header: {
     navLabel: "Portfolio sections",
