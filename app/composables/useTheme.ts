@@ -1,42 +1,61 @@
-export type Theme = "serieux" | "gaming" | "nature" | "manuscrit" | "terminal";
-
-const THEMES: Theme[] = ["serieux", "gaming", "nature", "manuscrit", "terminal"];
-const STORAGE_KEY = "cv-theme";
-
-const currentTheme = ref<Theme>("serieux");
-
-function isTheme(value: string | null): value is Theme {
-  return value !== null && (THEMES as string[]).includes(value);
-}
+import {
+  DEFAULT_THEME,
+  THEMES,
+  THEME_PENDING_CLASS,
+  THEME_STORAGE_KEY,
+  isTheme,
+  type Theme,
+} from "#shared/theme";
 
 function applyTheme(theme: Theme) {
   document.documentElement.setAttribute("data-theme", theme);
 }
 
-type DocumentWithViewTransition = Document & {
-  startViewTransition?: (callback: () => void | Promise<void>) => { ready: Promise<void> };
-};
-
 export function useTheme() {
-  /**
-   * À appeler une fois côté client : `?theme=` dans l'URL prime (lien
-   * partageable), sinon le choix sauvegardé, sinon le thème par défaut.
-   */
-  function initTheme() {
-    const fromQuery = new URLSearchParams(window.location.search).get("theme");
-    const saved = localStorage.getItem(STORAGE_KEY);
-    if (isTheme(fromQuery)) {
-      currentTheme.value = fromQuery;
-    } else if (isTheme(saved)) {
-      currentTheme.value = saved;
-    }
-    applyTheme(currentTheme.value);
-  }
+  const currentTheme = useState<Theme>("theme", () => DEFAULT_THEME);
 
+  /** Change de thème et le sauvegarde pour les prochaines visites */
   function setTheme(theme: Theme) {
     currentTheme.value = theme;
     applyTheme(theme);
-    localStorage.setItem(STORAGE_KEY, theme);
+    try {
+      localStorage.setItem(THEME_STORAGE_KEY, theme);
+    } catch {
+      /* stockage bloqué : le choix vaut pour la visite en cours */
+    }
+  }
+
+  /**
+   * À appeler une fois côté client, au montage de l'app. Le script inline
+   * (shared/theme) a déjà résolu le thème avant le premier rendu : on le lit
+   * sur <html> plutôt que dans l'URL, que vue-router réécrit pendant
+   * l'hydratation. On démasque ensuite la page, le bon layout étant monté.
+   */
+  async function initTheme() {
+    const root = document.documentElement;
+    const resolved = root.getAttribute("data-theme");
+    if (isTheme(resolved)) currentTheme.value = resolved;
+    await nextTick();
+    // Calcule les styles avant de retirer la classe : l'indicateur du
+    // sélecteur se pose sur le bon thème sans glisser depuis « Pro »
+    void root.offsetWidth;
+    root.classList.remove(THEME_PENDING_CLASS);
+
+    // L'impression suit la mise en page papier de Sérieux quel que soit le
+    // thème affiché : bascule le temps de l'impression, sans sauvegarder.
+    let themeBeforePrint: Theme | null = null;
+    window.addEventListener("beforeprint", () => {
+      if (currentTheme.value === DEFAULT_THEME) return;
+      themeBeforePrint = currentTheme.value;
+      currentTheme.value = DEFAULT_THEME;
+      applyTheme(DEFAULT_THEME);
+    });
+    window.addEventListener("afterprint", () => {
+      if (!themeBeforePrint) return;
+      currentTheme.value = themeBeforePrint;
+      applyTheme(themeBeforePrint);
+      themeBeforePrint = null;
+    });
   }
 
   /**
@@ -47,9 +66,8 @@ export function useTheme() {
   function switchTheme(theme: Theme, origin?: { x: number; y: number }) {
     if (theme === currentTheme.value) return;
 
-    const doc = document as DocumentWithViewTransition;
     const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-    if (!doc.startViewTransition || reduceMotion) {
+    if (!("startViewTransition" in document) || reduceMotion) {
       setTheme(theme);
       return;
     }
@@ -58,7 +76,7 @@ export function useTheme() {
     const y = origin?.y ?? 0;
     // On attend le re-rendu de Vue : le nouveau layout doit être dans le
     // DOM avant que la snapshot "new" ne soit capturée.
-    const transition = doc.startViewTransition(async () => {
+    const transition = document.startViewTransition(async () => {
       setTheme(theme);
       await nextTick();
     });

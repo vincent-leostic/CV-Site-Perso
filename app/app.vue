@@ -5,8 +5,6 @@ onMounted(initTheme);
 </script>
 
 <template>
-  <div>
-    <NuxtRouteAnnouncer />
-    <NuxtPage />
-  </div>
+  <NuxtRouteAnnouncer />
+  <NuxtPage />
 </template>
