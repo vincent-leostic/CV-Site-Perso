@@ -1,20 +1,22 @@
-/** Nom du CV en PDF, généré au build par scripts/cv-pdf.mjs à partir de la page /cv */
-export const CV_PDF_FILE = "cv-vincent-leostic.pdf";
+import type { Locale } from "~/data/types";
 
 /**
- * Format et poids affichés à côté des liens de téléchargement. Le script de
+ * CV en PDF de chaque langue, générés au build par scripts/cv-pdf.mjs à
+ * partir des pages /cv et /en/cv. Noms vérifiés par les tests.
+ */
+export const CV_PDF_FILES: Record<Locale, string> = {
+  fr: "cv-vincent-leostic.pdf",
+  en: "cv-vincent-leostic-en.pdf",
+};
+
+/**
+ * Poids annoncé à côté des liens de téléchargement, en Ko. Le script de
  * génération prévient si le poids réel s'en écarte trop.
  */
-export const CV_PDF_META = "PDF, environ 290 Ko";
+export const CV_PDF_KB = 275;
 
-/**
- * Lien « Télécharger mon CV ». Le PDF n'existe qu'après `vp run generate` :
- * en développement, on renvoie vers la page /cv qui en est la source.
- */
-export const CV_PDF_HREF = import.meta.dev ? "/cv" : `/${CV_PDF_FILE}`;
-
-/**
- * Attribut download du même lien. Absent en développement : il ferait
- * enregistrer la page /cv en .htm au lieu de l'ouvrir.
- */
-export const CV_PDF_DOWNLOAD = import.meta.dev ? undefined : CV_PDF_FILE;
+/** Miniature de partage de chaque langue, capturée par scripts/og-image.mjs */
+export const OG_IMAGE_FILES: Record<Locale, string> = {
+  fr: "og-image.png",
+  en: "og-image-en.png",
+};

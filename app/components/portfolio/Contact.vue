@@ -1,5 +1,6 @@
 <script setup lang="ts">
-import { cv } from "~/data/cv";
+const { cv, ui } = useContent();
+const pdf = useCvPdf();
 </script>
 
 <template>
@@ -8,11 +9,9 @@ import { cv } from "~/data/cv";
     <!-- Rossignol perché sur la limite basse du bloc, en miroir de l'accroche -->
     <Nightingale class="contact-panel__bird" />
     <div class="section__inner">
-      <p class="section__kicker contact-panel__kicker">Contact</p>
-      <h2 id="contact-title" class="section__title">Me contacter</h2>
-      <p class="section__intro contact-panel__intro">
-        Une question, une opportunité ? Écrivez-moi ou appelez-moi.
-      </p>
+      <p class="section__kicker contact-panel__kicker">{{ ui.contact.kicker }}</p>
+      <h2 id="contact-title" class="section__title">{{ ui.contact.title }}</h2>
+      <p class="section__intro contact-panel__intro">{{ ui.contact.intro }}</p>
 
       <ul class="contact-panel__list" role="list">
         <li>
@@ -29,18 +28,14 @@ import { cv } from "~/data/cv";
           <a class="contact-panel__link" :href="link.url" target="_blank" rel="noopener">
             <TechIcon v-if="link.icon" class="contact-panel__icon" :name="link.icon" />{{
               link.label
-            }}<span class="visually-hidden"> (nouvel onglet)</span>
+            }}<span class="visually-hidden">{{ ui.newTab }}</span>
           </a>
         </li>
       </ul>
 
-      <a
-        class="button button--primary contact-panel__cv"
-        :href="CV_PDF_HREF"
-        :download="CV_PDF_DOWNLOAD"
-      >
-        <LineIcon class="button__icon" name="download" />Télécharger mon CV
-        <span class="button__meta">({{ CV_PDF_META }})</span>
+      <a class="button button--primary contact-panel__cv" :href="pdf.href" :download="pdf.download">
+        <LineIcon class="button__icon" name="download" />{{ ui.contact.download }}
+        <span class="button__meta">({{ pdf.meta }})</span>
       </a>
     </div>
   </section>

@@ -1,12 +1,12 @@
 <script setup lang="ts">
-import { cv } from "~/data/cv";
+const { cv, ui } = useContent();
 </script>
 
 <template>
   <section id="competences" class="section section--alt skills" aria-labelledby="competences-title">
     <div class="section__inner">
-      <p class="section__kicker">Compétences</p>
-      <h2 id="competences-title" class="section__title">Ma boîte à outils</h2>
+      <p class="section__kicker">{{ ui.skills.kicker }}</p>
+      <h2 id="competences-title" class="section__title">{{ ui.skills.title }}</h2>
 
       <div class="skills__grid">
         <div v-for="group in cv.skillGroups" :key="group.title" class="skill-group">

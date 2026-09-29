@@ -17,6 +17,7 @@
   },
   "devDependencies": {
     "@nuxt/fonts": "^0.14.0",
+    "@nuxtjs/i18n": "^10.6.0",
     "@types/node": "^22.20.4",
     "typescript": "^5.7.0",
     "vite-plus": "^0.1.13",

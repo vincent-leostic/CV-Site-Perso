@@ -1,16 +1,17 @@
 <script setup lang="ts">
-import { cv } from "~/data/cv";
+import { COMMON } from "~/data/common";
 
-// Gabarit du PDF téléchargeable (scripts/cv-pdf.mjs) : retiré du site
-// publié une fois le PDF imprimé. En développement, sert d'aperçu.
-useBuildOnlyPage(`${cv.name} - CV`);
+// Gabarit du PDF téléchargeable (scripts/cv-pdf.mjs), un par langue : retiré
+// du site publié une fois le PDF imprimé. En développement, sert d'aperçu.
+definePageMeta({ layout: false });
+useBuildOnlyPage(`${COMMON.name} - CV`);
 </script>
 
 <template>
   <main class="cv-preview">
     <p class="cv-preview__note">
       Aperçu du CV en PDF, page non publiée.
-      <NuxtLink to="/">Retour au portfolio</NuxtLink>
+      <NuxtLinkLocale to="/">Retour au portfolio</NuxtLinkLocale>
     </p>
     <div class="cv-preview__page">
       <CvSheet />

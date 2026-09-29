@@ -1,11 +1,14 @@
 <script setup lang="ts">
-import { cv } from "~/data/cv";
+import { COMMON } from "~/data/common";
 
-// Gabarit de la miniature de partage (scripts/og-image.mjs) : capturée à
-// 1200 × 630 au build, puis retirée du site publié. Reprend l'accroche.
-useBuildOnlyPage(`${cv.name} - Miniature`);
+// Gabarit de la miniature de partage (scripts/og-image.mjs), une par langue :
+// capturée à 1200 × 630 au build, puis retirée du site publié. Reprend
+// l'accroche.
+definePageMeta({ layout: false });
+useBuildOnlyPage(`${COMMON.name} - Miniature`);
 
-const [firstName, ...lastNames] = cv.name.split(" ");
+const { cv, ui } = useContent();
+const [firstName, ...lastNames] = COMMON.name.split(" ");
 </script>
 
 <template>
@@ -13,16 +16,10 @@ const [firstName, ...lastNames] = cv.name.split(" ");
     <span class="og__ring" aria-hidden="true" />
     <span class="og__ring og__ring--highlight" aria-hidden="true" />
     <div class="og__visual">
-      <img
-        class="og__photo"
-        :src="cv.photo"
-        :alt="`Photo de ${cv.name}`"
-        width="200"
-        height="200"
-      />
+      <img class="og__photo" :src="cv.photo" :alt="ui.photoAlt" width="200" height="200" />
     </div>
     <div>
-      <p class="section__kicker og__kicker">Portfolio</p>
+      <p class="section__kicker og__kicker">{{ ui.og.kicker }}</p>
       <h1 class="og__name">{{ firstName }}<br />{{ lastNames.join(" ") }}</h1>
       <p class="og__role">{{ cv.title }}</p>
       <p class="og__url">{{ bareUrl(cv.website) }}</p>

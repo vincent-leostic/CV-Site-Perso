@@ -117,6 +117,7 @@ export async function renderPage(name, route, outputArgs) {
     server.close();
     await rm(profile, { recursive: true, force: true });
   }
-  await rm(join(ROOT, route.slice(1)), { recursive: true, force: true });
-  await rm(join(ROOT, `${route.slice(1)}.html`), { force: true });
+  const page = route.replace(/^\/|\/$/g, "");
+  await rm(join(ROOT, page), { recursive: true, force: true });
+  await rm(join(ROOT, `${page}.html`), { force: true });
 }

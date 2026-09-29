@@ -1,6 +1,15 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" xmlns:xhtml="http://www.w3.org/1999/xhtml">
   <url>
     <loc>https://vincent.leostic.bzh/</loc>
+    <xhtml:link rel="alternate" hreflang="fr-FR" href="https://vincent.leostic.bzh/"/>
+    <xhtml:link rel="alternate" hreflang="en-GB" href="https://vincent.leostic.bzh/en/"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://vincent.leostic.bzh/"/>
+  </url>
+  <url>
+    <loc>https://vincent.leostic.bzh/en/</loc>
+    <xhtml:link rel="alternate" hreflang="fr-FR" href="https://vincent.leostic.bzh/"/>
+    <xhtml:link rel="alternate" hreflang="en-GB" href="https://vincent.leostic.bzh/en/"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://vincent.leostic.bzh/"/>
   </url>
 </urlset>

@@ -1,15 +1,21 @@
 <script setup lang="ts">
-import { cv, type PersonalProject } from "~/data/cv";
+import type { PersonalProject } from "~/data/types";
+
+const { cv, ui } = useContent();
 
 // Missions menées en ESN, à plat
-const missions = cv.experiences.flatMap((exp) => exp.missions ?? []);
+const missions = computed(() => cv.value.experiences.flatMap((exp) => exp.missions ?? []));
 
 // Projets en ligne (carte cliquable avec aperçu) et projets en cours (sans aperçu)
 type LiveProject = PersonalProject & { url: string };
-const liveProjects = cv.personalProjects.filter(
-  (proj): proj is LiveProject => proj.url !== undefined && !proj.inProgress,
+const liveProjects = computed(() =>
+  cv.value.personalProjects.filter(
+    (proj): proj is LiveProject => proj.url !== undefined && !proj.inProgress,
+  ),
 );
-const projectsInProgress = cv.personalProjects.filter((proj) => proj.inProgress);
+const projectsInProgress = computed(() =>
+  cv.value.personalProjects.filter((proj) => proj.inProgress),
+);
 </script>
 
 <template>
@@ -17,21 +23,23 @@ const projectsInProgress = cv.personalProjects.filter((proj) => proj.inProgress)
   <section id="projets" class="projects" aria-labelledby="projets-title">
     <div class="section">
       <div class="section__inner">
-        <p class="section__kicker">Projets</p>
-        <h2 id="projets-title" class="section__title">
-          Des applications métier et des sites en ligne
-        </h2>
-        <p class="section__intro">
-          Une sélection de missions menées chez iD3i, puis mes projets perso : deux sites en ligne
-          et une application en cours.
-        </p>
+        <p class="section__kicker">{{ ui.projects.kicker }}</p>
+        <h2 id="projets-title" class="section__title">{{ ui.projects.title }}</h2>
+        <p class="section__intro">{{ ui.projects.intro }}</p>
 
-        <h3 class="projects__heading">Missions chez iD3i</h3>
+        <h3 class="projects__heading">{{ ui.projects.missionsHeading }}</h3>
         <ul class="projects__missions" role="list">
           <li v-for="m in missions" :key="m.title" class="mission-card">
-            <p v-if="m.favorite" class="mission-card__fav">Coup de cœur</p>
+            <p v-if="m.favorite" class="mission-card__fav">{{ ui.projects.favourite }}</p>
             <h4 class="mission-card__title">{{ m.title }}</h4>
-            <p v-if="m.badges" class="mission-card__roles">{{ sentenceList(m.badges) }}</p>
+            <p v-if="m.badges" class="mission-card__roles">
+              {{
+                sentenceList(
+                  m.badges.map((role) => ui.roles[role]),
+                  ui.intl,
+                )
+              }}
+            </p>
             <p class="mission-card__desc">{{ m.description }}</p>
           </li>
         </ul>
@@ -40,14 +48,14 @@ const projectsInProgress = cv.personalProjects.filter((proj) => proj.inProgress)
 
     <div class="section section--tint">
       <div class="section__inner">
-        <h3 class="projects__heading">Projets perso</h3>
+        <h3 class="projects__heading">{{ ui.projects.personalHeading }}</h3>
         <ul class="projects__showcase" role="list">
           <li v-for="proj in liveProjects" :key="proj.title" class="project-card">
             <img
               v-if="proj.image"
               class="project-card__image"
               :src="proj.image"
-              :alt="`Page d'accueil du site ${proj.title}`"
+              :alt="ui.projects.screenshotAlt(proj.title)"
               width="1280"
               height="800"
               loading="lazy"
@@ -56,7 +64,7 @@ const projectsInProgress = cv.personalProjects.filter((proj) => proj.inProgress)
               <h4 class="project-card__title">
                 <!-- Le lien s'étend à toute la carte ; son nom reste le titre -->
                 <a class="project-card__link" :href="proj.url" target="_blank" rel="noopener"
-                  >{{ proj.title }}<span class="visually-hidden"> (nouvel onglet)</span></a
+                  >{{ proj.title }}<span class="visually-hidden">{{ ui.newTab }}</span></a
                 >
               </h4>
               <p class="project-card__host">
@@ -80,7 +88,7 @@ const projectsInProgress = cv.personalProjects.filter((proj) => proj.inProgress)
             class="project-card project-card--in-progress"
           >
             <div class="project-card__body">
-              <p class="project-card__status">En cours de développement</p>
+              <p class="project-card__status">{{ ui.projects.inProgress }}</p>
               <h4 class="project-card__title">{{ proj.title }}</h4>
               <p class="project-card__desc">{{ proj.description }}</p>
               <ul v-if="proj.stack" class="project-card__stack" role="list">

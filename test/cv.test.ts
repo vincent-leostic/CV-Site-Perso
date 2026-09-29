@@ -1,6 +1,6 @@
 import { existsSync } from "node:fs";
 import { describe, expect, test } from "vite-plus/test";
-import { cv } from "../app/data/cv";
+import { CONTENT, LOCALES } from "../app/data/content";
 import { ICONS } from "../app/data/icons";
 import { toTelHref } from "../app/utils/format";
 
@@ -9,7 +9,9 @@ function duplicates(values: string[]) {
   return values.filter((value, index) => values.indexOf(value) !== index);
 }
 
-describe("données du CV", () => {
+describe.each(LOCALES)("données du CV (%s)", (locale) => {
+  const { cv } = CONTENT[locale];
+
   test("les URLs publiques sont valides et en https", () => {
     const urls = [
       cv.website,
@@ -28,7 +30,7 @@ describe("données du CV", () => {
 
   test("l'e-mail et le téléphone sont bien formés", () => {
     expect(cv.email).toMatch(/^[^\s@]+@[^\s@]+\.[a-z]{2,}$/);
-    expect(toTelHref(cv.phone)).toMatch(/^tel:0\d{9}$/);
+    expect(toTelHref(cv.phone)).toMatch(/^tel:(0|\+33)\d{9}$/);
   });
 
   // Les libellés servent de clés de rendu (v-for) : un doublon casse la liste
@@ -40,12 +42,12 @@ describe("données du CV", () => {
     }
     expect(duplicates(cv.personalProjects.map((proj) => proj.title))).toEqual([]);
     expect(duplicates(cv.skillGroups.map((group) => group.title))).toEqual([]);
-    // Le CV met toutes les compétences à plat dans un seul nuage
-    expect(
-      duplicates(cv.skillGroups.flatMap((group) => group.skills.map((skill) => skill.label))),
-    ).toEqual([]);
+    for (const group of cv.skillGroups) {
+      expect(duplicates(group.skills.map((skill) => skill.label))).toEqual([]);
+    }
     expect(duplicates(cv.education.map((edu) => edu.degree))).toEqual([]);
     expect(duplicates(cv.languages.map((lang) => lang.name))).toEqual([]);
+    expect(duplicates(cv.milestones.map((step) => step.title))).toEqual([]);
   });
 
   test("chaque capture de projet existe dans public/", () => {
@@ -63,5 +65,44 @@ describe("données du CV", () => {
     for (const tech of techs) {
       if (tech.icon) expect(ICONS, tech.label).toHaveProperty(tech.icon);
     }
+  });
+});
+
+/** Champs qui ne se traduisent pas : identiques dans toutes les langues */
+const SHARED_KEYS = new Set([
+  "url",
+  "icon",
+  "image",
+  "status",
+  "badges",
+  "favorite",
+  "inProgress",
+  "siteOnly",
+  "misc",
+  "photo",
+  "website",
+  "email",
+  "age",
+]);
+
+/** Forme d'une valeur : les textes s'effacent, sauf les champs partagés */
+function shape(value: unknown, key = ""): unknown {
+  if (SHARED_KEYS.has(key)) return value;
+  if (Array.isArray(value)) return value.map((item) => shape(item));
+  if (value && typeof value === "object") {
+    return Object.fromEntries(Object.entries(value).map(([k, v]) => [k, shape(v, k)]));
+  }
+  return typeof value;
+}
+
+describe("français et anglais", () => {
+  test("même structure, mêmes liens, icônes, images et casquettes", () => {
+    expect(shape(CONTENT.en.cv)).toEqual(shape(CONTENT.fr.cv));
+  });
+
+  test("même numéro de téléphone, au format local ou international", () => {
+    const national = toTelHref(CONTENT.fr.cv.phone).replace("tel:0", "");
+    const international = toTelHref(CONTENT.en.cv.phone).replace("tel:+33", "");
+    expect(international).toBe(national);
   });
 });

@@ -1,15 +1,21 @@
 <script setup lang="ts">
-import { cv, type PersonalProject } from "~/data/cv";
+import type { PersonalProject } from "~/data/types";
+
+const { cv, ui } = useContent();
+
+// Compétences du PDF : sans celles réservées au site
+const pdfSkillGroups = computed(() =>
+  cv.value.skillGroups
+    .map((group) => ({ ...group, skills: group.skills.filter((skill) => !skill.siteOnly) }))
+    .filter((group) => group.skills.length > 0),
+);
 
 // Seuls les projets en ligne figurent sur le CV
 type LiveProject = PersonalProject & { url: string };
-// Compétences du PDF : sans celles réservées au site
-const pdfSkillGroups = cv.skillGroups
-  .map((group) => ({ ...group, skills: group.skills.filter((skill) => !skill.siteOnly) }))
-  .filter((group) => group.skills.length > 0);
-
-const liveProjects = cv.personalProjects.filter(
-  (proj): proj is LiveProject => proj.url !== undefined && !proj.inProgress,
+const liveProjects = computed(() =>
+  cv.value.personalProjects.filter(
+    (proj): proj is LiveProject => proj.url !== undefined && !proj.inProgress,
+  ),
 );
 </script>
 
@@ -21,27 +27,21 @@ const liveProjects = cv.personalProjects.filter(
     <header class="cv-sheet__header">
       <span class="cv-sheet__ring" aria-hidden="true" />
       <div class="cv-sheet__visual">
-        <img
-          class="cv-sheet__photo"
-          :src="cv.photo"
-          :alt="`Photo de ${cv.name}`"
-          width="200"
-          height="200"
-        />
+        <img class="cv-sheet__photo" :src="cv.photo" :alt="ui.photoAlt" width="200" height="200" />
       </div>
       <div>
         <h1 class="cv-sheet__name">{{ cv.name }}</h1>
         <p class="cv-sheet__role">{{ cv.title }}</p>
         <ul class="cv-sheet__badges" role="list">
           <li class="cv-sheet__badge cv-sheet__badge--highlight">
-            Disponibilité {{ cv.availability.toLocaleLowerCase("fr") }}
+            {{ ui.sheet.availability }}
           </li>
           <li class="cv-sheet__badge">{{ cv.mobility }}</li>
         </ul>
         <p class="cv-sheet__bio">{{ cv.bio }}</p>
         <ul class="contact" role="list">
           <li class="contact__item">
-            <LineIcon class="contact__icon" name="map-pin" />{{ cv.age }} ans, {{ cv.location }}
+            <LineIcon class="contact__icon" name="map-pin" />{{ ui.sheet.ageAndPlace }}
           </li>
           <li>
             <a class="contact__item contact__link" :href="`mailto:${cv.email}`">
@@ -72,7 +72,7 @@ const liveProjects = cv.personalProjects.filter(
     <div class="cv-sheet__body">
       <div class="cv-sheet__main">
         <section class="cv-section">
-          <h2 class="cv-section__title">Expériences</h2>
+          <h2 class="cv-section__title">{{ ui.sheet.experience }}</h2>
           <ol class="cv-section__list" role="list">
             <li v-for="exp in cv.experiences" :key="`${exp.role}-${exp.company}`" class="job">
               <div class="job__head">
@@ -82,13 +82,16 @@ const liveProjects = cv.personalProjects.filter(
               <p class="job__company">{{ exp.company }}</p>
               <p class="job__desc">{{ exp.description }}</p>
               <template v-if="exp.missions">
-                <h4 class="job__missions-title">Mes missions principales</h4>
+                <h4 class="job__missions-title">{{ ui.sheet.missions }}</h4>
                 <ul class="job__missions" role="list">
                   <li v-for="m in exp.missions" :key="m.title" class="mission">
                     <p class="mission__head">
                       <span class="mission__title">{{ m.title }}</span>
                       <span v-if="m.badges" class="mission__roles">{{
-                        sentenceList(m.badges)
+                        sentenceList(
+                          m.badges.map((role) => ui.roles[role]),
+                          ui.intl,
+                        )
                       }}</span>
                     </p>
                     <p class="mission__desc">{{ m.description }}</p>
@@ -100,7 +103,7 @@ const liveProjects = cv.personalProjects.filter(
         </section>
 
         <section class="cv-section">
-          <h2 class="cv-section__title">Projets perso</h2>
+          <h2 class="cv-section__title">{{ ui.sheet.personalProjects }}</h2>
           <ul class="cv-section__list" role="list">
             <li v-for="proj in liveProjects" :key="proj.title">
               <p class="project__head">
@@ -109,7 +112,10 @@ const liveProjects = cv.personalProjects.filter(
                   >{{ hostOf(proj.url) }} <span aria-hidden="true">↗</span></a
                 >
                 <span v-if="proj.stack" class="project__stack">{{
-                  listFr(proj.stack.map((tech) => tech.label))
+                  listOf(
+                    proj.stack.map((tech) => tech.label),
+                    ui.intl,
+                  )
                 }}</span>
               </p>
               <p class="project__desc">{{ proj.description }}</p>
@@ -120,19 +126,24 @@ const liveProjects = cv.personalProjects.filter(
 
       <div class="cv-sheet__side">
         <section class="cv-section">
-          <h2 class="cv-section__title">Compétences</h2>
+          <h2 class="cv-section__title">{{ ui.sheet.skills }}</h2>
           <dl class="skill-list">
             <div v-for="group in pdfSkillGroups" :key="group.title">
               <dt class="skill-list__name">{{ group.title }}</dt>
               <dd class="cv-section__line">
-                {{ listFr(group.skills.map((skill) => skill.label)) }}
+                {{
+                  listOf(
+                    group.skills.map((skill) => skill.label),
+                    ui.intl,
+                  )
+                }}
               </dd>
             </div>
           </dl>
         </section>
 
         <section class="cv-section">
-          <h2 class="cv-section__title">Formation</h2>
+          <h2 class="cv-section__title">{{ ui.sheet.education }}</h2>
           <ul class="cv-section__list cv-section__list--tight" role="list">
             <li v-for="edu in cv.education" :key="edu.degree" class="cv-section__line">
               <a v-if="edu.url" class="cv-section__key cv-section__link" :href="edu.url">{{
@@ -145,15 +156,16 @@ const liveProjects = cv.personalProjects.filter(
         </section>
 
         <section class="cv-section">
-          <h2 class="cv-section__title">Langues</h2>
+          <h2 class="cv-section__title">{{ ui.sheet.languages }}</h2>
           <p v-for="lang in cv.languages" :key="lang.name" class="cv-section__line">
-            <strong class="cv-section__key">{{ lang.name }}</strong> : {{ lang.level }}
+            <strong class="cv-section__key">{{ lang.name }}</strong
+            >{{ ui.colon }} {{ lang.level }}
           </p>
         </section>
 
         <section class="cv-section">
-          <h2 class="cv-section__title">Loisirs</h2>
-          <p class="cv-section__line">{{ sentenceList(cv.hobbies) }}</p>
+          <h2 class="cv-section__title">{{ ui.sheet.hobbies }}</h2>
+          <p class="cv-section__line">{{ sentenceList(cv.hobbies, ui.intl) }}</p>
         </section>
       </div>
     </div>

@@ -1,4 +1,6 @@
 <script setup lang="ts">
+const { ui } = useContent();
+
 // Visible dès que l'accroche (#top) est sortie de l'écran
 const visible = ref(false);
 let observer: IntersectionObserver | undefined;
@@ -20,7 +22,7 @@ onUnmounted(() => observer?.disconnect());
        respecte prefers-reduced-motion. Masqué (v-show), il sort de
        l'ordre de tabulation. -->
   <Transition name="back-to-top">
-    <a v-show="visible" class="back-to-top" href="#top" aria-label="Remonter en haut de la page">
+    <a v-show="visible" class="back-to-top" href="#top" :aria-label="ui.backToTop">
       <LineIcon class="back-to-top__icon" name="arrow-up" />
     </a>
   </Transition>

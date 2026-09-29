@@ -1,16 +1,19 @@
 <script setup lang="ts">
-import { cv } from "~/data/cv";
+import type { SectionId } from "~/data/types";
 
-const SECTIONS = [
-  { id: "a-propos", label: "À propos" },
-  { id: "projets", label: "Projets" },
-  { id: "competences", label: "Compétences" },
-  { id: "parcours", label: "Parcours" },
-  { id: "loisirs", label: "Loisirs" },
-  { id: "contact", label: "Contact" },
+const { cv, ui } = useContent();
+const pdf = useCvPdf();
+
+const SECTIONS: SectionId[] = [
+  "a-propos",
+  "projets",
+  "competences",
+  "parcours",
+  "loisirs",
+  "contact",
 ];
 
-// Menu déroulant sous 1000px. Il se ferme au choix d'une section, avec
+// Menu déroulant sous 1080px. Il se ferme au choix d'une section, avec
 // Échap (le focus revient au bouton) et dès qu'on clique ou tabule hors
 // de l'en-tête.
 const open = ref(false);
@@ -54,31 +57,35 @@ onUnmounted(() => document.removeEventListener("pointerdown", onPointerDown));
         :aria-expanded="open"
         @click="open = !open"
       >
-        <LineIcon :name="open ? 'x' : 'menu'" /><span class="visually-hidden">Menu</span>
+        <LineIcon :name="open ? 'x' : 'menu'" /><span class="visually-hidden">{{
+          ui.header.menu
+        }}</span>
       </button>
       <nav
         id="site-nav"
         class="site-header__nav"
         :class="{ 'site-header__nav--open': open }"
-        aria-label="Sections du portfolio"
+        :aria-label="ui.header.navLabel"
       >
         <ul class="site-header__links" role="list">
-          <li v-for="section in SECTIONS" :key="section.id" class="site-header__item">
-            <a class="site-header__link" :href="`#${section.id}`" @click="open = false">{{
-              section.label
+          <li v-for="id in SECTIONS" :key="id" class="site-header__item">
+            <a class="site-header__link" :href="`#${id}`" @click="open = false">{{
+              ui.header.sections[id]
             }}</a>
           </li>
         </ul>
       </nav>
       <a
-        class="button button--primary button--small"
-        :href="CV_PDF_HREF"
-        :download="CV_PDF_DOWNLOAD"
+        class="button button--primary button--small site-header__cv"
+        :href="pdf.href"
+        :download="pdf.download"
       >
-        <LineIcon class="button__icon" name="download" />Mon CV<span class="visually-hidden">
-          ({{ CV_PDF_META }})</span
-        >
+        <LineIcon class="button__icon" name="download" /><span class="site-header__cv-label">{{
+          ui.header.cv
+        }}</span
+        ><span class="visually-hidden"> ({{ pdf.meta }})</span>
       </a>
+      <PortfolioLangSwitch />
     </div>
   </header>
 </template>
@@ -99,7 +106,7 @@ onUnmounted(() => document.removeEventListener("pointerdown", onPointerDown));
   padding: 0.7rem 1.5rem;
   display: flex;
   align-items: center;
-  gap: 2rem;
+  gap: 1.5rem;
 }
 
 /* Le nom fait office de logo : police des titres */
@@ -136,7 +143,7 @@ onUnmounted(() => document.removeEventListener("pointerdown", onPointerDown));
   text-decoration-color: var(--highlight);
 }
 
-/* Bouton du menu, affiché sous 1000px : même hauteur que « Mon CV » */
+/* Bouton du menu, affiché sous 1080px : même hauteur que « Mon CV » */
 .site-header__toggle {
   display: none;
   place-items: center;
@@ -158,9 +165,9 @@ onUnmounted(() => document.removeEventListener("pointerdown", onPointerDown));
   background: color-mix(in srgb, var(--accent) 7%, transparent);
 }
 
-/* Sous 1000px, les six liens ne tiennent plus à côté du nom et du bouton :
-   ils passent dans un panneau déroulé sous l'en-tête */
-@media (max-width: 1000px) {
+/* Sous 1080px, les six liens ne tiennent plus à côté du nom, du CV et de
+   la langue : ils passent dans un panneau déroulé sous l'en-tête */
+@media (max-width: 1080px) {
   .site-header__inner {
     gap: 0.75rem;
   }
@@ -203,10 +210,36 @@ onUnmounted(() => document.removeEventListener("pointerdown", onPointerDown));
   }
 }
 
+/* Petits écrans : nom, menu, CV et langue ne tiennent plus côte à côte.
+   Le bouton du CV garde son icône ; son libellé reste lu. */
+@media (max-width: 480px) {
+  .site-header__cv {
+    gap: 0;
+    padding: 0.5rem;
+  }
+
+  .site-header__cv-label {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip-path: inset(50%);
+    white-space: nowrap;
+  }
+}
+
 @media (max-width: 400px) {
   .site-header__inner,
   .site-header__nav {
     padding-inline: 0.75rem;
+  }
+}
+
+/* Sous 360px, même l'icône du CV ne tient plus : le bouton « Télécharger
+   mon CV » de l'accroche est juste en dessous */
+@media (max-width: 359px) {
+  .site-header__cv {
+    display: none;
   }
 }
 

@@ -1,12 +1,12 @@
 <script setup lang="ts">
-import { cv } from "~/data/cv";
+const { cv, ui } = useContent();
 </script>
 
 <template>
   <section id="a-propos" class="section section--alt about" aria-labelledby="a-propos-title">
     <div class="section__inner about__grid">
       <div>
-        <p class="section__kicker">À propos</p>
+        <p class="section__kicker">{{ ui.about.kicker }}</p>
         <h2 id="a-propos-title" class="section__title">{{ cv.about.title }}</h2>
         <p class="about__intro">{{ cv.about.intro }}</p>
         <!-- Questions-réponses : une liste de définitions, question puis réponse -->
@@ -20,7 +20,7 @@ import { cv } from "~/data/cv";
 
       <div class="about__side">
         <div class="about__method">
-          <h3 class="about__method-title">Ma façon de travailler</h3>
+          <h3 class="about__method-title">{{ ui.about.method }}</h3>
           <ol class="about__steps" role="list">
             <li v-for="(step, index) in cv.about.method" :key="step.title" class="about__step">
               <!-- La liste ordonnée porte déjà le rang pour les lecteurs d'écran -->
@@ -35,7 +35,7 @@ import { cv } from "~/data/cv";
 
         <!-- Anecdote en marge du propos : un aside -->
         <aside v-if="cv.about.funFact" class="about__fact" aria-labelledby="a-propos-fact">
-          <h3 id="a-propos-fact" class="about__fact-title">Le saviez-vous ?</h3>
+          <h3 id="a-propos-fact" class="about__fact-title">{{ ui.about.funFact }}</h3>
           <p class="about__fact-text">{{ cv.about.funFact }}</p>
         </aside>
       </div>

@@ -1,166 +1,18 @@
-import type { IconName } from "./icons";
-
-/** Libellé affiché, accompagné d'une icône de marque s'il y en a une */
-export interface Tech {
-  label: string;
-  icon?: IconName;
-  /** Affichée sur le site mais absente du CV en PDF */
-  siteOnly?: boolean;
-}
-
-export interface Link extends Tech {
-  url: string;
-}
-
-/** Casquettes tenues sur une mission ; chaque thème leur associe un style */
-export type Casquette =
-  | "Product Owner"
-  | "Chef de projet"
-  | "Développeur"
-  | "Responsable technique"
-  | "Responsable fonctionnel"
-  | "IA";
-
-export interface Mission {
-  /** Nom court du projet */
-  title: string;
-  description: string;
-  /** Casquettes tenues sur la mission */
-  badges?: Casquette[];
-  /** Mission coup de cœur, signalée à côté du titre */
-  favorite?: boolean;
-}
-
-export interface Experience {
-  role: string;
-  company: string;
-  period: string;
-  description: string;
-  /** Missions ou projets marquants, affichés en cartes ou liste selon le thème */
-  missions?: Mission[];
-}
-
-export interface PersonalProject {
-  /** Nom du site ou du projet */
-  title: string;
-  description: string;
-  /** URL publique, ouverte dans un nouvel onglet ; absente tant que rien n'est en ligne */
-  url?: string;
-  /** Projet en cours de développement : pas d'aperçu, carte à part */
-  inProgress?: boolean;
-  /** Technos marquantes, affichées en tags */
-  stack?: Tech[];
-  /** Capture de la page d'accueil (dans public/), 1280×800 */
-  image?: string;
-}
-
-export interface SkillGroup {
-  title: string;
-  skills: Tech[];
-}
-
-export interface Education {
-  degree: string;
-  /** Organisme, omis quand il n'a pas à figurer sur le CV */
-  school?: string;
-  period: string;
-  /** Fiche officielle de la certification (France compétences), liée depuis l'intitulé */
-  url?: string;
-  /** Diplôme pas encore obtenu : absent des diplômes déclarés au référencement */
-  inProgress?: boolean;
-}
-
-export interface Language {
-  name: string;
-  level: string;
-}
-
-/** Section « À propos » du portfolio (absente du CV en PDF) */
-export interface About {
-  title: string;
-  /** Phrase d'ouverture, avant les questions-réponses */
-  intro: string;
-  faq: { question: string; answer: string }[];
-  /** Façon de travailler, étape par étape */
-  method: { title: string; detail: string }[];
-  /** Anecdote de l'encadré « Le saviez-vous ? » */
-  funFact?: string;
-}
-
-/** Étape de la frise du parcours (portfolio) */
-export interface Milestone {
-  period: string;
-  title: string;
-  detail: string;
-  /** Étape en cours ou à venir : la frise y mène en pointillé */
-  status?: "current" | "future";
-  /** Lien depuis le titre : page externe (nouvel onglet) ou ancre du site */
-  url?: string;
-}
-
-/** Tuile de la mosaïque « En dehors du code » (portfolio) */
-export interface InterestTile {
-  title: string;
-  /** Phrase courte sous le titre */
-  text?: string;
-  /** Favoris en texte, éventuellement sous un intitulé */
-  lists?: { label?: string; items: string[] }[];
-}
-
-export interface Interests {
-  /** Fil rouge qui ouvre la section */
-  intro: string;
-  /** Tuile phare, sur fond sombre */
-  featured: { caption: string; title: string; text: string };
-  /** Écoute du moment, tuile rousse */
-  nowPlaying: { caption: string; title: string };
-  tiles: InterestTile[];
-}
-
-export interface CvData {
-  name: string;
-  title: string;
-  bio: string;
-  about: About;
-  /** Frise du parcours, de la plus ancienne étape à la plus récente */
-  milestones: Milestone[];
-  /** Loisirs détaillés ; `hobbies` en reste la version courte (PDF) */
-  interests: Interests;
-  /** Disponibilité pour un nouveau poste, mise en avant dans le parcours */
-  availability: string;
-  /** Mobilité, affichée dans le parcours */
-  mobility: string;
-  /** Chemin de la photo de profil (dans public/) */
-  photo: string;
-  /** URL publique du site : canonique SEO, et affichée sur le PDF imprimé */
-  website: string;
-  email: string;
-  /** Numéro affiché tel quel ; les thèmes en dérivent le lien tel: */
-  phone: string;
-  age: number;
-  /** Ville, affichée à côté de l'âge */
-  location: string;
-  links: Link[];
-  experiences: Experience[];
-  /** Sites réalisés en dehors du travail, avec lien vers le site en ligne */
-  personalProjects: PersonalProject[];
-  skillGroups: SkillGroup[];
-  education: Education[];
-  languages: Language[];
-  hobbies: string[];
-}
+import { COMMON } from "./common";
+import type { CvData, UiText } from "./types";
 
 /**
- * Tout le contenu du CV est centralisé ici : c'est le seul fichier à
- * modifier pour mettre à jour les infos affichées sur le site.
+ * Contenu français du portfolio et du CV en PDF, puis textes d'interface.
+ * La version anglaise (en.ts) suit la même structure, vérifiée par les tests.
  *
- * Contenu réel (interview du 2026-08-14). Restent à confirmer : les dates
- * exactes de la période restauration et de la gendarmerie.
+ * Contenu réel (interview du 2026-08-14). Reste à confirmer : les dates
+ * exactes de la période restauration.
  */
 export const cv: CvData = {
-  name: "Vincent LEOSTIC",
+  ...COMMON,
   title: "Développeur logiciel front-end, UI/UX et accessibilité",
   bio: "Je conçois et développe des applications métier, du besoin jusqu'à la production, en soignant chaque détail de l'interface.",
+  area: "Plougastel-Daoulas, près de Brest",
   about: {
     title: "Des interfaces qui font « wow »",
     intro:
@@ -257,16 +109,7 @@ export const cv: CvData = {
       },
     ],
   },
-  photo: "/avatar.jpg",
-  website: "https://vincent.leostic.bzh",
-  email: "vincent.leostic@gmail.com",
   phone: "06 13 39 80 06",
-  age: 37,
-  location: "Plougastel-Daoulas",
-  links: [
-    { label: "GitHub", url: "https://github.com/vincent-leostic", icon: "github" },
-    { label: "LinkedIn", url: "https://www.linkedin.com/in/vincent-leostic", icon: "linkedin" },
-  ],
   experiences: [
     {
       role: "Développeur logiciel",
@@ -279,32 +122,32 @@ export const cv: CvData = {
           title: "Gestion d'adhérents de clubs de sport",
           description:
             "Application qui centralise la vie d'un club de sport : fiches adhérents et inscriptions.",
-          badges: ["Product Owner", "Chef de projet", "Développeur"],
+          badges: ["po", "projectManager", "developer"],
         },
         {
           title: "Planification en restauration",
           description:
             "Outil de gestion des commandes, des plannings et de tous les à-côtés de la vie en restauration. Un métier que je connais de l'intérieur.",
-          badges: ["Développeur"],
+          badges: ["developer"],
         },
         {
           title: "Sécurité incendie",
           description:
             "Application de création des fiches d'aide à l'intervention pour les pompiers, retrouvées en saisissant les informations d'un lieu et générées en PDF. Moteur de dessin sur photo prise par drone pour délimiter les zones sensibles et à risque.",
-          badges: ["Product Owner", "Chef de projet", "Développeur"],
+          badges: ["po", "projectManager", "developer"],
           favorite: true,
         },
         {
           title: "Antipollution maritime",
           description:
             "Application de gestion du stock de matériel antipollution, pour un matériel prêt le jour où il doit servir.",
-          badges: ["Chef de projet", "Responsable technique"],
+          badges: ["projectManager", "techLead"],
         },
         {
           title: "Refonte du site id3i.fr",
           description:
             "Refonte complète de la vitrine de l'entreprise, avec des technologies éprouvées et validées par la communauté.",
-          badges: ["Développeur", "Responsable fonctionnel", "IA"],
+          badges: ["developer", "functionalLead", "ai"],
         },
       ],
     },
@@ -386,6 +229,7 @@ export const cv: CvData = {
     },
     {
       title: "Divers",
+      misc: true,
       skills: [
         { label: "Gestion de projet" },
         { label: "Recueil du besoin & spécifications" },
@@ -426,4 +270,86 @@ export const cv: CvData = {
     "Soirées entre amis",
     "Développer à temps perdu",
   ],
+};
+
+export const ui: UiText = {
+  intl: "fr",
+  colon: " :",
+  newTab: " (nouvel onglet)",
+  roles: {
+    po: "Product Owner",
+    projectManager: "Chef de projet",
+    developer: "Développeur",
+    techLead: "Responsable technique",
+    functionalLead: "Responsable fonctionnel",
+    ai: "IA",
+  },
+  photoAlt: `Photo de ${COMMON.name}`,
+  seo: {
+    title: `${COMMON.name} - Portfolio`,
+    description: `Portfolio de ${COMMON.name}, développeur logiciel à Brest, spécialisé front-end, UI/UX et accessibilité : Vue, Nuxt, TypeScript. Projets, compétences, parcours et CV à télécharger.`,
+    ogImageAlt: `${COMMON.name}, ${cv.title}`,
+  },
+  skipLink: "Aller au contenu",
+  footer: `Site conçu et développé par ${COMMON.name}, avec Nuxt et TypeScript.`,
+  backToTop: "Remonter en haut de la page",
+  header: {
+    navLabel: "Sections du portfolio",
+    menu: "Menu",
+    sections: {
+      "a-propos": "À propos",
+      projets: "Projets",
+      competences: "Compétences",
+      parcours: "Parcours",
+      loisirs: "Loisirs",
+      contact: "Contact",
+    },
+    cv: "Mon CV",
+    language: "Langue",
+  },
+  pdfMeta: (kb) => `PDF, environ ${kb} Ko`,
+  hero: { kicker: "Portfolio", download: "Télécharger mon CV", contact: "Me contacter" },
+  about: {
+    kicker: "À propos",
+    method: "Ma façon de travailler",
+    funFact: "Le saviez-vous ?",
+  },
+  projects: {
+    kicker: "Projets",
+    title: "Des applications métier et des sites en ligne",
+    intro:
+      "Une sélection de missions menées chez iD3i, puis mes projets perso : deux sites en ligne et une application en cours.",
+    missionsHeading: "Missions chez iD3i",
+    favourite: "Coup de cœur",
+    personalHeading: "Projets perso",
+    inProgress: "En cours de développement",
+    screenshotAlt: (title) => `Page d'accueil du site ${title}`,
+  },
+  skills: { kicker: "Compétences", title: "Ma boîte à outils" },
+  journey: {
+    kicker: "Parcours",
+    title: "Le chemin jusqu'ici",
+    availability: "Disponibilité",
+    mobility: "Mobilité",
+    languages: "Langues",
+  },
+  hobbies: { kicker: "Loisirs", title: "En dehors du code" },
+  contact: {
+    kicker: "Contact",
+    title: "Me contacter",
+    intro: "Une question, une opportunité ? Écrivez-moi ou appelez-moi.",
+    download: "Télécharger mon CV",
+  },
+  sheet: {
+    availability: "Disponibilité immédiate",
+    ageAndPlace: `${COMMON.age} ans, ${COMMON.location}`,
+    experience: "Expériences",
+    missions: "Mes missions principales",
+    personalProjects: "Projets perso",
+    skills: "Compétences",
+    education: "Formation",
+    languages: "Langues",
+    hobbies: "Loisirs",
+  },
+  og: { kicker: "Portfolio" },
 };

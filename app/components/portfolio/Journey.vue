@@ -1,12 +1,12 @@
 <script setup lang="ts">
-import { cv } from "~/data/cv";
+const { cv, ui } = useContent();
 </script>
 
 <template>
   <section id="parcours" class="section section--tint journey" aria-labelledby="parcours-title">
     <div class="section__inner">
-      <p class="section__kicker">Parcours</p>
-      <h2 id="parcours-title" class="section__title">Le chemin jusqu'ici</h2>
+      <p class="section__kicker">{{ ui.journey.kicker }}</p>
+      <h2 id="parcours-title" class="section__title">{{ ui.journey.title }}</h2>
 
       <!-- Frise : horizontale sur grand écran, verticale sur mobile -->
       <ol class="milestones" role="list">
@@ -26,9 +26,9 @@ import { cv } from "~/data/cv";
               :target="step.url.startsWith('http') ? '_blank' : undefined"
               :rel="step.url.startsWith('http') ? 'noopener' : undefined"
               >{{ step.title
-              }}<span v-if="step.url.startsWith('http')" class="visually-hidden">
-                (nouvel onglet)</span
-              ></a
+              }}<span v-if="step.url.startsWith('http')" class="visually-hidden">{{
+                ui.newTab
+              }}</span></a
             >
             <template v-else>{{ step.title }}</template>
           </h3>
@@ -39,19 +39,24 @@ import { cv } from "~/data/cv";
       <!-- Infos pratiques : ce qu'un recruteur cherche en premier -->
       <dl class="journey__facts">
         <div>
-          <dt class="caption">Disponibilité</dt>
+          <dt class="caption">{{ ui.journey.availability }}</dt>
           <dd class="journey__value">
             <span class="tag tag--highlight">{{ cv.availability }}</span>
           </dd>
         </div>
         <div>
-          <dt class="caption">Mobilité</dt>
+          <dt class="caption">{{ ui.journey.mobility }}</dt>
           <dd class="journey__value">{{ cv.mobility }}</dd>
         </div>
         <div>
-          <dt class="caption">Langues</dt>
+          <dt class="caption">{{ ui.journey.languages }}</dt>
           <dd class="journey__value">
-            {{ sentenceList(cv.languages.map((lang) => `${lang.name} (${lang.level})`)) }}
+            {{
+              sentenceList(
+                cv.languages.map((lang) => `${lang.name} (${lang.level})`),
+                ui.intl,
+              )
+            }}
           </dd>
         </div>
       </dl>

@@ -1,5 +1,6 @@
 <script setup lang="ts">
-import { cv } from "~/data/cv";
+const { cv, ui } = useContent();
+const pdf = useCvPdf();
 </script>
 
 <template>
@@ -11,40 +12,34 @@ import { cv } from "~/data/cv";
 
     <div class="hero__inner">
       <div class="hero__text">
-        <p class="section__kicker hero__kicker">Portfolio</p>
+        <p class="section__kicker hero__kicker">{{ ui.hero.kicker }}</p>
         <h1 id="hero-name" class="hero__name">{{ cv.name }}</h1>
         <p class="hero__role">{{ cv.title }}</p>
         <p class="hero__pitch">{{ cv.bio }}</p>
 
         <div class="hero__actions">
-          <a class="button button--primary" :href="CV_PDF_HREF" :download="CV_PDF_DOWNLOAD">
-            <LineIcon class="button__icon" name="download" />Télécharger mon CV
-            <span class="button__meta">({{ CV_PDF_META }})</span>
+          <a class="button button--primary" :href="pdf.href" :download="pdf.download">
+            <LineIcon class="button__icon" name="download" />{{ ui.hero.download }}
+            <span class="button__meta">({{ pdf.meta }})</span>
           </a>
-          <a class="button button--ghost" href="#contact">Me contacter</a>
+          <a class="button button--ghost" href="#contact">{{ ui.hero.contact }}</a>
         </div>
 
         <ul class="hero__meta" role="list">
           <li class="hero__meta-item">
-            <LineIcon class="hero__meta-icon" name="map-pin" />{{ cv.location }}, près de Brest
+            <LineIcon class="hero__meta-icon" name="map-pin" />{{ cv.area }}
           </li>
           <li v-for="link in cv.links" :key="link.label">
             <a class="hero__meta-item hero__social" :href="link.url" target="_blank" rel="noopener">
               <TechIcon v-if="link.icon" class="hero__meta-icon" :name="link.icon" />{{ link.label
-              }}<span class="visually-hidden"> (nouvel onglet)</span>
+              }}<span class="visually-hidden">{{ ui.newTab }}</span>
             </a>
           </li>
         </ul>
       </div>
 
       <div class="hero__visual">
-        <img
-          class="hero__photo"
-          :src="cv.photo"
-          :alt="`Photo de ${cv.name}`"
-          width="200"
-          height="200"
-        />
+        <img class="hero__photo" :src="cv.photo" :alt="ui.photoAlt" width="200" height="200" />
       </div>
     </div>
   </section>

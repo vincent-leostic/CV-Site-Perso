@@ -3,7 +3,10 @@ export function noBreak(text: string): string {
   return text.replaceAll(" ", " ");
 }
 
-/** Lien d'appel d'un numéro affiché avec espaces, ex. "06 13 39 80 06" → "tel:0613398006" */
+/**
+ * Lien d'appel d'un numéro affiché avec espaces, ex. "06 13 39 80 06" →
+ * "tel:0613398006" ou "+33 6 13 39 80 06" → "tel:+33613398006"
+ */
 export function toTelHref(phone: string): string {
   return `tel:${phone.replaceAll(" ", "")}`;
 }
@@ -13,11 +16,20 @@ export function hostOf(url: string): string {
   return new URL(url).hostname.replace(/^www\./, "");
 }
 
-const FRENCH_LIST = new Intl.ListFormat("fr", { style: "long", type: "conjunction" });
+const listFormats = new Map<string, Intl.ListFormat>();
 
-/** Liste de noms en français, ex. ["Sabaton", "Ghost", "Rammstein"] → "Sabaton, Ghost et Rammstein" */
-export function listFr(items: string[]): string {
-  return FRENCH_LIST.format(items);
+/**
+ * Liste de noms dans une langue (code Intl, voir UiText.intl), ex.
+ * ["Sabaton", "Ghost", "Rammstein"] → "Sabaton, Ghost et Rammstein" en
+ * français, "Sabaton, Ghost and Rammstein" en anglais britannique.
+ */
+export function listOf(items: string[], lang: string): string {
+  let format = listFormats.get(lang);
+  if (!format) {
+    format = new Intl.ListFormat(lang, { style: "long", type: "conjunction" });
+    listFormats.set(lang, format);
+  }
+  return format.format(items);
 }
 
 /**
@@ -26,13 +38,14 @@ export function listFr(items: string[]): string {
  * « Product Owner »). Ex. ["Product Owner", "Chef de projet", "Développeur"]
  * → "Product Owner, chef de projet et développeur".
  */
-export function sentenceList(items: string[]): string {
-  return listFr(
+export function sentenceList(items: string[], lang: string): string {
+  return listOf(
     items.map((item, index) =>
       index === 0 || /\p{Lu}/u.test(item.slice(1))
         ? item
-        : item.charAt(0).toLocaleLowerCase("fr") + item.slice(1),
+        : item.charAt(0).toLocaleLowerCase(lang) + item.slice(1),
     ),
+    lang,
   );
 }
 

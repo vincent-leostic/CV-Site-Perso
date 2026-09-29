@@ -1,31 +1,39 @@
 import { describe, expect, test } from "vite-plus/test";
-import { bareUrl, hostOf, listFr, sentenceList, toTelHref } from "../app/utils/format";
+import { bareUrl, hostOf, listOf, sentenceList, toTelHref } from "../app/utils/format";
 
-describe("listFr", () => {
-  test("sépare par des virgules et termine par « et »", () => {
-    expect(listFr(["Sabaton", "Ghost", "Rammstein"])).toBe("Sabaton, Ghost et Rammstein");
-    expect(listFr(["Hellfest", "Motocultor"])).toBe("Hellfest et Motocultor");
-    expect(listFr(["NieR"])).toBe("NieR");
+describe("listOf", () => {
+  test("en français : virgules, puis « et »", () => {
+    expect(listOf(["Sabaton", "Ghost", "Rammstein"], "fr")).toBe("Sabaton, Ghost et Rammstein");
+    expect(listOf(["Hellfest", "Motocultor"], "fr")).toBe("Hellfest et Motocultor");
+    expect(listOf(["NieR"], "fr")).toBe("NieR");
+  });
+
+  test("en anglais britannique : « and », sans virgule avant", () => {
+    expect(listOf(["Sabaton", "Ghost", "Rammstein"], "en-GB")).toBe("Sabaton, Ghost and Rammstein");
   });
 });
 
 describe("sentenceList", () => {
   test("met en minuscule les éléments qui suivent le premier", () => {
-    expect(sentenceList(["Product Owner", "Chef de projet", "Développeur"])).toBe(
+    expect(sentenceList(["Product Owner", "Chef de projet", "Développeur"], "fr")).toBe(
       "Product Owner, chef de projet et développeur",
+    );
+    expect(sentenceList(["Product Owner", "Project manager", "Developer"], "en-GB")).toBe(
+      "Product Owner, project manager and developer",
     );
   });
 
   test("garde les sigles et les termes à majuscule interne", () => {
-    expect(sentenceList(["Développeur", "IA", "Product Owner"])).toBe(
+    expect(sentenceList(["Développeur", "IA", "Product Owner"], "fr")).toBe(
       "Développeur, IA et Product Owner",
     );
   });
 });
 
 describe("toTelHref", () => {
-  test("retire les espaces du numéro affiché", () => {
+  test("retire les espaces du numéro affiché, local ou international", () => {
     expect(toTelHref("06 13 39 80 06")).toBe("tel:0613398006");
+    expect(toTelHref("+33 6 13 39 80 06")).toBe("tel:+33613398006");
   });
 });
 

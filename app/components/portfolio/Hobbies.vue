@@ -1,14 +1,16 @@
 <script setup lang="ts">
-import { cv } from "~/data/cv";
+const { cv, ui } = useContent();
 
-const { featured, nowPlaying, tiles } = cv.interests;
+const featured = computed(() => cv.value.interests.featured);
+const nowPlaying = computed(() => cv.value.interests.nowPlaying);
+const tiles = computed(() => cv.value.interests.tiles);
 </script>
 
 <template>
   <section id="loisirs" class="section section--alt hobbies" aria-labelledby="loisirs-title">
     <div class="section__inner">
-      <p class="section__kicker">Loisirs</p>
-      <h2 id="loisirs-title" class="section__title">En dehors du code</h2>
+      <p class="section__kicker">{{ ui.hobbies.kicker }}</p>
+      <h2 id="loisirs-title" class="section__title">{{ ui.hobbies.title }}</h2>
       <p class="section__intro">{{ cv.interests.intro }}</p>
 
       <!-- Mosaïque : tuile phare, écoute du moment, puis tuiles en texte.
@@ -37,8 +39,8 @@ const { featured, nowPlaying, tiles } = cv.interests;
             :key="list.label ?? list.items.join()"
             class="bento__list"
           >
-            <strong v-if="list.label" class="bento__label">{{ list.label }}&nbsp;:</strong>
-            {{ listFr(list.items) }}
+            <strong v-if="list.label" class="bento__label">{{ list.label }}{{ ui.colon }}</strong>
+            {{ listOf(list.items, ui.intl) }}
           </p>
         </div>
       </div>
