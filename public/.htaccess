@@ -1,5 +1,17 @@
-# Force le https : la redirection GitHub Pages (301) arrive en http,
-# et Google ne doit voir qu'une seule version du site.
+# Google ne doit voir qu'une seule version du site : tout passe en https.
 RewriteEngine On
 RewriteCond %{HTTPS} !=on
 RewriteRule ^ https://%{HTTP_HOST}%{REQUEST_URI} [R=301,L]
+
+# Page d'erreur générée par nuxt generate
+ErrorDocument 404 /404.html
+
+<IfModule mod_headers.c>
+  Header always set Strict-Transport-Security "max-age=31536000"
+  Header always set X-Content-Type-Options "nosniff"
+  Header always set Referrer-Policy "strict-origin-when-cross-origin"
+  # Fichiers du build nommés par empreinte : ils ne changent jamais
+  <If "%{REQUEST_URI} =~ m#^/_nuxt/#">
+    Header set Cache-Control "public, max-age=31536000, immutable"
+  </If>
+</IfModule>

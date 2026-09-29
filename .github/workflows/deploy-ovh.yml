@@ -1,9 +1,7 @@
 # Déploiement automatique sur l'hébergement mutualisé OVH (vincent.leostic.bzh)
-# à chaque push sur main. Coexiste avec deploy.yml (GitHub Pages).
+# à chaque push sur main, après vérification (format, lint, types, tests).
 # Nécessite 3 secrets (Settings → Secrets and variables → Actions) :
-#   OVH_FTP_HOST     ftp.cluster131.hosting.ovh.net
-#   OVH_FTP_USER     codexog
-#   OVH_FTP_PASSWORD mot de passe de l'utilisateur FTP
+#   OVH_FTP_HOST, OVH_FTP_USER et OVH_FTP_PASSWORD.
 # Tant que les secrets ne sont pas configurés, le workflow ne fait rien (pas d'échec).
 name: Déploiement OVH
 
@@ -11,6 +9,12 @@ on:
   push:
     branches: [main]
   workflow_dispatch:
+
+# Deux pushes rapprochés : le second annule le premier plutôt que de lancer
+# deux `mirror --delete` en parallèle sur le même dossier distant.
+concurrency:
+  group: deploy-ovh
+  cancel-in-progress: true
 
 jobs:
   deploy:
@@ -31,10 +35,13 @@ jobs:
           node-version: 22
           cache: npm
 
-      - name: Générer le site statique
+      - name: Vérifier puis générer le site statique
         if: env.OVH_READY == 'true'
         run: |
           npm ci
+          npx nuxi prepare
+          npx vp check
+          npm test
           npm run generate
 
       # SFTP (port 22) : le FTP d'OVH mutualisé ne supporte pas le FTPS explicite.
