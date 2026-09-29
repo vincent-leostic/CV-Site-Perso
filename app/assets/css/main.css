@@ -196,10 +196,20 @@ a:is(:hover, :focus-visible) {
   box-shadow: none;
 }
 
-.button__icon {
-  width: 1.15em;
-  height: 1.15em;
+/* Icônes au trait (LineIcon) et de marque (TechIcon), à la taille du texte.
+   Styles globaux plutôt que dans les composants : Nuxt n'intègre pas à la
+   page le CSS des composants communs à plusieurs pages, qui bloquerait le
+   premier affichage. */
+.line-icon,
+.tech-icon {
+  width: 1em;
+  height: 1em;
   flex: none;
+}
+
+.tech-icon {
+  display: inline-block;
+  vertical-align: -0.12em;
 }
 
 /* Texte réservé aux lecteurs d'écran, ex. « (nouvel onglet) » */

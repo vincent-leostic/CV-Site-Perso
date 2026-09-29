@@ -3,6 +3,7 @@ import { describe, expect, test } from "vite-plus/test";
 import { CONTENT, LOCALES } from "../app/data/content";
 import { ICONS } from "../app/data/icons";
 import { toTelHref } from "../app/utils/format";
+import { PROJECT_IMAGE_WIDTHS, projectImageAt } from "../app/utils/images";
 
 /** Doublons d'une liste, pour des messages d'échec lisibles */
 function duplicates(values: string[]) {
@@ -50,9 +51,13 @@ describe.each(LOCALES)("données du CV (%s)", (locale) => {
     expect(duplicates(cv.milestones.map((step) => step.title))).toEqual([]);
   });
 
-  test("chaque capture de projet existe dans public/", () => {
+  test("chaque capture de projet existe dans public/, avec ses versions réduites", () => {
     for (const proj of cv.personalProjects) {
-      if (proj.image) expect(existsSync(`public${proj.image}`), proj.image).toBe(true);
+      if (!proj.image) continue;
+      for (const width of PROJECT_IMAGE_WIDTHS) {
+        const file = projectImageAt(proj.image, width);
+        expect(existsSync(`public${file}`), file).toBe(true);
+      }
     }
   });
 

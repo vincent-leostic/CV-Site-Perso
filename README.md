@@ -22,7 +22,12 @@ Les anciens thèmes ludiques (Gaming, Nature, Manuscrit, Terminal) restent récu
 - Aucune dépendance UI : CSS pur en BEM, icônes simple-icons ([app/data/icons.ts](app/data/icons.ts)) et Lucide ([app/components/LineIcon.vue](app/components/LineIcon.vue))
 - Polices Inter et Bricolage Grotesque auto-hébergées au build par [@nuxt/fonts](https://fonts.nuxt.com) : aucune requête vers Google à la visite
 
-Tout le contenu vit dans [app/data/fr.ts](app/data/fr.ts) et [app/data/en.ts](app/data/en.ts) : textes du portfolio et du CV, puis textes d'interface. Les données communes (nom, e-mail, liens…) sont dans [app/data/common.ts](app/data/common.ts). Les types imposent les mêmes textes dans les deux langues, et un test vérifie que les deux fichiers gardent la même structure (liens, icônes, images, casquettes). Les captures des projets perso sont dans `public/projects/`.
+Tout le contenu vit dans [app/data/fr.ts](app/data/fr.ts) et [app/data/en.ts](app/data/en.ts) : textes du portfolio et du CV, puis textes d'interface. Les données communes (nom, e-mail, liens…) sont dans [app/data/common.ts](app/data/common.ts). Les types imposent les mêmes textes dans les deux langues, et un test vérifie que les deux fichiers gardent la même structure (liens, icônes, images, casquettes). Les captures des projets perso sont dans `public/projects/` : un original de 1280 × 800 en webp, plus deux versions réduites pour les petits écrans, à générer ainsi :
+
+```bash
+vp dlx sharp-cli -i projet.webp -o projet-640.webp -f webp -q 80 resize 640
+vp dlx sharp-cli -i projet.webp -o projet-960.webp -f webp -q 80 resize 960
+```
 
 ## Développement
 

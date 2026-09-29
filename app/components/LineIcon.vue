@@ -17,11 +17,3 @@ defineProps<{ name: LineIconName }>();
     v-html="LINE_ICONS[name]"
   />
 </template>
-
-<style scoped>
-.line-icon {
-  width: 1em;
-  height: 1em;
-  flex: none;
-}
-</style>

@@ -57,7 +57,7 @@ const pdf = useCvPdf();
         :data-umami-event-lang="pdf.lang"
         data-umami-event-from="contact"
       >
-        <LineIcon class="button__icon" name="download" />{{ ui.contact.download }}
+        <LineIcon name="download" />{{ ui.contact.download }}
         <span class="button__meta">({{ pdf.meta }})</span>
       </a>
     </div>

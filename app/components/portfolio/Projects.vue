@@ -55,6 +55,8 @@ const projectsInProgress = computed(() =>
               v-if="proj.image"
               class="project-card__image"
               :src="proj.image"
+              :srcset="projectSrcset(proj.image)"
+              sizes="(max-width: 911px) calc(100vw - 3rem), (max-width: 1167px) calc(50vw - 2.25rem), 548px"
               :alt="ui.projects.screenshotAlt(proj.title)"
               width="1280"
               height="800"

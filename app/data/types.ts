@@ -47,7 +47,7 @@ export interface PersonalProject {
   inProgress?: boolean;
   /** Technos marquantes, affichées en tags */
   stack?: Tech[];
-  /** Capture de la page d'accueil (dans public/), 1280×800 */
+  /** Capture de la page d'accueil (dans public/), 1280×800 en webp, avec ses versions -640 et -960 */
   image?: string;
 }
 

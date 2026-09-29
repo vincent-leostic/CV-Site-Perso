@@ -7,6 +7,9 @@ export default defineNuxtConfig({
     strict: true,
   },
   css: ["~/assets/css/main.css"],
+  // Tout le CSS dans la page (une quinzaine de Ko) : plus de feuille
+  // externe qui bloque le premier affichage
+  features: { inlineStyles: true },
   // Polices auto-hébergées au build : aucune requête vers Google à la visite.
   // Inter pour le texte, Bricolage Grotesque pour les titres, avec son axe
   // de taille optique (dessin plus expressif en grand).

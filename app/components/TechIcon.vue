@@ -21,13 +21,3 @@ const icon = computed(() => ICONS[props.name]);
     <path :d="icon.path" fill="currentColor" />
   </svg>
 </template>
-
-<style scoped>
-.tech-icon {
-  width: 1em;
-  height: 1em;
-  flex: none;
-  display: inline-block;
-  vertical-align: -0.12em;
-}
-</style>

@@ -79,9 +79,7 @@ onUnmounted(() => document.removeEventListener("pointerdown", onPointerDown));
         :data-umami-event-lang="pdf.lang"
         data-umami-event-from="header"
       >
-        <LineIcon class="button__icon" name="download" /><span class="site-header__cv-label">{{
-          ui.header.cv
-        }}</span
+        <LineIcon name="download" /><span class="site-header__cv-label">{{ ui.header.cv }}</span
         ><span class="visually-hidden"> ({{ pdf.meta }})</span>
       </a>
       <PortfolioLangSwitch />
