@@ -8,9 +8,12 @@ export function hostOf(url: string): string {
   return new URL(url).hostname.replace(/^www\./, "");
 }
 
-/** URL lisible sur papier, sans protocole ni barre finale, ex. "github.com/vincent-leostic" */
+/** URL lisible sur papier, sans protocole, www ni barre finale, ex. "github.com/vincent-leostic" */
 export function bareUrl(url: string): string {
-  return url.replace(/^https?:\/\//, "").replace(/\/$/, "");
+  return url
+    .replace(/^https?:\/\//, "")
+    .replace(/^www\./, "")
+    .replace(/\/$/, "");
 }
 
 /** Identifiant ASCII en minuscules, ex. "Les ateliers de Camille" → "les-ateliers-de-camille" */

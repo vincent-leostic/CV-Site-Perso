@@ -23,7 +23,7 @@ export interface Mission {
   /** Nom court du projet */
   title: string;
   description: string;
-  /** Casquettes tenues sur la mission, affichées en badges */
+  /** Casquettes tenues sur la mission, affichées en badges ou en texte selon le thème */
   badges?: Casquette[];
   /** Mission préférée : affiche une étoile à côté du titre */
   favorite?: boolean;
@@ -62,6 +62,8 @@ export interface Education {
   degree: string;
   school: string;
   period: string;
+  /** Fiche officielle de la certification (France compétences), liée depuis l'intitulé */
+  url?: string;
 }
 
 export interface Language {
@@ -102,8 +104,8 @@ export interface CvData {
  */
 export const cv: CvData = {
   name: "Vincent LEOSTIC",
-  title: "Développeur logiciel front, UI/UX et outillage IA",
-  bio: "Développeur logiciel chez iD3i, à Brest, après une reconversion. Spécialisé front et UI/UX, je développe assisté par IA au quotidien et je construis l'outillage qui va avec.",
+  title: "Développeur logiciel front-end et UI/UX",
+  bio: "Développeur logiciel chez iD3i, à Brest, après une reconversion. Spécialisé front et UI/UX, je conçois et développe des applications métier, du besoin jusqu'à la production.",
   photo: "/avatar.jpg",
   website: "https://vincent.leostic.bzh",
   email: "vincent.leostic@gmail.com",
@@ -120,7 +122,7 @@ export const cv: CvData = {
       company: "iD3i, ESN à Brest",
       period: "2019 – aujourd'hui",
       description:
-        "Des missions variées, d'un secteur à l'autre, et rarement la même casquette : développeur, chef de projet, responsable technique ou fonctionnel selon les besoins. Ma spécialité reste le front et l'UI/UX.\nAvec le développement assisté par IA au quotidien, j'ai pu franchir le cap de la simple « théorie » : bibliothèque de skills, hooks, spécifications détaillées, IA marketplaces.",
+        "Des missions variées, d'un secteur à l'autre, et rarement la même casquette : développeur, chef de projet, responsable technique ou fonctionnel selon les besoins. Ma spécialité reste le front et l'UI/UX.\nL'IA fait partie de mes outils au quotidien, encadrée par des spécifications détaillées.",
       missions: [
         {
           title: "Gestion d'adhérents de clubs de sport",
@@ -204,15 +206,6 @@ export const cv: CvData = {
       ],
     },
     {
-      title: "Outillage IA",
-      skills: [
-        { label: "Claude Code", icon: "claude", level: 95 },
-        { label: "Skills & hooks", level: 90 },
-        { label: "Agents", level: 85 },
-        { label: "Intégration LLM", level: 75 },
-      ],
-    },
-    {
       title: "Backend",
       skills: [
         { label: "Node.js", icon: "node", level: 70 },
@@ -230,8 +223,22 @@ export const cv: CvData = {
         { label: "Veille technique", level: 85 },
       ],
     },
+    {
+      title: "Développement assisté par IA",
+      skills: [
+        { label: "Claude Code", icon: "claude", level: 85 },
+        { label: "Skills, hooks & agents", level: 80 },
+        { label: "Intégration LLM", level: 70 },
+      ],
+    },
   ],
   education: [
+    {
+      degree: "Expert en développement logiciel, niveau 7 (Bac+5)",
+      school: "OpenClassrooms",
+      period: "VAE en cours",
+      url: "https://www.francecompetences.fr/recherche/rncp/41330",
+    },
     {
       degree: "Titre professionnel Développeur logiciel (équivalent BAC+2)",
       school: "AFPA",

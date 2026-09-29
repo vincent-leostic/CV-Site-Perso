@@ -1,18 +1,17 @@
 import { describe, expect, test } from "vite-plus/test";
-import { DEFAULT_THEME, THEME_PENDING_CLASS, isTheme, themeInitScript } from "../shared/theme";
-
-interface RunOptions {
-  search?: string;
-  stored?: string | null;
-  /** Simule un stockage bloqué (SecurityError) */
-  storageThrows?: boolean;
-}
+import {
+  DEFAULT_THEME,
+  THEME_PENDING_CLASS,
+  isTheme,
+  themeHref,
+  themeInitScript,
+} from "../shared/theme";
 
 /**
  * Exécute le script inline tel qu'il est injecté dans le <head>, avec un
- * document, une URL et un localStorage factices.
+ * document et une URL factices.
  */
-function runInitScript({ search = "", stored = null, storageThrows = false }: RunOptions = {}) {
+function runInitScript(search = "") {
   const attributes = new Map<string, string>();
   const classes = new Set<string>();
   const document = {
@@ -24,12 +23,8 @@ function runInitScript({ search = "", stored = null, storageThrows = false }: Ru
       },
     },
   };
-  const localStorage = {
-    getItem: () => {
-      if (storageThrows) throw new Error("SecurityError");
-      return stored;
-    },
-  };
+  // Un ancien choix sauvegardé ne doit plus rien changer
+  const localStorage = { getItem: () => "gaming" };
   // Le filet de sécurité (setTimeout) n'est pas déclenché ici
   const setTimeout = () => 0;
   // On exécute la chaîne exacte envoyée au navigateur, pas une copie de sa logique
@@ -44,35 +39,23 @@ function runInitScript({ search = "", stored = null, storageThrows = false }: Ru
 }
 
 describe("script inline de thème", () => {
-  test("sans paramètre ni choix sauvegardé : thème par défaut, rien de masqué", () => {
+  test("sans paramètre : version Pro, rien de masqué, même avec un ancien choix sauvegardé", () => {
     expect(runInitScript()).toEqual({ theme: DEFAULT_THEME, pending: false });
   });
 
-  test("?theme= prime sur le choix sauvegardé (lien partagé)", () => {
-    expect(runInitScript({ search: "?theme=gaming", stored: "nature" })).toEqual({
-      theme: "gaming",
-      pending: true,
-    });
+  test("?theme= affiche la version demandée (lien partagé)", () => {
+    expect(runInitScript("?theme=nature")).toEqual({ theme: "nature", pending: true });
   });
 
-  test("sans paramètre, le choix sauvegardé s'applique", () => {
-    expect(runInitScript({ stored: "manuscrit" })).toEqual({ theme: "manuscrit", pending: true });
+  test("un ?theme= inconnu retombe sur la version Pro", () => {
+    expect(runInitScript("?theme=oups")).toEqual({ theme: DEFAULT_THEME, pending: false });
   });
+});
 
-  test("un ?theme= inconnu retombe sur le choix sauvegardé", () => {
-    expect(runInitScript({ search: "?theme=oups", stored: "terminal" })).toEqual({
-      theme: "terminal",
-      pending: true,
-    });
-  });
-
-  test("une valeur sauvegardée inconnue retombe sur le défaut", () => {
-    expect(runInitScript({ stored: "oups" })).toEqual({ theme: DEFAULT_THEME, pending: false });
-  });
-
-  test("un stockage bloqué n'empêche ni ?theme= ni le défaut", () => {
-    expect(runInitScript({ search: "?theme=nature", storageThrows: true }).theme).toBe("nature");
-    expect(runInitScript({ storageThrows: true }).theme).toBe(DEFAULT_THEME);
+describe("themeHref", () => {
+  test("la version Pro est la racine, les autres portent ?theme=", () => {
+    expect(themeHref(DEFAULT_THEME)).toBe("/");
+    expect(themeHref("terminal")).toBe("/?theme=terminal");
   });
 });
 

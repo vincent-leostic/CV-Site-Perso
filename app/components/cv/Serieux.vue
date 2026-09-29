@@ -1,18 +1,8 @@
 <script setup lang="ts">
-import { cv, type Casquette } from "~/data/cv";
+import { cv } from "~/data/cv";
 
 // Nuage de technos : tous les groupes à plat
 const allSkills = cv.skillGroups.flatMap((group) => group.skills);
-
-/** Chaque casquette a sa couleur, portée par un modificateur du badge */
-const BADGE_MODIFIERS: Record<Casquette, string> = {
-  "Chef de projet": "lead",
-  Développeur: "dev",
-  "Responsable technique": "tech",
-  "Responsable fonctionnel": "func",
-  IA: "ai",
-  "En autonomie": "solo",
-};
 
 /** Le PDF, c'est simplement la version imprimée : les styles print s'occupent du reste */
 function printCv() {
@@ -121,8 +111,17 @@ function printCv() {
         <div class="side-section">
           <h2 class="side-section__title">Formation</h2>
           <p v-for="edu in cv.education" :key="edu.degree" class="side-section__line">
-            <strong class="side-section__key">{{ edu.period }}</strong> : {{ edu.degree }},
-            {{ edu.school }}
+            <strong class="side-section__key">{{ edu.period }}</strong> :
+            <a
+              v-if="edu.url"
+              class="side-section__link"
+              :href="edu.url"
+              target="_blank"
+              rel="noopener"
+              >{{ edu.degree }}</a
+            >
+            <template v-else>{{ edu.degree }}</template
+            >, {{ edu.school }}
           </p>
         </div>
 
@@ -169,16 +168,7 @@ function printCv() {
                       >★</span
                     >
                   </p>
-                  <ul v-if="m.badges" class="mission__badges" role="list">
-                    <li
-                      v-for="badge in m.badges"
-                      :key="badge"
-                      class="badge"
-                      :class="`badge--${BADGE_MODIFIERS[badge]}`"
-                    >
-                      {{ badge }}
-                    </li>
-                  </ul>
+                  <p v-if="m.badges" class="mission__roles">{{ m.badges.join(" · ") }}</p>
                   <p class="mission__desc">{{ m.description }}</p>
                 </li>
               </ul>
@@ -225,10 +215,6 @@ function printCv() {
 </template>
 
 <style scoped>
-.serieux {
-  --border-accent: color-mix(in srgb, var(--accent) 45%, var(--border));
-}
-
 /* La "feuille" : une page imprimée haut de gamme */
 .sheet {
   --enter-y: 14px;
@@ -251,11 +237,12 @@ function printCv() {
 }
 
 /* Collante seulement si elle tient dans la fenêtre : sinon Langues,
-   Hobbies et le bouton d'impression resteraient hors champ */
-@media screen and (min-width: 761px) and (min-height: 66rem) {
+   Hobbies et le bouton d'impression resteraient hors champ. Seuil à
+   relever si la colonne s'allonge (elle fait environ 65 rem). */
+@media screen and (min-width: 761px) and (min-height: 70rem) {
   .sheet__side {
     position: sticky;
-    top: 5rem;
+    top: 1.5rem;
   }
 }
 
@@ -272,11 +259,6 @@ function printCv() {
   border-radius: 50%;
   filter: grayscale(1) contrast(1.05);
   margin-bottom: 1rem;
-  transition: filter 0.4s;
-}
-
-.identity__avatar:hover {
-  filter: grayscale(0);
 }
 
 .identity__name {
@@ -290,6 +272,8 @@ function printCv() {
   color: var(--accent);
   font-weight: 600;
   font-size: 1.05rem;
+  /* Lignes équilibrées : évite de couper « front-end » sur son trait d'union */
+  text-wrap: balance;
 }
 
 .identity__meta {
@@ -371,6 +355,10 @@ function printCv() {
   font-weight: 600;
 }
 
+.side-section__link:is(:hover, :focus-visible) {
+  text-decoration: underline;
+}
+
 .print-button {
   align-self: start;
   margin-top: 0.3rem;
@@ -380,7 +368,7 @@ function printCv() {
   font-weight: 600;
   color: var(--accent);
   background: none;
-  border: 1px solid var(--border-accent);
+  border: 1px solid color-mix(in srgb, var(--accent) 45%, var(--border));
   border-radius: var(--radius-pill);
   cursor: pointer;
   transition:
@@ -500,11 +488,10 @@ function printCv() {
   gap: 0.6rem;
 }
 
-/* --- Cartes : missions et projets perso --- */
+/* --- Cartes : missions et projets perso. Un simple fond, sans bordure :
+   la feuille est déjà une carte --- */
 .card {
   background: var(--bg);
-  border: 1px solid var(--border);
-  border-left: 3px solid color-mix(in srgb, var(--accent) 55%, var(--border));
   border-radius: 8px;
 }
 
@@ -524,54 +511,17 @@ function printCv() {
   margin-left: 0.15rem;
 }
 
-.mission__badges {
-  list-style: none;
-  display: flex;
-  flex-wrap: wrap;
-  gap: 0.28rem;
-  margin: 0.3rem 0 0.4rem;
+/* Casquettes tenues : une ligne discrète plutôt qu'une rangée de badges */
+.mission__roles {
+  font-size: 0.8rem;
+  font-weight: 500;
+  color: var(--text-muted);
+  margin-bottom: 0.35rem;
 }
 
 .mission__desc {
   font-size: 0.92rem;
   color: var(--text-muted);
-}
-
-/* --- Badges de casquette : une couleur par casquette --- */
-.badge {
-  font-size: 0.75rem;
-  font-weight: 600;
-  text-transform: uppercase;
-  letter-spacing: 0.03em;
-  color: var(--badge, var(--accent));
-  background: color-mix(in srgb, var(--badge, var(--accent)) 10%, transparent);
-  border: 1px solid color-mix(in srgb, var(--badge, var(--accent)) 28%, transparent);
-  border-radius: var(--radius-pill);
-  padding: 0.05rem 0.5rem;
-}
-
-.badge--lead {
-  --badge: #3b5bdb;
-}
-
-.badge--dev {
-  --badge: #237532;
-}
-
-.badge--tech {
-  --badge: #b04409;
-}
-
-.badge--func {
-  --badge: #0a7283;
-}
-
-.badge--ai {
-  --badge: #9c36b5;
-}
-
-.badge--solo {
-  --badge: #5d6470;
 }
 
 /* --- Projets perso --- */
@@ -582,16 +532,19 @@ function printCv() {
   gap: 0.8rem;
 }
 
+/* Toute la carte est cliquable : le lien du titre s'étend sur elle, son
+   nom accessible reste court (titre et domaine) */
 .project {
+  position: relative;
   padding: 0.9rem 1.1rem;
   transition:
-    border-color 0.2s,
-    box-shadow 0.2s;
+    box-shadow 0.2s,
+    transform 0.2s;
 }
 
-.project:is(:hover, :focus-within) {
-  border-color: var(--border-accent);
-  box-shadow: var(--shadow);
+.project:has(.project__link:is(:hover, :focus-visible)) {
+  box-shadow: var(--shadow-hover);
+  transform: translateY(-2px);
 }
 
 .project__link {
@@ -600,6 +553,23 @@ function printCv() {
   align-items: flex-start;
   gap: 0.1rem;
   margin-bottom: 0.35rem;
+}
+
+.project__link::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+}
+
+/* Le contour de focus entoure la carte entière */
+.project__link:focus-visible {
+  outline: none;
+}
+
+.project__link:focus-visible::after {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
 }
 
 .project__link:is(:hover, :focus-visible) .project__title {
@@ -661,16 +631,6 @@ function printCv() {
   background: var(--bg);
   font-size: 0.95rem;
   font-weight: 500;
-  transition:
-    border-color 0.2s,
-    box-shadow 0.2s,
-    transform 0.2s;
-}
-
-.tech-list__item:hover {
-  border-color: var(--border-accent);
-  box-shadow: var(--shadow);
-  transform: translateY(-1px);
 }
 
 .tech-list__icon {
@@ -728,15 +688,15 @@ function printCv() {
      Positionnée pour passer au-dessus de la bande fixe. --- */
   .sheet__side {
     position: relative;
-    padding: 7mm 5mm 10mm 7mm;
+    padding: 6mm 5mm 5mm 7mm;
     color: #fff;
   }
 
   .identity__avatar {
-    width: 30mm;
-    height: 30mm;
+    width: 26mm;
+    height: 26mm;
     border: 2px solid rgba(255, 255, 255, 0.85);
-    margin-bottom: 4mm;
+    margin-bottom: 3mm;
     filter: none;
   }
 
@@ -759,6 +719,7 @@ function printCv() {
   .identity__bio {
     color: var(--ink-pale);
     font-size: 9pt;
+    line-height: 1.5;
     border: 0;
     padding-bottom: 0;
     margin-bottom: 4mm;
@@ -792,7 +753,7 @@ function printCv() {
   }
 
   .side-section {
-    margin-bottom: 3.5mm;
+    margin-bottom: 2.5mm;
     break-inside: avoid;
   }
 
@@ -810,7 +771,8 @@ function printCv() {
     font-size: 9pt;
   }
 
-  .side-section__key {
+  .side-section__key,
+  .side-section__link {
     color: #fff;
   }
 
@@ -957,12 +919,6 @@ function printCv() {
     height: 2mm;
     border-radius: 50%;
     background: var(--ink);
-  }
-
-  /* En impression, les casquettes restent sobres : marine uniforme */
-  .badge {
-    --badge: var(--ink);
-    font-size: 0.62rem;
   }
 }
 </style>

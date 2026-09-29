@@ -14,6 +14,7 @@ describe("données du CV", () => {
       cv.website,
       ...cv.links.map((link) => link.url),
       ...cv.personalProjects.map((proj) => proj.url),
+      ...cv.education.flatMap((edu) => (edu.url ? [edu.url] : [])),
     ];
     for (const url of urls) {
       expect(new URL(url).protocol, url).toBe("https:");

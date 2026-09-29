@@ -1,28 +1,27 @@
-import {
-  DEFAULT_THEME,
-  THEMES,
-  THEME_PENDING_CLASS,
-  THEME_STORAGE_KEY,
-  isTheme,
-  type Theme,
-} from "#shared/theme";
+import { DEFAULT_THEME, THEMES, THEME_PENDING_CLASS, isTheme, type Theme } from "#shared/theme";
 
 function applyTheme(theme: Theme) {
   document.documentElement.setAttribute("data-theme", theme);
 }
 
+/** Reflète le thème dans l'URL : un rechargement ou un lien copié le conserve */
+function syncUrl(theme: Theme) {
+  const url = new URL(window.location.href);
+  if (theme === DEFAULT_THEME) url.searchParams.delete("theme");
+  else url.searchParams.set("theme", theme);
+  // history.state conservé : vue-router y range sa position de défilement
+  window.history.replaceState(window.history.state, "", url);
+}
+
 export function useTheme() {
   const currentTheme = useState<Theme>("theme", () => DEFAULT_THEME);
 
-  /** Change de thème et le sauvegarde pour les prochaines visites */
+  /** Nouveau layout affiché depuis son début */
   function setTheme(theme: Theme) {
     currentTheme.value = theme;
     applyTheme(theme);
-    try {
-      localStorage.setItem(THEME_STORAGE_KEY, theme);
-    } catch {
-      /* stockage bloqué : le choix vaut pour la visite en cours */
-    }
+    syncUrl(theme);
+    window.scrollTo({ top: 0, behavior: "instant" });
   }
 
   /**
@@ -36,13 +35,10 @@ export function useTheme() {
     const resolved = root.getAttribute("data-theme");
     if (isTheme(resolved)) currentTheme.value = resolved;
     await nextTick();
-    // Calcule les styles avant de retirer la classe : l'indicateur du
-    // sélecteur se pose sur le bon thème sans glisser depuis « Pro »
-    void root.offsetWidth;
     root.classList.remove(THEME_PENDING_CLASS);
 
     // L'impression suit la mise en page papier de Sérieux quel que soit le
-    // thème affiché : bascule le temps de l'impression, sans sauvegarder.
+    // thème affiché : bascule le temps de l'impression, sans toucher à l'URL.
     let themeBeforePrint: Theme | null = null;
     window.addEventListener("beforeprint", () => {
       if (currentTheme.value === DEFAULT_THEME) return;
@@ -100,11 +96,24 @@ export function useTheme() {
       });
   }
 
+  /**
+   * Clic sur un lien de thème (href = themeHref) : bascule animée depuis le
+   * lien. Un clic modifié (nouvel onglet, etc.) garde le comportement natif.
+   */
+  function followThemeLink(theme: Theme, event: MouseEvent) {
+    if (event.button !== 0 || event.metaKey || event.ctrlKey || event.shiftKey || event.altKey) {
+      return;
+    }
+    event.preventDefault();
+    const rect = (event.currentTarget as HTMLElement).getBoundingClientRect();
+    switchTheme(theme, { x: rect.left + rect.width / 2, y: rect.top + rect.height / 2 });
+  }
+
   return {
     currentTheme: readonly(currentTheme),
     themes: THEMES,
     initTheme,
-    setTheme,
     switchTheme,
+    followThemeLink,
   };
 }

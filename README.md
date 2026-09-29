@@ -2,7 +2,7 @@
 
 Site CV multi-thèmes, en ligne sur [vincent.leostic.bzh](https://vincent.leostic.bzh/).
 
-Un même contenu, cinq mises en scène complètes. Le sélecteur en haut de page bascule d'un univers à l'autre, avec une transition circulaire (View Transitions). Le choix est conservé en localStorage et partageable via `?theme=` dans l'URL.
+Le CV s'ouvre toujours en version Pro. Quatre variantes ludiques du même contenu sont proposées discrètement en pied de page, avec une transition circulaire (View Transitions) ; la version affichée est portée par `?theme=` dans l'URL (lien partageable), sans être mémorisée.
 
 | Thème     | Ambiance                                        |
 | --------- | ----------------------------------------------- |

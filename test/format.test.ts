@@ -17,9 +17,12 @@ describe("hostOf", () => {
 });
 
 describe("bareUrl", () => {
-  test("retire le protocole et la barre finale", () => {
+  test("retire le protocole, le www et la barre finale", () => {
     expect(bareUrl("https://github.com/vincent-leostic/")).toBe("github.com/vincent-leostic");
     expect(bareUrl("http://vincent.leostic.bzh")).toBe("vincent.leostic.bzh");
+    expect(bareUrl("https://www.linkedin.com/in/vincent-leostic")).toBe(
+      "linkedin.com/in/vincent-leostic",
+    );
   });
 });
 

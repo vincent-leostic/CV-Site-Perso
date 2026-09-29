@@ -1,7 +1,8 @@
 <script setup lang="ts">
+import { DEFAULT_THEME, themeHref } from "#shared/theme";
 import { cv } from "~/data/cv";
 
-const { currentTheme } = useTheme();
+const { currentTheme, followThemeLink } = useTheme();
 
 // Référencement : le site doit sortir en tête sur « Vincent Leostic ».
 // Nom en premier dans le titre ; canonique vers le domaine .bzh pour que
@@ -9,7 +10,7 @@ const { currentTheme } = useTheme();
 // (JSON-LD) qui relie le site aux profils GitHub/LinkedIn.
 const siteUrl = cv.website;
 const seoTitle = `${cv.name} — ${cv.title}`;
-const seoDescription = `CV de ${cv.name}, développeur logiciel à Brest. Spécialisé front et UI/UX (Vue, Nuxt, TypeScript) et outillage de développement assisté par IA.`;
+const seoDescription = `CV de ${cv.name}, développeur logiciel à Brest, spécialisé front-end et UI/UX : Vue, Nuxt, TypeScript.`;
 
 useSeoMeta({
   title: seoTitle,
@@ -50,10 +51,17 @@ useHead({
 
 <template>
   <div class="site">
-    <header class="site-header">
+    <!-- La version Pro n'a pas d'en-tête : la feuille porte déjà le nom.
+         Les versions ludiques gardent toujours un chemin de retour. -->
+    <header v-if="currentTheme !== DEFAULT_THEME" class="site-header">
       <div class="site-header__inner">
         <p class="site-header__brand">{{ cv.name }}</p>
-        <ThemeSwitcher class="site-header__switcher" />
+        <a
+          class="site-header__back"
+          :href="themeHref(DEFAULT_THEME)"
+          @click="followThemeLink(DEFAULT_THEME, $event)"
+          ><span aria-hidden="true">← </span>Revenir à la version pro</a
+        >
       </div>
     </header>
 
@@ -70,6 +78,7 @@ useHead({
     </main>
 
     <footer class="site-footer">
+      <ThemeLinks />
       <p>Fait avec Nuxt & TypeScript</p>
     </footer>
   </div>
@@ -116,8 +125,14 @@ useHead({
   color: var(--accent);
 }
 
-.site-header__switcher {
+.site-header__back {
   flex: none;
+  font-size: 0.9rem;
+  font-weight: 600;
+}
+
+.site-header__back:is(:hover, :focus-visible) {
+  text-decoration: underline;
 }
 
 .site-main {
@@ -131,6 +146,9 @@ useHead({
 }
 
 .site-footer {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
   text-align: center;
   padding: 1.5rem;
   color: var(--text-muted);
