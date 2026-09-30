@@ -10,6 +10,8 @@ Le CV est une feuille A4 d'une page aux couleurs du site : en-tête brun (photo,
 
 Les miniatures de partage (`og-image.png` et `og-image-en.png`, 1200 × 630) suivent le même chemin : [scripts/og-image.mjs](scripts/og-image.mjs) capture les pages `/og` et `/en/og` ([app/pages/og.vue](app/pages/og.vue)), qui reprend l'accroche, puis la retire du site. Les deux gabarits répondent 404 en ligne.
 
+Le favicon est le rossignol de l'accroche sur le dégradé brun du site ([public/favicon.svg](public/favicon.svg)). Pour les navigateurs et appareils qui ne lisent pas le SVG, [scripts/favicon.mjs](scripts/favicon.mjs) en tire au build `favicon.ico` (32 px) et `apple-touch-icon.png` (180 px, coins carrés : iOS les arrondit lui-même).
+
 En développement, les liens « Télécharger mon CV » ouvrent l'aperçu de la langue affichée (`/cv` ou `/en/cv`), un aperçu fidèle du PDF avec la limite de la page A4 en pointillés : le PDF n'existe qu'après le build.
 
 Les anciens thèmes ludiques (Gaming, Nature, Manuscrit, Terminal) restent récupérables via le tag git `themes-ludiques`.

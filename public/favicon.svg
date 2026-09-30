@@ -1,0 +1,47 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="65 17 278 278">
+  <!-- Favicon : le rossignol de l'accroche (Nightingale.vue, mêmes cotes),
+       en plein et aux traits épaissis pour rester lisible à 16 px, sur le
+       dégradé brun du site. Bec roux : il chante. scripts/favicon.mjs en
+       tire favicon.ico et apple-touch-icon.png au build. -->
+  <defs>
+    <!-- Mêmes cotes que le fond : l'aile et l'œil, peints avec ce dégradé,
+         semblent évidés -->
+    <linearGradient
+      id="background"
+      gradientUnits="userSpaceOnUse"
+      x1="65"
+      y1="17"
+      x2="343"
+      y2="295"
+    >
+      <stop offset="0" stop-color="#3a2a1e" />
+      <stop offset="1" stop-color="#7a4f2f" />
+    </linearGradient>
+  </defs>
+  <rect x="65" y="17" width="278" height="278" rx="61" fill="url(#background)" />
+  <g fill="#fff" stroke="#fff" stroke-width="10" stroke-linecap="round" stroke-linejoin="round">
+    <!-- Corps : tête, dos, queue, ventre, poitrine -->
+    <path
+      d="M288 104 C 284 80, 258 70, 238 80 C 214 92, 204 120, 190 146 C 180 164, 168 176, 150 186 L 98 212 C 86 219, 88 232, 100 229 L 164 206 C 182 222, 222 234, 250 220 C 280 204, 298 170, 292 132 C 291 122, 290 112, 288 104 Z"
+    />
+    <!-- Pattes -->
+    <path fill="none" stroke-width="16" d="M230 228 L 228 252 M248 224 L 252 250" />
+  </g>
+  <!-- Bec ouvert -->
+  <path
+    fill="#e8793f"
+    stroke="#e8793f"
+    stroke-width="10"
+    stroke-linejoin="round"
+    d="M288 100 L 324 92 L 291 107 Z M292 112 L 320 121 L 289 116 Z"
+  />
+  <!-- Aile et œil -->
+  <path
+    fill="none"
+    stroke="url(#background)"
+    stroke-width="12"
+    stroke-linecap="round"
+    d="M232 118 C 250 150, 238 190, 184 204"
+  />
+  <circle cx="262" cy="98" r="11" fill="url(#background)" />
+</svg>

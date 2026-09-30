@@ -1,5 +1,5 @@
 // Outils communs aux scripts lancés après `nuxt generate` (cv-pdf.mjs,
-// og-image.mjs) : un serveur statique sur .output/public et Chrome en mode
+// og-image.mjs, favicon.mjs) : un serveur statique sur .output/public et Chrome en mode
 // headless, sans fenêtre, avec un profil temporaire.
 //
 // Chrome est cherché dans CHROME_PATH, puis aux emplacements habituels

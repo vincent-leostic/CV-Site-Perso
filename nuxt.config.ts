@@ -6,6 +6,18 @@ export default defineNuxtConfig({
   typescript: {
     strict: true,
   },
+  // Favicon : le SVG pour les navigateurs récents, l'ICO pour les autres
+  // (sizes le fait passer après le SVG), le PNG pour l'écran d'accueil iOS.
+  // ICO et PNG sont tirés du SVG au build (scripts/favicon.mjs).
+  app: {
+    head: {
+      link: [
+        { rel: "icon", href: "/favicon.ico", sizes: "32x32" },
+        { rel: "icon", href: "/favicon.svg", type: "image/svg+xml" },
+        { rel: "apple-touch-icon", href: "/apple-touch-icon.png" },
+      ],
+    },
+  },
   css: ["~/assets/css/main.css"],
   // Tout le CSS dans la page (une quinzaine de Ko) : plus de feuille
   // externe qui bloque le premier affichage

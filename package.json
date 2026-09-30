@@ -5,7 +5,7 @@
   "scripts": {
     "build": "nuxt build",
     "dev": "nuxt dev",
-    "generate": "nuxt generate && node scripts/cv-pdf.mjs && node scripts/og-image.mjs",
+    "generate": "nuxt generate && node scripts/cv-pdf.mjs && node scripts/og-image.mjs && node scripts/favicon.mjs",
     "preview": "nuxt preview",
     "prepare": "vp config",
     "test": "vp test"
