@@ -28,8 +28,8 @@ const switchLocalePath = useSwitchLocalePath();
         :to="switchLocalePath(code)"
         :lang="code"
         :hreflang="code"
-        data-umami-event="lang-switch"
-        :data-umami-event-to="code"
+        data-track="lang-switch"
+        :data-track-to="code"
         >{{ code.toUpperCase()
         }}<span class="visually-hidden"> ({{ LANGUAGE_LABELS[code] }})</span></NuxtLink
       >

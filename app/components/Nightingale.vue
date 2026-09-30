@@ -1,5 +1,5 @@
 <template>
-  <!-- Rossignol qui chante (LEOSTIC en breton), dessiné au trait, décoratif.
+  <!-- Rossignol qui chante (eostig en breton, d'où LEOSTIC), dessiné au trait, décoratif.
        Le bas du viewBox est le bout des pattes : posé sur un bord, il s'y
        perche. L'opacité s'applique au dessin entier : les traits qui se
        croisent ne s'éclaircissent pas. Position et taille : au parent. -->

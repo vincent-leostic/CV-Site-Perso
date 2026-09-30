@@ -1,3 +1,4 @@
+import { lowerFirst, sentenceList } from "../utils/format";
 import { COMMON } from "./common";
 import type { CvData, UiText } from "./types";
 
@@ -5,8 +6,7 @@ import type { CvData, UiText } from "./types";
  * Contenu français du portfolio et du CV en PDF, puis textes d'interface.
  * La version anglaise (en.ts) suit la même structure, vérifiée par les tests.
  *
- * Contenu réel (interview du 2026-08-14). Reste à confirmer : les dates
- * exactes de la période restauration.
+ * Contenu réel (entretien du 2026-08-14).
  */
 export const cv: CvData = {
   ...COMMON,
@@ -16,12 +16,12 @@ export const cv: CvData = {
   about: {
     title: "Des interfaces qui font « wow »",
     intro:
-      "Après dix ans en restauration, j'avais fait le tour du métier : en 2018, je me suis reconverti dans le développement.",
+      "Après dix ans en restauration, j'avais fait le tour du métier : en 2018, je me suis reconverti dans le développement.",
     faq: [
       {
         question: "Ce que j'aime ?",
         answer:
-          "C'est concevoir des interfaces soignées, qui font dire « wow » dès qu'on arrive dessus. Mes premières étaient un peu criardes : j'ai appris à la dure, et j'en ai gardé le goût du détail juste.",
+          "C'est concevoir des interfaces soignées, qui font dire « wow » dès qu'on arrive dessus. Mes premières étaient un peu criardes : j'ai appris à la dure, et j'en ai gardé le goût du détail juste.",
       },
       {
         question: "Le projet dont je suis le plus fier ?",
@@ -56,7 +56,7 @@ export const cv: CvData = {
       period: "Depuis 2019",
       title: "Développeur logiciel",
       detail:
-        "En ESN à Brest, chez iD3i : des missions variées, avec le front et l'UI/UX pour spécialité.",
+        "En ESN à Brest, chez iD3i : des missions variées, avec le front et l'UI/UX pour spécialité.",
     },
     {
       period: "En cours",
@@ -68,7 +68,7 @@ export const cv: CvData = {
     {
       period: "Demain",
       title: "Chez vous ?",
-      detail: "Un poste à temps plein dans votre équipe : parlons-en.",
+      detail: "Un poste à temps plein dans votre équipe : parlons-en.",
       status: "future",
       url: "#contact",
     },
@@ -116,12 +116,12 @@ export const cv: CvData = {
       company: "iD3i, ESN à Brest",
       period: "2019 – aujourd'hui",
       description:
-        "Des missions variées, d'un secteur à l'autre, et rarement la même casquette : développeur, chef de projet, responsable technique ou fonctionnel selon les besoins. Ma spécialité reste le front et l'UI/UX.\nL'IA fait partie de mes outils au quotidien, encadrée par des spécifications détaillées.",
+        "Des missions variées, d'un secteur à l'autre, et rarement la même casquette : développeur, chef de projet, responsable technique ou fonctionnel selon les besoins. Ma spécialité reste le front et l'UI/UX.\nL'IA fait partie de mes outils au quotidien, encadrée par des spécifications détaillées.",
       missions: [
         {
           title: "Gestion d'adhérents de clubs de sport",
           description:
-            "Application qui centralise la vie d'un club de sport : fiches adhérents et inscriptions.",
+            "Application qui centralise la vie d'un club de sport : fiches adhérents et inscriptions.",
           badges: ["po", "projectManager", "developer"],
         },
         {
@@ -152,19 +152,18 @@ export const cv: CvData = {
       ],
     },
     {
-      // Dates approximatives (~10 ans, avant la reconversion de 2018), à confirmer.
       role: "Serveur, puis responsable de salle",
       company: "Restauration",
       period: "2008 – 2018",
       description:
-        "Dix ans en salle : encadrement d'équipe, gestion du rush, relation client. Multiples restaurants, autant de façons de travailler.",
+        "Dix ans en salle : encadrement d'équipe, gestion du rush, relation client. Multiples restaurants, autant de façons de travailler.",
     },
   ],
   personalProjects: [
     {
       title: "Ramonéa",
       description:
-        "Site vitrine d'une entreprise de ramonage de la presqu'île de Crozon : prestations, tarifs, FAQ et contact, avec un back-office complet pour que l'artisan gère lui-même contenus, photos, traductions et SEO.",
+        "Site vitrine d'une entreprise de ramonage de la presqu'île de Crozon : prestations, tarifs, FAQ et contact, avec un back-office complet pour que l'artisan gère lui-même contenus, photos, traductions et SEO.",
       url: "https://ramonea.fr",
       image: "/projects/ramonea.webp",
       stack: [
@@ -176,7 +175,7 @@ export const cv: CvData = {
     {
       title: "Les ateliers de Camille",
       description:
-        "Site de Camille de Boiscuillé, psychopraticienne à Crozon : ses accompagnements (art-thérapie, EMDR, thérapie familiale) présentés dans un site statique ultra-léger, sans JavaScript ni cookies.",
+        "Site de Camille de Boiscuillé, psychopraticienne à Crozon : ses accompagnements (art-thérapie, EMDR, thérapie familiale) présentés dans un site statique ultra-léger, sans JavaScript ni cookies.",
       url: "https://www.camilledeboiscuilletherapeute.com",
       image: "/projects/camille.webp",
       stack: [{ label: "Astro", icon: "astro" }],
@@ -190,7 +189,7 @@ export const cv: CvData = {
   ],
   skillGroups: [
     {
-      title: "Frontend & UI/UX",
+      title: "Front-end & UI/UX",
       skills: [
         { label: "Accessibilité (WCAG)" },
         { label: "Vue.js 3", icon: "vue" },
@@ -202,7 +201,7 @@ export const cv: CvData = {
       ],
     },
     {
-      title: "Backend",
+      title: "Back-end",
       skills: [
         { label: "Node.js", icon: "node", siteOnly: true },
         { label: "C#", icon: "csharp" },
@@ -268,7 +267,7 @@ export const cv: CvData = {
     "Jeux vidéo",
     "Jeux de société",
     "Soirées entre amis",
-    "Développer à temps perdu",
+    "Développement à temps perdu",
   ],
 };
 
@@ -286,9 +285,9 @@ export const ui: UiText = {
   },
   photoAlt: `Photo de ${COMMON.name}`,
   seo: {
-    title: `${COMMON.name} - Portfolio`,
-    description: `Portfolio de ${COMMON.name}, développeur logiciel à Brest, spécialisé front-end, UI/UX et accessibilité : Vue, Nuxt, TypeScript. Projets, compétences, parcours et CV à télécharger.`,
-    ogImageAlt: `${COMMON.name}, ${cv.title}`,
+    title: `${COMMON.name} – Portfolio`,
+    description: `Portfolio de ${COMMON.name}, développeur logiciel à Brest, spécialisé en front-end, UI/UX et accessibilité : Vue, Nuxt, TypeScript. Projets, compétences, parcours et CV à télécharger.`,
+    ogImageAlt: `${COMMON.name}, ${lowerFirst(cv.title, "fr")}`,
   },
   skipLink: "Aller au contenu",
   footer: `Site conçu et développé par ${COMMON.name}, avec Nuxt et TypeScript.`,
@@ -308,7 +307,7 @@ export const ui: UiText = {
     cv: "Mon CV",
     language: "Langue",
   },
-  pdfMeta: (kb) => `PDF, environ ${kb} Ko`,
+  pdfMeta: (kb) => `PDF, environ ${kb} Ko`,
   hero: { kicker: "Portfolio", download: "Télécharger mon CV", contact: "Me contacter" },
   about: {
     kicker: "À propos",
@@ -333,6 +332,12 @@ export const ui: UiText = {
     availability: "Disponibilité",
     mobility: "Mobilité",
     languages: "Langues",
+    // « Français (…) et anglais (…) »
+    languageList: (languages) =>
+      sentenceList(
+        languages.map((lang) => `${lang.name} (${lang.level})`),
+        "fr",
+      ),
   },
   hobbies: { kicker: "Loisirs", title: "En dehors du code" },
   contact: {
@@ -343,7 +348,7 @@ export const ui: UiText = {
   },
   sheet: {
     availability: "Disponibilité immédiate",
-    ageAndPlace: `${COMMON.age} ans, ${COMMON.location}`,
+    ageAndPlace: `${COMMON.age} ans, ${COMMON.location}`,
     experience: "Expériences",
     missions: "Mes missions principales",
     personalProjects: "Projets perso",
@@ -353,4 +358,15 @@ export const ui: UiText = {
     hobbies: "Loisirs",
   },
   og: { kicker: "Portfolio" },
+  error: {
+    notFound: {
+      title: "Page introuvable",
+      text: "L'adresse est peut-être mal saisie, ou la page n'existe plus.",
+    },
+    unexpected: {
+      title: "Une erreur est survenue",
+      text: "Rechargez la page, ou repartez du portfolio.",
+    },
+    back: "Retour au portfolio",
+  },
 };

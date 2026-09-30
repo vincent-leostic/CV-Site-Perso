@@ -22,14 +22,14 @@ const pdf = useCvPdf();
             class="button button--primary"
             :href="pdf.href"
             :download="pdf.download"
-            data-umami-event="cv-download"
-            :data-umami-event-lang="pdf.lang"
-            data-umami-event-from="hero"
+            data-track="cv-download"
+            :data-track-lang="pdf.lang"
+            data-track-from="hero"
           >
             <LineIcon name="download" />{{ ui.hero.download }}
             <span class="button__meta">({{ pdf.meta }})</span>
           </a>
-          <a class="button button--ghost" href="#contact" data-umami-event="cta-contact">{{
+          <a class="button button--ghost" href="#contact" data-track="cta-contact">{{
             ui.hero.contact
           }}</a>
         </div>
@@ -44,9 +44,9 @@ const pdf = useCvPdf();
               :href="link.url"
               target="_blank"
               rel="noopener"
-              data-umami-event="social-link"
-              :data-umami-event-network="link.label"
-              data-umami-event-from="hero"
+              data-track="social-link"
+              :data-track-network="link.label"
+              data-track-from="hero"
             >
               <TechIcon v-if="link.icon" class="hero__meta-icon" :name="link.icon" />{{ link.label
               }}<span class="visually-hidden">{{ ui.newTab }}</span>

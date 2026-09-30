@@ -2,6 +2,7 @@
 import type { PersonalProject } from "~/data/types";
 
 const { cv, ui } = useContent();
+const homeUrl = useHomeUrl();
 
 // Compétences du PDF : sans celles réservées au site
 const pdfSkillGroups = computed(() =>
@@ -54,8 +55,8 @@ const liveProjects = computed(() =>
             </a>
           </li>
           <li>
-            <a class="contact__item contact__link" :href="cv.website">
-              <LineIcon class="contact__icon" name="globe" />{{ bareUrl(cv.website) }}
+            <a class="contact__item contact__link" :href="homeUrl">
+              <LineIcon class="contact__icon" name="globe" />{{ bareUrl(homeUrl) }}
             </a>
           </li>
           <li v-for="link in cv.links" :key="link.label">
@@ -130,13 +131,10 @@ const liveProjects = computed(() =>
           <dl class="skill-list">
             <div v-for="group in pdfSkillGroups" :key="group.title">
               <dt class="skill-list__name">{{ group.title }}</dt>
+              <!-- Libellés séparés par des points médians, pas une phrase :
+                   chacun garde sa majuscule (« Design d'interface ») -->
               <dd class="cv-section__line">
-                {{
-                  listOf(
-                    group.skills.map((skill) => skill.label),
-                    ui.intl,
-                  )
-                }}
+                {{ group.skills.map((skill) => skill.label).join(" · ") }}
               </dd>
             </div>
           </dl>

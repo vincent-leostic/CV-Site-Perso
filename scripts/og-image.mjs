@@ -1,4 +1,4 @@
-// Capture la miniature de partage (1200 × 630) de chaque langue à partir des
+// Capture les miniatures de partage (1200 × 630), une par langue, à partir des
 // pages /og et /en/og du site statique, avec Chrome en mode headless. Lancé
 // après `nuxt generate` (script `generate`) : elles suivent toujours les
 // couleurs et le titre du site. Les pages /og sont retirées du site une
@@ -31,7 +31,9 @@ for (const { route, file } of IMAGES) {
   const width = buffer.readUInt32BE(16);
   const height = buffer.readUInt32BE(20);
   console.log(`og-image : ${file} généré (${width} × ${height})`);
+  // Bloquant : le build échoue plutôt que de publier une miniature mal cadrée
   if (width !== WIDTH || height !== HEIGHT) {
-    console.warn(`og-image : ${WIDTH} × ${HEIGHT} attendu pour les réseaux sociaux`);
+    console.error(`og-image : ${WIDTH} × ${HEIGHT} attendu pour les réseaux sociaux`);
+    process.exitCode = 1;
   }
 }

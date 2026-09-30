@@ -94,7 +94,7 @@ export async function renderPage(name, route, outputArgs) {
     process.exit(1);
   }
   if (!existsSync(join(ROOT, "index.html"))) {
-    console.error(`${name} : lancer d'abord \`nuxt generate\` (.output/public absent).`);
+    console.error(`${name} : Lancez d'abord \`nuxt generate\` (.output/public absent).`);
     process.exit(1);
   }
 

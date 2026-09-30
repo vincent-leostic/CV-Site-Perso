@@ -10,7 +10,7 @@ on:
     branches: [main]
   workflow_dispatch:
 
-# Deux pushes rapprochés : le second annule le premier plutôt que de lancer
+# Deux push rapprochés : le second annule le premier plutôt que de lancer
 # deux `mirror --delete` en parallèle sur le même dossier distant.
 concurrency:
   group: deploy-ovh
@@ -45,7 +45,7 @@ jobs:
           npm test
           npm run generate
 
-      # SFTP (port 22) : le FTP d'OVH mutualisé ne supporte pas le FTPS explicite.
+      # SFTP (port 22) : le FTP d'OVH mutualisé ne prend pas en charge le FTPS explicite.
       # lftp mirror crée le dossier distant au besoin et synchronise (ajouts,
       # modifications, suppressions). Chemin relatif au home de l'utilisateur FTP.
       - name: Déployer .output/public sur OVH (SFTP)

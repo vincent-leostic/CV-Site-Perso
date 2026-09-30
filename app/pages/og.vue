@@ -5,9 +5,10 @@ import { COMMON } from "~/data/common";
 // capturée à 1200 × 630 au build, puis retirée du site publié. Reprend
 // l'accroche.
 definePageMeta({ layout: false });
-useBuildOnlyPage(`${COMMON.name} - Miniature`);
+useBuildOnlyPage(`${COMMON.name} – Miniature`);
 
 const { cv, ui } = useContent();
+const homeUrl = useHomeUrl();
 const [firstName, ...lastNames] = COMMON.name.split(" ");
 </script>
 
@@ -22,7 +23,7 @@ const [firstName, ...lastNames] = COMMON.name.split(" ");
       <p class="section__kicker og__kicker">{{ ui.og.kicker }}</p>
       <h1 class="og__name">{{ firstName }}<br />{{ lastNames.join(" ") }}</h1>
       <p class="og__role">{{ cv.title }}</p>
-      <p class="og__url">{{ bareUrl(cv.website) }}</p>
+      <p class="og__url">{{ bareUrl(homeUrl) }}</p>
     </div>
   </main>
 </template>

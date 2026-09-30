@@ -24,8 +24,11 @@ for (const { route, file } of PDFS) {
   console.log(`cv-pdf : ${file} généré (${kb} Ko)`);
   // Chrome écrit chaque page en clair (« /Type /Page »), l'arbre en « /Pages »
   const pages = (await readFile(output, "latin1")).match(/\/Type\s*\/Page(?!s)/g)?.length ?? 0;
+  // Bloquant : le build échoue et la CI ne publie pas un CV de deux pages.
+  // L'autre langue est tout de même imprimée, pour tout voir d'un coup.
   if (pages !== 1) {
-    console.warn(`cv-pdf : ${file} fait ${pages} pages au lieu d'une, voir l'aperçu ${route}`);
+    console.error(`cv-pdf : ${file} fait ${pages} pages au lieu d'une, voir l'aperçu ${route}`);
+    process.exitCode = 1;
   }
   if (Math.abs(kb - ANNOUNCED_KB) / ANNOUNCED_KB > 0.15) {
     console.warn(

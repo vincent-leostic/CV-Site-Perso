@@ -1,3 +1,4 @@
+import { listOf, lowerFirst } from "../utils/format";
 import { COMMON } from "./common";
 import type { CvData, UiText } from "./types";
 
@@ -24,7 +25,7 @@ export const cv: CvData = {
       {
         question: "The project I'm proudest of?",
         answer:
-          "A fire safety application that helps firefighters prepare their interventions. Knowing it will help protect people means a lot to me.",
+          "A fire safety application that helps firefighters plan their response to incidents. Knowing it will help protect people means a lot to me.",
       },
       {
         question: "Outside work?",
@@ -33,7 +34,7 @@ export const cv: CvData = {
       },
     ],
     method: [
-      { title: "Listen", detail: "To the need, as users experience it." },
+      { title: "Listen", detail: "To users' needs, as they experience them." },
       { title: "Understand", detail: "How people work, the constraints and the goals." },
       {
         title: "Design in iterations",
@@ -77,7 +78,7 @@ export const cv: CvData = {
   ],
   interests: {
     intro:
-      "A common thread: in Final Fantasy XIV as around a role-playing table, I play the tank. Moving forward as a team while holding an essential role matters to me.",
+      "A common thread: whether in Final Fantasy XIV or in a tabletop role-playing game, I play the tank. Moving forward as a team while holding an essential role matters to me.",
     featured: {
       caption: "All-time favourite",
       title: "Final Fantasy XIV",
@@ -107,7 +108,7 @@ export const cv: CvData = {
       },
       {
         title: "Around a table",
-        text: "Chess, quick little games, never-ending games of Risk… and role-playing, which I'd love to play more often.",
+        text: "Chess, quick little games, never-ending games of Risk… and tabletop role-playing games, which I'd love to play more often.",
       },
     ],
   },
@@ -123,7 +124,7 @@ export const cv: CvData = {
         {
           title: "Sports club membership management",
           description:
-            "Application that centralises the life of a sports club: member records and registrations.",
+            "Application that brings a sports club's day-to-day running into one place: member records and registrations.",
           badges: ["po", "projectManager", "developer"],
         },
         {
@@ -135,7 +136,7 @@ export const cv: CvData = {
         {
           title: "Fire safety",
           description:
-            "Application for creating firefighters' intervention sheets, found by entering a site's details and generated as PDFs. Drawing engine on drone photos to mark sensitive and high-risk areas.",
+            "Application for creating pre-incident plans for firefighters, looked up by entering a site's details and exported as PDFs. Drawing tool for marking sensitive and high-risk areas on drone photos.",
           badges: ["po", "projectManager", "developer"],
           favorite: true,
         },
@@ -154,12 +155,11 @@ export const cv: CvData = {
       ],
     },
     {
-      // Approximate dates (~10 years, before the 2018 career change), to be confirmed.
       role: "Waiter, then front-of-house manager",
       company: "Restaurant trade",
       period: "2008 – 2018",
       description:
-        "Ten years front of house: team management, handling the rush, customer relations. Many restaurants, as many ways of working.",
+        "Ten years front of house: team management, handling the rush, customer relations. Many restaurants, each with its own way of working.",
     },
   ],
   personalProjects: [
@@ -285,9 +285,9 @@ export const ui: UiText = {
   },
   photoAlt: `Photo of ${COMMON.name}`,
   seo: {
-    title: `${COMMON.name} - Portfolio`,
+    title: `${COMMON.name} – Portfolio`,
     description: `Portfolio of ${COMMON.name}, software developer in Brest, France, specialising in front-end, UI/UX and accessibility: Vue, Nuxt, TypeScript. Projects, skills, background and downloadable CV.`,
-    ogImageAlt: `${COMMON.name}, ${cv.title}`,
+    ogImageAlt: `${COMMON.name}, ${lowerFirst(cv.title, "en-GB")}`,
   },
   skipLink: "Skip to content",
   footer: `Site designed and built by ${COMMON.name}, with Nuxt and TypeScript.`,
@@ -326,8 +326,14 @@ export const ui: UiText = {
     kicker: "Background",
     title: "The road so far",
     availability: "Availability",
-    mobility: "Mobility",
+    mobility: "Transport",
     languages: "Languages",
+    // "French (…) and English (…)": language names keep their capital
+    languageList: (languages) =>
+      listOf(
+        languages.map((lang) => `${lang.name} (${lang.level})`),
+        "en-GB",
+      ),
   },
   hobbies: { kicker: "Interests", title: "Away from the code" },
   contact: {
@@ -348,4 +354,15 @@ export const ui: UiText = {
     hobbies: "Interests",
   },
   og: { kicker: "Portfolio" },
+  error: {
+    notFound: {
+      title: "Page not found",
+      text: "The address may be mistyped, or the page no longer exists.",
+    },
+    unexpected: {
+      title: "Something went wrong",
+      text: "Reload the page, or start again from the portfolio.",
+    },
+    back: "Back to the portfolio",
+  },
 };

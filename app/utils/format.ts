@@ -33,6 +33,14 @@ export function listOf(items: string[], lang: string): string {
 }
 
 /**
+ * Texte repris en milieu de phrase, première lettre en minuscule, ex.
+ * "Développeur logiciel front-end, UI/UX…" → "développeur logiciel…"
+ */
+export function lowerFirst(text: string, lang: string): string {
+  return text.charAt(0).toLocaleLowerCase(lang) + text.slice(1);
+}
+
+/**
  * Liste en phrase : après le premier élément, les suivants passent en
  * minuscule, sauf les sigles et termes à majuscule interne (« IA »,
  * « Product Owner »). Ex. ["Product Owner", "Chef de projet", "Développeur"]
@@ -41,9 +49,7 @@ export function listOf(items: string[], lang: string): string {
 export function sentenceList(items: string[], lang: string): string {
   return listOf(
     items.map((item, index) =>
-      index === 0 || /\p{Lu}/u.test(item.slice(1))
-        ? item
-        : item.charAt(0).toLocaleLowerCase(lang) + item.slice(1),
+      index === 0 || /\p{Lu}/u.test(item.slice(1)) ? item : lowerFirst(item, lang),
     ),
     lang,
   );

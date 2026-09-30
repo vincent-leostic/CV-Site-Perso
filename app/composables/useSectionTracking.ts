@@ -2,7 +2,7 @@ import { SECTION_IDS } from "~/data/content";
 
 /**
  * Jusqu'où on descend dans le portfolio : un événement « section-<ancre> »
- * la première fois qu'une section arrive dans les 60 % hauts de l'écran,
+ * la première fois qu'une section arrive dans les 60 % supérieurs de l'écran,
  * une fois par page vue. L'entonnoir d'Umami, section par section, montre
  * ensuite où les visiteurs s'arrêtent.
  */

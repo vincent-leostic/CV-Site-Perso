@@ -4,7 +4,7 @@ import { COMMON } from "~/data/common";
 // Gabarit du PDF téléchargeable (scripts/cv-pdf.mjs), un par langue : retiré
 // du site publié une fois le PDF imprimé. En développement, sert d'aperçu.
 definePageMeta({ layout: false });
-useBuildOnlyPage(`${COMMON.name} - CV`);
+useBuildOnlyPage(`${COMMON.name} – CV`);
 </script>
 
 <template>

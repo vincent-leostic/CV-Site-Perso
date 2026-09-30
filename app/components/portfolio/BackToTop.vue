@@ -27,7 +27,7 @@ onUnmounted(() => observer?.disconnect());
       class="back-to-top"
       href="#top"
       :aria-label="ui.backToTop"
-      data-umami-event="back-to-top"
+      data-track="back-to-top"
     >
       <LineIcon class="back-to-top__icon" name="arrow-up" />
     </a>

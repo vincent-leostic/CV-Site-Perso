@@ -4,9 +4,9 @@ import { ICONS, type IconName } from "~/data/icons";
 const props = defineProps<{ name: IconName; branded?: boolean }>();
 
 /**
- * Icône de marque, remplie en currentColor : chaque thème la colore via la
- * couleur de texte courante, sauf si `branded` est passé, auquel cas elle
- * prend la couleur officielle de la marque.
+ * Icône de marque, remplie en currentColor : elle prend la couleur du texte
+ * environnant, sauf si `branded` est passé, auquel cas elle prend la
+ * couleur officielle de la marque.
  */
 const icon = computed(() => ICONS[props.name]);
 </script>

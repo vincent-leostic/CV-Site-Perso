@@ -9,10 +9,9 @@ import type { Locale } from "~/data/types";
 const { cv, ui } = useContent();
 useSectionTracking();
 const { locale } = useI18n();
-const localePath = useLocalePath();
 
 const siteUrl = cv.value.website;
-const pageUrl = computed(() => `${siteUrl}${localePath("/")}`);
+const pageUrl = useHomeUrl();
 
 useSeoMeta({
   title: () => ui.value.seo.title,

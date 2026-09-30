@@ -13,7 +13,7 @@ function duplicates(values: string[]) {
 describe.each(LOCALES)("données du CV (%s)", (locale) => {
   const { cv } = CONTENT[locale];
 
-  test("les URLs publiques sont valides et en https", () => {
+  test("les URL publiques sont valides et en https", () => {
     const urls = [
       cv.website,
       ...cv.links.map((link) => link.url),
@@ -73,6 +73,23 @@ describe.each(LOCALES)("données du CV (%s)", (locale) => {
   });
 });
 
+/** Tous les textes d'une valeur, fonctions de UiText exclues */
+function strings(value: unknown): string[] {
+  if (typeof value === "string") return [value];
+  if (value && typeof value === "object") return Object.values(value).flatMap(strings);
+  return [];
+}
+
+// Typographie française : espace insécable (U+00A0) devant « : ; ! ? » et
+// dans les guillemets, entre un nombre et son unité. Une espace ordinaire
+// laisse le signe partir seul en début de ligne.
+test("typographie française : pas d'espace sécable avant la ponctuation haute", () => {
+  const { cv, ui } = CONTENT.fr;
+  const texts = [...strings(cv), ...strings(ui), ui.pdfMeta(275)];
+  const faults = texts.filter((text) => / [:;!?»]|« |\d (ans|Ko)\b/.test(text));
+  expect(faults).toEqual([]);
+});
+
 /** Champs qui ne se traduisent pas : identiques dans toutes les langues */
 const SHARED_KEYS = new Set([
   "url",
@@ -103,6 +120,16 @@ function shape(value: unknown, key = ""): unknown {
 describe("français et anglais", () => {
   test("même structure, mêmes liens, icônes, images et casquettes", () => {
     expect(shape(CONTENT.en.cv)).toEqual(shape(CONTENT.fr.cv));
+  });
+
+  // Minuscule en français (nom commun), majuscule en anglais (nom propre)
+  test("les langues parlées suivent la casse de chaque langue", () => {
+    expect(CONTENT.fr.ui.journey.languageList(CONTENT.fr.cv.languages)).toBe(
+      "Français (langue maternelle) et anglais (courant et professionnel)",
+    );
+    expect(CONTENT.en.ui.journey.languageList(CONTENT.en.cv.languages)).toBe(
+      "French (native) and English (fluent, professional)",
+    );
   });
 
   test("même numéro de téléphone, au format local ou international", () => {

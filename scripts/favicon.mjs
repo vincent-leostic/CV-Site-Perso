@@ -35,8 +35,10 @@ async function capture(file, size, { square = false } = {}) {
   // Dimensions lues dans l'en-tête PNG (bloc IHDR, octets 16 à 23)
   const width = png.readUInt32BE(16);
   const height = png.readUInt32BE(20);
+  // Bloquant : le build échoue plutôt que de publier une icône déformée
   if (width !== size || height !== size) {
-    console.warn(`favicon : ${file} fait ${width} × ${height} au lieu de ${size} × ${size}`);
+    console.error(`favicon : ${file} fait ${width} × ${height} au lieu de ${size} × ${size}`);
+    process.exitCode = 1;
   }
   return png;
 }

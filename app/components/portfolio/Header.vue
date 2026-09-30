@@ -63,8 +63,8 @@ onUnmounted(() => document.removeEventListener("pointerdown", onPointerDown));
             <a
               class="site-header__link"
               :href="`#${id}`"
-              data-umami-event="nav-link"
-              :data-umami-event-section="id"
+              data-track="nav-link"
+              :data-track-section="id"
               @click="open = false"
               >{{ ui.header.sections[id] }}</a
             >
@@ -75,9 +75,9 @@ onUnmounted(() => document.removeEventListener("pointerdown", onPointerDown));
         class="button button--primary button--small site-header__cv"
         :href="pdf.href"
         :download="pdf.download"
-        data-umami-event="cv-download"
-        :data-umami-event-lang="pdf.lang"
-        data-umami-event-from="header"
+        data-track="cv-download"
+        :data-track-lang="pdf.lang"
+        data-track-from="header"
       >
         <LineIcon name="download" /><span class="site-header__cv-label">{{ ui.header.cv }}</span
         ><span class="visually-hidden"> ({{ pdf.meta }})</span>

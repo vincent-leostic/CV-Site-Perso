@@ -204,6 +204,11 @@ export interface UiText {
     availability: string;
     mobility: string;
     languages: string;
+    /**
+     * Langues parlées en une phrase. Propre à chaque langue : les noms de
+     * langue sont des noms communs en français, des noms propres en anglais.
+     */
+    languageList: (languages: Language[]) => string;
   };
   hobbies: { kicker: string; title: string };
   contact: { kicker: string; title: string; intro: string; download: string };
@@ -221,4 +226,10 @@ export interface UiText {
     hobbies: string;
   };
   og: { kicker: string };
+  /** Page d'erreur (app/error.vue) : adresse inconnue, ou panne de l'appli */
+  error: {
+    notFound: { title: string; text: string };
+    unexpected: { title: string; text: string };
+    back: string;
+  };
 }

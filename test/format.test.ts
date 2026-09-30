@@ -1,5 +1,5 @@
 import { describe, expect, test } from "vite-plus/test";
-import { bareUrl, hostOf, listOf, sentenceList, toTelHref } from "../app/utils/format";
+import { bareUrl, hostOf, listOf, lowerFirst, sentenceList, toTelHref } from "../app/utils/format";
 
 describe("listOf", () => {
   test("en français : virgules, puis « et »", () => {
@@ -26,6 +26,14 @@ describe("sentenceList", () => {
   test("garde les sigles et les termes à majuscule interne", () => {
     expect(sentenceList(["Développeur", "IA", "Product Owner"], "fr")).toBe(
       "Développeur, IA et Product Owner",
+    );
+  });
+});
+
+describe("lowerFirst", () => {
+  test("met la première lettre en minuscule, même si le texte contient un sigle", () => {
+    expect(lowerFirst("Développeur logiciel front-end, UI/UX et accessibilité", "fr")).toBe(
+      "développeur logiciel front-end, UI/UX et accessibilité",
     );
   });
 });

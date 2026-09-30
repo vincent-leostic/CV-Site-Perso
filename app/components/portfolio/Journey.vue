@@ -22,8 +22,8 @@ const { cv, ui } = useContent();
             <a
               v-if="step.url"
               class="milestone__link"
-              data-umami-event="milestone-link"
-              :data-umami-event-target="step.url"
+              data-track="milestone-link"
+              :data-track-target="step.url"
               :href="step.url"
               :target="step.url.startsWith('http') ? '_blank' : undefined"
               :rel="step.url.startsWith('http') ? 'noopener' : undefined"
@@ -52,14 +52,7 @@ const { cv, ui } = useContent();
         </div>
         <div>
           <dt class="caption">{{ ui.journey.languages }}</dt>
-          <dd class="journey__value">
-            {{
-              sentenceList(
-                cv.languages.map((lang) => `${lang.name} (${lang.level})`),
-                ui.intl,
-              )
-            }}
-          </dd>
+          <dd class="journey__value">{{ ui.journey.languageList(cv.languages) }}</dd>
         </div>
       </dl>
     </div>

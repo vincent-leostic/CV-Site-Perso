@@ -15,20 +15,12 @@ const pdf = useCvPdf();
 
       <ul class="contact-panel__list" role="list">
         <li>
-          <a
-            class="contact-panel__link"
-            :href="`mailto:${cv.email}`"
-            data-umami-event="contact-email"
-          >
+          <a class="contact-panel__link" :href="`mailto:${cv.email}`" data-track="contact-email">
             <LineIcon class="contact-panel__icon" name="mail" />{{ cv.email }}
           </a>
         </li>
         <li>
-          <a
-            class="contact-panel__link"
-            :href="toTelHref(cv.phone)"
-            data-umami-event="contact-phone"
-          >
+          <a class="contact-panel__link" :href="toTelHref(cv.phone)" data-track="contact-phone">
             <LineIcon class="contact-panel__icon" name="phone" />{{ noBreak(cv.phone) }}
           </a>
         </li>
@@ -38,9 +30,9 @@ const pdf = useCvPdf();
             :href="link.url"
             target="_blank"
             rel="noopener"
-            data-umami-event="social-link"
-            :data-umami-event-network="link.label"
-            data-umami-event-from="contact"
+            data-track="social-link"
+            :data-track-network="link.label"
+            data-track-from="contact"
           >
             <TechIcon v-if="link.icon" class="contact-panel__icon" :name="link.icon" />{{
               link.label
@@ -53,9 +45,9 @@ const pdf = useCvPdf();
         class="button button--primary contact-panel__cv"
         :href="pdf.href"
         :download="pdf.download"
-        data-umami-event="cv-download"
-        :data-umami-event-lang="pdf.lang"
-        data-umami-event-from="contact"
+        data-track="cv-download"
+        :data-track-lang="pdf.lang"
+        data-track-from="contact"
       >
         <LineIcon name="download" />{{ ui.contact.download }}
         <span class="button__meta">({{ pdf.meta }})</span>

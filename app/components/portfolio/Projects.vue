@@ -70,8 +70,8 @@ const projectsInProgress = computed(() =>
                   :href="proj.url"
                   target="_blank"
                   rel="noopener"
-                  data-umami-event="project-open"
-                  :data-umami-event-project="proj.title"
+                  data-track="project-open"
+                  :data-track-project="proj.title"
                   >{{ proj.title }}<span class="visually-hidden">{{ ui.newTab }}</span></a
                 >
               </h4>
